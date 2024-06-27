@@ -1,0 +1,108 @@
+body{
+    background-color: white;
+    margin: 0;
+}
+
+/*div wrapper container*/
+.wrap{
+    margin: 3em
+    
+}
+
+/*header*/
+header{
+    display: flex;
+    justify-content: space-between;
+    font-weight: lighter;
+    font-family: 'Inter', 'Segoe UI';
+}
+
+.login-cta {
+    background: #9B1410;
+    padding: 1em;
+    width: 10%;
+    box-sizing: border-box;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1rem;
+    color: white;
+    border-radius: .75em;
+    margin-right:0%;
+
+}
+
+.signup-cta {
+    margin-right:0%;
+    margin-left:-61%;
+    background: rgb(252, 246, 246);
+    padding: 1em;
+    width: 10%;
+    box-sizing: border-box;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1rem;
+    color: #9B1410;
+    border-radius: .75em;
+
+}
+
+h1, h3{
+    font-family: 'Inter';
+    text-align: left;
+}
+
+.wildcats-foods{
+    margin-top: 1.5em;
+    margin-bottom: 0em;
+    color: #9B1410;
+    font-size:7rem;  
+}
+.express{
+    color: #F2B54C;
+    font-size:7rem;
+    display: block;
+    margin: 0 auto;
+}
+
+
+h3{
+    font-size: 2.25em;
+    font-weight:normal;
+    margin-bottom: 3em;
+}
+
+.primary-cta{
+    background-color:#9B1410;
+    padding: 1em;
+    width: 10%;
+    box-sizing: border-box;
+    text-align: center;
+    text-decoration: none;
+    font-family: 'Inter';
+    font-weight:bolder;
+    font-size: 1.2rem;
+    color: white;
+    border-radius: .75em;
+}
+
+.cat{
+    position: relative;
+    height: 400px;
+    width: 69%;
+    margin-top: -33.5em;
+    
+    img{
+        width: 50%;
+        position: absolute;
+        left: 110%;
+        transform: translateX(-50%);
+    }
+}
+
+main{
+    position:relative;
+left: 4%;
+}
+
