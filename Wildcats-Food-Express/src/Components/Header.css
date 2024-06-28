@@ -1,0 +1,58 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: lighter;
+  }
+  
+  .logo-image {
+    width: 18rem;
+  }
+  
+  /*
+  .login-cta,
+  .signup-cta {
+    padding: 1em;
+    width: 10%;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.2rem;
+    border-radius: 0.75em;
+  }
+  
+  .login-cta {
+    background: #9b1410;
+    color: white;
+  }
+  
+  .signup-cta {
+    background: rgb(252, 246, 246);
+    color: #9b1410;
+    margin-left: -50%;
+  }*/
+  
+  .cta {
+    padding: 1em;
+    width: 10%;
+    box-sizing: border-box;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.2rem;
+    border-radius: 0.75em;
+    margin-right: 0%;
+  }
+  
+  .login-cta {
+    background: #9b1410;
+    color: white;
+    margin-left: -20%;
+  }
+  
+  .signup-cta {
+    background: rgb(252, 246, 246);
+    color: #9b1410;
+    margin-left: 10%;
+  }
+  
+
