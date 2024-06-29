@@ -1,5 +1,5 @@
 import './CatImage.css';
-import catImage from '/public/cat_dashboard.svg';
+import catImage from '/cat_model.svg';
 
 const CatImage = () => {
   return (

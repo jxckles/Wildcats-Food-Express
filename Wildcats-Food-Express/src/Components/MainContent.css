@@ -3,40 +3,71 @@
     left: 4%;
   }
   
-  h1,
+  .wildcats-foods
+  {
+    text-align: left;
+  }
+
+  .wildcats-foods
+  {
+    text-align: center;
+  }
+  
   h3 {
     text-align: left;
   }
-  
-  .wildcats-foods {
-    margin-top: 1.5em;
-    margin-bottom: 0em;
-    color: #9b1410;
-    font-size: 7rem;
-  }
-  
-  .express {
-    color: #f2b54c;
-    font-size: 7rem;
-    display: block;
-    margin: 0 auto;
-  }
-  
-  h3 {
-    font-size: 2.25em;
-    font-weight: normal;
-    margin-bottom: 3em;
-  }
-  
+
+ 
+
   .primary-cta {
     background-color: #9b1410;
     padding: 1em;
-    width: 10%;
+    width:30%;
     text-align: center;
     text-decoration: none;
     font-weight: bolder;
     font-size: 1.2rem;
     color: white;
     border-radius: 0.75em;
+
+    &:hover {
+      text-decoration:underline;
+      font-size: 1.4rem;
+      }
+
+    &:active{
+        color: #aa0303b6;
+      }
   }
+  
+  /*header 1*/
+.rh1{
+ 
+
+    margin-top: 1em;
+    margin-bottom: 0em;
+    color: #9b1410;
+    font-size: 1.35rem;
+
+    .express {
+      color: #f2b54c;
+      font-size: 3.2rem;
+      display: block;
+    }
+}
+
+
+
+h3{
+  font-size: 2em;
+  font-weight: normal;
+  margin-bottom: 1.5em;
+  line-height: 1.5;
+}
+
+
+  
+
+  
+
   

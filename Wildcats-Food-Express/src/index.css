@@ -1,0 +1,159 @@
+body {
+    background-color: white;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .wrap {
+    margin: 1em;
+  }
+  
+  hr {
+    border: none;
+    border-top: 1px solid #ccc;
+  }
+  
+  .express-mobile {
+    color: #f2b54c;
+  }
+
+  /* Media queries for screen resolutions */
+  @media (max-width: 799px) {
+    /* For mobile screens */
+    .hide-title {
+      display: none; /* Hide on mobile */
+    }
+    
+    .hide-mobile {
+      display: block; /* Show on mobile */
+    }
+
+    .hide-hr {
+      display: none;
+    }
+  
+    .primary-cta {
+      display: block; /* Ensure it takes up its own line */
+      width: 35%; /* Adjust the width as needed */
+      margin: 0 auto; /* Center it horizontally */
+      text-align: center; /* Center text inside the button */
+    }
+
+    /* Added mobile-specific styles for the header */
+    .logo-image {
+      width: 12rem; /* Smaller size for mobile screens */
+    }
+
+    .login-cta, .signup-cta {
+      background: none; /* Remove background color */
+      color: #9b1410; /* Change text color */
+      padding: 0; /* Remove padding */
+      border-radius: 0; /* Remove border radius */
+      font-size: 1.5rem; /* Adjust font size if needed */
+      text-align: right; /* Align text to the left */
+      margin: 2em 0; /* Adjust margin if needed */
+
+      &:hover {
+        font-size: 1.5rem;
+        text-decoration: underline; /* Add underline on hover */
+      }
+    }
+
+    .login-cta:active, .signup-cta:active {
+      color: #555; /* Change text color on active */
+    }
+
+    h3 {
+        text-align: center;
+      }
+  }
+  
+  @media (min-width: 800px) {
+    /* For tablet and larger screens */
+    .wrapper {
+      margin: 0 4em;
+    }
+  
+    .hide-desktop {
+      display: none;
+    }
+  
+    .hide-title {
+      display: block; /* Show on tablet and larger screens */
+    }
+    
+    .hide-mobile {
+      display: none; /* Hide on tablet and larger screens */
+    }
+  
+    .header-left {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1em;
+  
+      a {
+        text-decoration: none;
+        color: black;
+        font-size: 1.2rem;
+      }
+    }
+  
+    nav ul {
+      position: unset;
+      background: none;
+      display: flex;
+      gap: 2em;
+      height: auto;
+      width: auto;
+      transform: translateX(0%);
+  
+      li a {
+        font-size: 1.2rem;
+      }
+    }
+  
+    h1, p {
+      text-align: left;
+    }
+  
+    h1 img {
+      margin: 0;
+    }
+  
+    main {
+      width: 50%;
+    }
+  
+    .cat img {
+      margin-top: 0;
+    }
+  
+    .cat-container {
+      position: absolute;
+      z-index: -1;
+      width: 50%;
+      top: 25%;
+      right: 0;
+    }
+  }
+  
+  @media (min-width: 801px) {
+    .wrapper {
+      margin: 0 auto;
+      max-width: 1200px;
+    }
+  
+    .hide-hr {
+      display: block;
+    }
+  
+    a.primary-cta {
+      display: inline-block;
+      width: auto;
+    }
+  
+    .hide-title {
+      display: block;
+    }
+  }
