@@ -8,7 +8,7 @@ function App() {
   return (
     <div className="wrap">
       <Header />
-      <hr />
+      <hr className="hide-hr"/>
       <MainContent />
       <CatImage />
       <Footer />

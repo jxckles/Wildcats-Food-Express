@@ -1,14 +1,30 @@
 .cat-container {
-    position: relative;
+    position: abo;
     height: 400px;
     width: 69%;
     margin-top: -33.5em;
   }
   
   .cat img {
-    width: 50%;
-    position: absolute;
-    left: 110%;
+    width: 30%;
+    position:fixed;
+    top: 25%;
+    left: 80%;
     transform: translateX(-50%);
   }
   
+  .cat{
+    position: absolute;
+    height: 500px;
+    width: 100%;
+    top: 34%;
+    margin-top: 3em;
+    
+    img{
+        width: 70%;
+        position: absolute;
+        left: 50%;
+
+        transform: translateX(-50%);
+    }
+}
