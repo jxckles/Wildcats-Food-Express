@@ -1,0 +1,55 @@
+.MainContent-container {
+  display: flex;
+  justify-content: space-between;
+  padding: 40px;
+  height: 100vh; /* Set height to 100% of the viewport height */
+  box-sizing: border-box; /* Ensure padding is included in height calculation */
+}
+
+.left-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.right-panel {
+  flex: 1;
+  text-align: center;
+}
+
+.wildcat-img {
+  width: 300px;
+  height: auto;
+}
+
+.left-panel h1 {
+  font-size: 4em;
+  color: #990000;
+}
+
+.left-panel h2 {
+  font-size: 4em;
+  color: #FFA500;
+}
+
+.left-panel p {
+  font-size: 1.5em;
+  color: #666;
+  margin-top: 10px;
+}
+
+.order-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #990000;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1.5em;
+}
+
+.order-button:hover {
+  background-color: #cc0000;
+}

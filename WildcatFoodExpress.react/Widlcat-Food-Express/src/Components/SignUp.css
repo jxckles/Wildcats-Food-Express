@@ -1,0 +1,78 @@
+.signup-container {
+  display: flex;
+  padding: 40px;
+}
+
+.left-panel {
+  flex: 1;
+  text-align: center;
+}
+
+.right-panel {
+  flex: 1;
+  padding-left: 20px;
+}
+
+.wildcat-img {
+  width: 300px;
+  height: auto;
+}
+
+.left-panel h1 {
+  font-size: 2.5em;
+  color: #990000;
+}
+
+.left-panel h2 {
+  font-size: 2.5em;
+  color: #FFA500;
+}
+
+.right-panel h2 {
+  color: #990000;
+  margin-bottom: 20px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  margin-bottom: 5px;
+}
+
+input {
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #990000;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+button:hover {
+  background-color: #cc0000;
+}
+
+p {
+  margin-top: 15px;
+}
+
+a {
+  color: #990000;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
