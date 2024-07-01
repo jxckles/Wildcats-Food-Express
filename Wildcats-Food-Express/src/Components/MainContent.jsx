@@ -8,8 +8,7 @@ const MainContent = () => {
           <h1 className="wildcats-foods">Wildcats Food <span className="express-mobile">Express</span></h1>
         </div>
         <div className="hide-title">
-          <h1 className="wildcats-food">Wildcats Food</h1>
-          <h1 className="express">Express</h1>
+        <h1 className="wildcats-food">Wildcats Food <span className="express-mobile">Express</span></h1>
         </div>
       </div>
       
