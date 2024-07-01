@@ -1,4 +1,6 @@
+// src/components/Header.jsx
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import './Header.css';
 import logo from '/logo.svg';
 import menuIcon from '/menu.svg';
@@ -14,9 +16,9 @@ const Header = () => {
   return (
     <header className="header">
       <div className="header-left">
-        <a href="/" className="logo">
+        <Link to="/" className="logo">
           <img src={logo} alt="Wildcats Food Express Logo" className="logo-image" />
-        </a>
+        </Link>
       </div>
       <nav>
         <a
@@ -25,7 +27,7 @@ const Header = () => {
           onClick={toggleMenu}
           style={{ display: menuOpen ? 'none' : 'inline-block' }} // Hide menu button when menu is open
         >
-          <img src={menuIcon} alt="Open Menu" className="hide-desktop"/>
+          <img src={menuIcon} alt="Open Menu" className="hide-desktop" />
         </a>
 
         <ul className={menuOpen ? 'open' : ''}>
@@ -34,8 +36,16 @@ const Header = () => {
               <img src={closeIcon} alt="Close Menu" className="menuClose" />
             </a>
           </li>
-          <li><a href="#" className="cta login-cta">LOG IN</a></li>
-          <li><a href="#" className="cta signup-cta">SIGN UP</a></li>
+          <li>
+            <Link to="/login" className="cta login-cta" onClick={toggleMenu}>
+              LOG IN
+            </Link>
+          </li>
+          <li>
+            <Link to="/signup" className="cta signup-cta" onClick={toggleMenu}>
+              SIGN UP
+            </Link>
+          </li>
         </ul>
       </nav>
     </header>

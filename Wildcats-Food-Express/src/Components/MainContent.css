@@ -3,15 +3,8 @@
     left: 4%;
   }
   
-  .wildcats-foods
-  {
-    text-align: left;
-  }
 
-  .wildcats-foods
-  {
-    text-align: center;
-  }
+
   
   h3 {
     text-align: left;
@@ -49,9 +42,19 @@
     color: #9b1410;
     font-size: 1.35rem;
 
+    
+  .wildcats-foods
+  {
+    text-align: center;
+  }
+    .wildcats-food
+    {
+      margin-top: 2em;
+      text-align: left;
+    }
+
     .express {
       color: #f2b54c;
-      font-size: 3.2rem;
       display: block;
     }
 }
