@@ -22,7 +22,7 @@
     font-size: 1.2rem;
     color: white;
     border-radius: 0.75em;
-
+    border-bottom: 300px;
     &:hover {
       text-decoration:underline;
       font-size: 1.4rem;
@@ -33,7 +33,6 @@
       }
   }
   
-  /*header 1*/
 .rh1{
  
 
@@ -68,9 +67,18 @@ h3{
   line-height: 1.5;
 }
 
+.CatImage {
+  position: absolute;
+  border-radius: 50%;
+  top: -150px;
+  right: -500px;
+}
 
-  
+.CatImage img {
+  width: 500px; /* Set the width of the image */
+  height: auto; /* Maintain aspect ratio */
+  display: block; /* Ensures no extra space is added below the image */
+}
 
-  
 
   

@@ -49,7 +49,6 @@ function App() {
 const HomePage = () => (
   <div>
     <MainContent />
-    <CatImage />
   </div>
 );
 

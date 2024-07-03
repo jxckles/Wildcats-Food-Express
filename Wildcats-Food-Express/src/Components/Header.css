@@ -38,8 +38,7 @@
   color: white;
 
   &:hover {
-    font-size: 1.25rem;
-    text-decoration: underline;
+
   }
 
   &:active {
@@ -52,8 +51,6 @@
   color: #b40f0a;
 
   &:hover {
-    font-size: 1.25rem;
-    text-decoration: underline;
   }
 
   &:active {
