@@ -28,8 +28,11 @@ const Login = () => {
         }
       })
       .catch((error) => {
-        toast.error("Login failed!");
+          toast.error("Login failed!", {
+          autoClose: 500,
+        });
       });
+       
   };
 
   return (
