@@ -33,9 +33,13 @@ const Login = () => {
         }
       })
       .catch((error) => {
-        toast.error("Login failed!" {
-           autoClose: 500,
+        // Handle error
+        console.error(error);
+        toast.error("Login failed!", {
+          autoClose: 500,
+        });
       });
+       
   };
 
   return (
