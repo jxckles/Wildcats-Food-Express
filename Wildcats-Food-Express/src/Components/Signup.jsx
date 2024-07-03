@@ -64,12 +64,12 @@ const Signup = () => {
     <div className="signup-container">
       <div className="left-panel">
         <img
-          src="path_to_wildcat_image.png"
+          src="cat_profile.svg"
           alt="Wildcat"
           className="wildcat-img"
         />
-        <h1>Wildcat Food Express</h1>
-        <h2>Fast. Fresh. Fierce.</h2>
+        <h1>Wildcat Food <span className="express">Express</span></h1>
+        <p>Fast. Fresh. Fierce.</p>
       </div>
       <div className="right-panel">
         <h2>CREATE YOUR ACCOUNT</h2>

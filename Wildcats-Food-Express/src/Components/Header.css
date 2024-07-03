@@ -14,21 +14,6 @@
   display: none; /* Hide on desktop and tablet */
 }
 
-.panel {
-  position: fixed;
-  top: 0;
-  right: -85%; /* Initially off-screen */
-  height: 100%;
-  width: 85%; /* Adjust width as needed */
-  background-color: white;
-  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
-  transition: right 0.3s ease-in-out; /* Smooth transition */
-  z-index: 1000;
-}
-
-.panel.open {
-  right: 0; /* Slide in when open */
-}
 
 .menu-close {
   cursor: pointer;
@@ -89,7 +74,7 @@ ul {
   text-align: right;
   padding: 2em;
   transform: translateX(100%);
-  transition: transform 0.5s ease-in-out;
+
 }
 
 .open {
