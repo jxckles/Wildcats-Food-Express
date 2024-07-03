@@ -1,60 +1,67 @@
+/* Center the signup container and give it some padding */
 .signup-container {
   display: flex;
+  justify-content: center;
   padding: 40px;
 }
 
-.left-panel {
-  flex: 1;
-}
-
+/* Style the right panel with form elements */
 .right-panel {
-  flex: 1;
-  padding-left: 20px;
+  background: white;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
 }
 
+/* Add styles for the wildcat image */
 .wildcat-img {
-  width: 300px;
+  width: 100px;
   height: auto;
+  margin-bottom: 5px;
 }
 
-.left-panel h1 {
-  font-size: 2.5em;
-  color: #990000;
-  text-align: center;
-
-  .express{
-    color: #f2b54c;
-  }
-}
-
-.left-panel p {
-  font-size: 2em;
-  color: black;
-  text-align: center;
-}
-
+/* Heading styles */
 .right-panel h2 {
   color: #990000;
   margin-bottom: 20px;
 }
 
+/* Form layout */
 form {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
 }
 
-label {
-  margin-bottom: 5px;
-}
-
-input {
+/* Form group layout */
+.form-group {
+  display: flex;
+  align-items: center;
   margin-bottom: 15px;
+  width: 100%;
+}
+
+/* Label styling */
+label {
+  flex: 0 0 150px; /* Fixed width for labels */
+  text-align: right; /* Right-align text */
+  margin-right: 10px; /* Space between label and input */
+}
+
+/* Input styling */
+input {
+  flex: 1; /* Grow to fill available space */
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 16px;
+  width: 100%; /* Full width within the form group */
 }
 
+/* Button styling */
 button {
   padding: 10px 20px;
   background-color: #990000;
@@ -63,12 +70,16 @@ button {
   border-radius: 5px;
   cursor: pointer;
   font-size: 1em;
+  width: 100%;
+  max-width: 200px;
+  align-self: center; /* Center the button */
 }
 
 button:hover {
   background-color: #cc0000;
 }
 
+/* Paragraph and link styling */
 p {
   margin-top: 15px;
 }
@@ -80,4 +91,19 @@ a {
 
 a:hover {
   text-decoration: underline;
+}
+
+/* Media query for small screens */
+@media (max-width: 600px) {
+  .signup-container {
+    padding: 10px;
+  }
+
+  .right-panel {
+    padding: 20px;
+  }
+
+  button {
+    max-width: 100%;
+  }
 }
