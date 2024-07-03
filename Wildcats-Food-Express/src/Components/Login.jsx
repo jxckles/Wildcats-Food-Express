@@ -12,7 +12,6 @@ const Login = () => {
   const [password, setPassword] = React.useState("");
   const navigate = useNavigate();
 
-
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
@@ -22,20 +21,14 @@ const Login = () => {
       })
       .then((result) => {
         if (result.data === "Success") {
-          toast.success("Login successful!", {
-            autoClose: 500,
-          });
+          toast.success("Login successful!");
           setTimeout(() => navigate("/dashboard"), 2000);
         } else {
-          toast.error(result.data, {
-            autoClose: 500,
-          });
+          toast.error(result.data);
         }
       })
       .catch((error) => {
-        // Handle error
-        console.error(error);
-        toast.error("Login failed!", {
+          toast.error("Login failed!", {
           autoClose: 500,
         });
       });
