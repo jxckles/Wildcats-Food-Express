@@ -8,6 +8,7 @@ import Footer from "./Components/Footer";
 import Login from "./Components/Login";
 import Signup from "./Components/Signup";
 import Dashboard from "./Components/Dashboard";
+import ForgotPassword from "./Components/ForgotPassword"; // Import the ForgotPassword component
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import toastify css
@@ -36,6 +37,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} /> {/* New route for ForgotPassword */}
           </Routes>
           <Footer />
         </div>
