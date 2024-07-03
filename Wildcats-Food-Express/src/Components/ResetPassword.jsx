@@ -1,9 +1,9 @@
 // src/Components/ResetPassword.jsx
 import React, { useState } from "react";
-import "./ResetPassword.css";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "./ResetPassword.css";
 
 const ResetPassword = ({ token }) => {
   const [newPassword, setNewPassword] = useState("");
@@ -40,20 +40,24 @@ const ResetPassword = ({ token }) => {
     <div className="reset-password-container">
       <h2>Reset Your Password</h2>
       <form onSubmit={handleSubmit}>
-        <label>New Password:</label>
-        <input
-          type="password"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          required
-        />
-        <label>Confirm New Password:</label>
-        <input
-          type="password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          required
-        />
+        <div className="form-group">
+          <label>New Password:</label>
+          <input
+            type="password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Confirm New Password:</label>
+          <input
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
+        </div>
         <button type="submit">Reset Password</button>
       </form>
       <ToastContainer />

@@ -1,0 +1,18 @@
+/* SimpleHeader.css */
+.simple-header {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    padding: 20px;
+    background-color: #fff;
+  }
+  
+  .logo {
+    display: flex;
+    align-items: center;
+  }
+  
+  .logo-image {
+    width: 350px; /* Adjust size as needed */
+  }
+  
