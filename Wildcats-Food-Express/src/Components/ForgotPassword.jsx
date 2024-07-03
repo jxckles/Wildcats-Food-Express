@@ -44,6 +44,7 @@ const ForgotPassword = () => {
         <p>
           Remembered your password? <a href="/login">Log in here.</a>
         </p>
+        <a href="/reset-password">Test Reset Password Here Dev. Only.</a>
       </div>
       <ToastContainer />
     </div>
