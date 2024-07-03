@@ -1,50 +1,57 @@
+/* Center the login container and give it some padding */
 .login-container {
   display: flex;
-  padding: 40px;
-}
-
-.left-panel {
-  flex: 1;
-  text-align: center;
+  margin: 1em;
+  margin-top: 3%;
+  justify-content: center; /* Center horizontally */
+  align-items: flex-start; /* Align items at the top */
+  min-height: 100vh; /* Full height of the viewport */
+  background-color: white; /* Add background color for contrast */
+  padding: 20px; /* Padding around the container */
 }
 
 .right-panel {
-  flex: 1;
-  padding-left: 20px;
+  background: white; /* Background color for the form */
+  padding: 40px;
+  border-radius: 10px; /* Rounded corners for the form */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  width: 100%; /* Full width within the container */
+  max-width: 400px; /* Maximum width to prevent too wide on larger screens */
+  text-align: center; /* Center align the text */
+
+  h3 {
+    text-align: center;
+    color: #990000;
+    margin-bottom: 20px;
+    font-size: 2rem; /* Slightly bigger text */
+    font-weight:550 ;
+  }
+
+  .welcome{
+    margin-top: 2px;
+    font-size: 1.75rem;
+  }
 }
 
-.wildcat-img {
-  width: 300px;
-  height: auto;
-}
-
-.left-panel h1 {
-  font-size: 2.5em;
-  color: #990000;
-}
-
-.left-panel h2 {
-  font-size: 2.5em;
-  color: #FFA500;
+.cat-profile {
+  width: 100px; /* Adjust the size as needed */
+  height: auto; /* Maintain aspect ratio */
+  margin-bottom: 5px; /* Space below the image */
 }
 
 .right-panel h2 {
   color: #990000;
   margin-bottom: 5px;
+  font-size: 2rem; /* Slightly bigger text */
 }
 
-.right-panel h3 {
-  color: #990000;
-  margin-bottom: 20px;
-}
+
 
 form {
   display: flex;
   flex-direction: column;
-}
-
-label {
-  margin-bottom: 5px;
+  align-items: center; /* Center align form elements */
+  width: 100%; /* Ensure the form is full width */
 }
 
 input {
@@ -53,6 +60,14 @@ input {
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 16px;
+  width: 100%; /* Full width within the form */
+  max-width: 375px; /* Maximum width to prevent too wide on larger screens */
+  box-sizing: border-box; /* Include padding in width calculation */
+}
+
+/* Style the placeholder text */
+input::placeholder {
+  color: #990000; /* Set placeholder color to #990000 */
 }
 
 button {
@@ -63,6 +78,8 @@ button {
   border-radius: 5px;
   cursor: pointer;
   font-size: 1em;
+  width: 100%; /* Full width for a consistent button size */
+  max-width: 200px; /* Limit the button width on larger screens */
 }
 
 button:hover {
@@ -71,13 +88,38 @@ button:hover {
 
 p {
   margin-top: 15px;
+  color: #990000;
+  font-weight: 450;
+  a {
+    text-decoration: none;
+  }
 }
 
-a {
-  color: #990000;
-  text-decoration: none;
-}
+
 
 a:hover {
   text-decoration: underline;
+}
+
+.reset_password {
+  margin-top: 10px;
+  text-align: center;
+}
+.no_account {
+  text-align: center;
+}
+
+/* Media query for small screens */
+@media (max-width: 600px) {
+  .login-container {
+    padding: 10px; /* Reduce padding on small screens */
+  }
+
+  .right-panel {
+    padding: 20px; /* Reduce padding inside the form */
+  }
+
+  button {
+    max-width: 100%; /* Allow button to expand fully on small screens */
+  }
 }

@@ -3,8 +3,9 @@ import React from "react";
 import "./Login.css";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify"; // Import ToastContainer and toast
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import catProfile from "/cat_profile.svg"; // Update the path to your cat profile image
 
 const Login = () => {
   const [email, setEmail] = React.useState("");
@@ -19,7 +20,6 @@ const Login = () => {
         password,
       })
       .then((result) => {
-        console.log(result);
         if (result.data === "Success") {
           toast.success("Login successful!");
           setTimeout(() => navigate("/dashboard"), 2000);
@@ -28,45 +28,41 @@ const Login = () => {
         }
       })
       .catch((error) => {
-        console.error(error);
         toast.error("Login failed!");
       });
   };
 
   return (
     <div className="login-container">
-      <div className="left-panel">
-        <img
-          src="path_to_wildcat_image.png"
-          alt="Wildcat"
-          className="wildcat-img"
-        />
-        <h1>Wildcat Food Express</h1>
-        <h2>Fast. Fresh. Fierce.</h2>
-      </div>
       <div className="right-panel">
-        <h2>Hi Teknoy!</h2>
-        <h3>Welcome Back</h3>
+        <img src={catProfile} alt="Cat Profile" className="cat-profile" />
+        <h3>Hi Teknoy!</h3>
+        <h3 className="welcome">Welcome Back</h3>
         <form onSubmit={handleSubmit}>
-          <label>Email:</label>
           <input
             type="email"
             name="email"
+            placeholder="Email"
             onChange={(e) => setEmail(e.target.value)}
+            required
           />
-          <label>Password:</label>
           <input
             type="password"
             name="password"
-            required
+            placeholder="Password"
             onChange={(e) => setPassword(e.target.value)}
+            required
           />
           <button type="submit">Log in</button>
         </form>
-        <p>
-          No account yet? <a href="/signup">Sign up here instead</a>
+        <p className="reset_password">
+          <a href="/forgot-password">Forgot password?</a> {/* Updated link */}
+        </p>
+        <p className="no_account">
+          No account yet? <a href="/signup">Sign up here instead.</a>
         </p>
       </div>
+      <ToastContainer />
     </div>
   );
 };

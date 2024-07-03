@@ -32,6 +32,10 @@ body {
       display: none;
     }
   
+    ul
+    {
+      transition: transform 0.5s ease-in-out;
+    }
     .primary-cta {
       display: block; /* Ensure it takes up its own line */
       width: 35%; /* Adjust the width as needed */
