@@ -13,7 +13,6 @@ mongoose.connect(
   "mongodb+srv://castroy092003:7xiHqTSiUKH0ZIf4@wildcats-food-express.7w2snhk.mongodb.net/User?retryWrites=true&w=majority&appName=Wildcats-Food-Express"
 );
 
-
 app.post("/Login", (req, res) => {
   const { email, password } = req.body;
   UserModel.findOne({ email: email }).then((user) => {
@@ -41,7 +40,6 @@ app.post("/Register", (req, res) => {
     }
   });
 });
-
 
 app.listen(5000, () => {
   console.log("Server is running on port 5000");

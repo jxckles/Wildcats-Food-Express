@@ -46,8 +46,6 @@ function App() {
   );
 }
 
-
-
 const HomePage = () => (
   <div>
     <MainContent />
