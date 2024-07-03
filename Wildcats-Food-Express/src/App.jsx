@@ -63,7 +63,6 @@ const AppLayout = () => {
 const HomePage = () => (
   <div>
     <MainContent />
-    <CatImage />
   </div>
 );
 

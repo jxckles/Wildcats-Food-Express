@@ -1,5 +1,5 @@
 import './MainContent.css';
-
+import catImage from "../assets/chef.png"
 const MainContent = () => {
   return (
     <main className="main-content">
@@ -14,6 +14,10 @@ const MainContent = () => {
       
       <h3>Fast. Fresh. Fierce.</h3>
       <a href="#" className="primary-cta">Order Food</a>
+
+      <div className="CatImage">
+        <img src={catImage} alt="Photo of Wildcat chef"/>
+      </div>
     </main>
   );
 };
