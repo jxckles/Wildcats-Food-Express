@@ -21,7 +21,9 @@ const Signup = () => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match!", {}); // Show error toast
+      toast.error("Passwords do not match!", {
+        autoClose: 500,
+      }); // Show error toast
       return;
     }
 
@@ -35,18 +37,26 @@ const Signup = () => {
       })
       .then((response) => {
         console.log(response);
-        if (response.data === "Email already exists") {
-          toast.error("Email already exists!", {}); // Show error toast
+        if (response.data === "Email already exists", {
+          autoClose: 500,
+        }) {
+          toast.error("Email already exists!", {
+            autoClose: 500,
+          }); // Show error toast
           return;
         } else {
-          toast.success("Registration successful!", {}); // Show success toast
+          toast.success("Registration successful!", {
+            autoClose: 500,
+          }); // Show success toast
           setTimeout(() => navigate("/login"), 2000);
         }
       })
       .catch((error) => {
         // Handle error
         console.error(error);
-        toast.error("Registration failed!", {});
+        toast.error("Registration failed!", {
+          autoClose: 500,
+        });
       });
   };
 
