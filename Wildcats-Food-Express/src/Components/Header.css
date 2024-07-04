@@ -4,10 +4,14 @@
   justify-content: space-between;
   font-weight: lighter;
   padding: 0.5em;
+  border-bottom: 2px solid rgb(139, 139, 139);
 }
+
 
 .logo-image {
   width: 18rem; /* Default size for larger screens */
+  margin-bottom: 5%; /* For hr distance from the contents */
+  margin-left: -5%; 
 }
 
 .menu-open {
@@ -63,11 +67,11 @@ ul {
   position: fixed;
   z-index: 69;
   top: 0;
-  right: -7%;
+  right: -5%;
   height: 100vh;
   margin: 0;
   list-style: none;
-  width: 35%;
+  width: 25%;
   text-align: right;
   padding: 2em;
   transform: translateX(100%);
