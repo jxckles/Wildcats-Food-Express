@@ -24,7 +24,9 @@ const Login = () => {
           toast.success("Login successful!");
           setTimeout(() => navigate("/dashboard"), 2000);
         } else {
-          toast.error(result.data);
+          toast.error(result.data, {
+            autoClose: 500,
+          });
         }
       })
       .catch((error) => {
