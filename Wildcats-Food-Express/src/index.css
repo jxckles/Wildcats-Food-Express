@@ -1,3 +1,4 @@
+/* General Styles */
 body {
     background-color: white;
     margin: 0;
@@ -12,44 +13,33 @@ body {
     display: block;
     position: relative;
     margin-top: -2%;
-    
   }
   
   .express-mobile {
     color: #f2b54c;
   }
-
-  /* Media queries for screen resolutions */
-  @media (max-width: 849px) {
-    /* For mobile screens */
-    .hide-title {
-      display: none; /* Hide on mobile */
-    }
-    
-    .hide-mobile {
-      display: block; /* Show on mobile */
-    }
-
-    .hide-hr {
-      display: none;
+  
+  /* Mobile Styles */
+  @media (max-width: 599px) {
+    .main-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
     }
   
-    ul
-    {
-      transition: transform 0.5s ease-in-out;
+    .hide-title {
+        display: none; /* Hide on mobile */
     }
-    .primary-cta {
-      display: block; /* Ensure it takes up its own line */
-      width: 35%; /* Adjust the width as needed */
-      margin: 0 auto; /* Center it horizontally */
-      text-align: center; /* Center text inside the button */
+  
+    .hide-mobile {
+        display: block; /* Show on mobile */
     }
-
-    /* Added mobile-specific styles for the header */
-    .logo-image {
-      width: 12rem; /* Smaller size for mobile screens */
+  
+    .hide-hr {
+        display: none;
     }
-
+  
     .login-cta, .signup-cta {
       background: none; /* Remove background color */
       color: #9b1410; /* Change text color */
@@ -58,274 +48,135 @@ body {
       font-size: 1.5rem; /* Adjust font size if needed */
       text-align: right; /* Align text to the left */
       margin: 2em 0; /* Adjust margin if needed */
-
-      &:hover {
-        font-size: 1.5rem;
-        text-decoration: underline; /* Add underline on hover */
-      }
-    }
-
-    .login-cta:active, .signup-cta:active {
-      color: #555; /* Change text color on active */
-    }
-
-    h3 {
-        text-align: center;
-      }
   
-      .cat-container {
-        position: abo;
-        height: 400px;
-        width: 69%;
-        margin-top: -33.5em;
+      &:hover {
+          font-size: 1.5rem;
+          text-decoration: underline; /* Add underline on hover */
       }
-      
+  }
+  
+  .login-cta:active, .signup-cta:active {
+      color: #555; /* Change text color on active */
+  }
+  
+    .primary-cta {
+        width: 80%; /* Full width on mobile */
+        margin: 1em 0; /* Margin for spacing */
+    }
+  
     .cat img {
-        width: 30%;
-        position:fixed;
-        top: 29%;
-        left: 80%;
-        transform: translateX(-50%);
-      }
-      
-    .cat{
-        position: absolute;
-        height: 500px;
-        width: 100%;
-        top: 28%;
-        margin-top: 3em;
-        z-index: -2;
-        
-        img{
-            width: 70%;
-            position: absolute;
-            left: 50%;
-    
-            transform: translateX(-50%);
+        width: 80%; /* Smaller image size */
+        margin-top: 1em; /* Space below CTA */
+        position: relative;
+    }
+  }
+  
+  /* Tablet Styles */
+  @media (min-width: 600px) and (max-width: 1279px) {
+    .main-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+  
+    .wrapper {
+        margin: 0 4em;
+    }
+  
+    .hide-title {
+        display: block; /* Show on tablet and larger screens */
+    }
+  
+    .hide-mobile {
+        display: none; /* Hide on tablet and larger screens */
+    }
+  
+    .login-cta, .signup-cta {
+        background: none; /* Remove background color */
+        color: #9b1410; /* Change text color */
+        padding: 0; /* Remove padding */
+        border-radius: 0; /* Remove border radius */
+        font-size: 1.5rem; /* Adjust font size if needed */
+        text-align: right; /* Align text to the left */
+        margin: 2em 0; /* Adjust margin if needed */
+  
+        &:hover {
+            font-size: 1.5rem;
+            text-decoration: underline; /* Add underline on hover */
         }
     }
-  }
   
-  @media (min-width: 850px) {
-    /* For tablet */
-    .wrapper {
-      margin: 0 4em;
+    .login-cta:active, .signup-cta:active {
+        color: #555; /* Change text color on active */
     }
-    .header {
-      padding: 0em;
-    }
-  
-    .hide-desktop {
-      display: none;
-    }
-  
-    .hide-title {
-      display: block; /* Show on tablet and larger screens */
-    }
-    
-    .hide-mobile {
-      display: none; /* Hide on tablet and larger screens */
-    }
-  
-    .header-left {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 1em;
-  
-      a {
-        text-decoration: none;
-        color: black;
-        font-size: 1.2rem;
-      }
-    }
-  
-    nav ul {
-      position: unset;
-      background: none;
-      display: flex;
-      gap: 2em;
-      height: auto;
-      width: auto;
-      transform: translateX(0%);
-  
-      li a {
-        font-size: 1.2rem;
-      }
-    }
-  
-    h1, p {
-      text-align: left;
-    }
-  
-    h1 img {
-      margin: 0;
-    }
-  
-    main {
-      width: 50%;
+    .primary-cta {
+        width: 60%; /* Slightly larger width on tablet */
     }
   
     .cat img {
-      margin-top: 0;
-      width: 40%;
-      height: 55%;
-      position: fixed;
-      z-index: 100;
+        width: 60%; /* Larger image size */
+        margin-top: 2em; /* More space below CTA */
+        position: relative;
     }
-  
-    .cat-container {
-      position: absolute;
-      margin-left: auto;
-      margin-right: 20em;
-      top: 15%;
-      left: 30em;
-    }
-
-    .wildcats-food
-    {
-      margin-left: auto;
-      margin-right: 20aem;
-      font-size: 3.5rem;
-    }
-
-    
-  }
-
-  
-  @media (min-width: 900px) {
-    /* For tablet */
-    .wrapper {
-      margin: 0 4em;
-    }
-    .header {
-      padding: 0em;
-    }
-  
-    .hide-desktop {
-      display: none;
-    }
-  
-    .hide-title {
-      display: block; /* Show on tablet and larger screens */
-    }
-    
-    .hide-mobile {
-      display: none; /* Hide on tablet and larger screens */
-    }
-  
-    .header-left {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 1em;
-  
-      a {
-        text-decoration: none;
-        color: black;
-        font-size: 1.2rem;
-      }
-    }
-  
-    nav ul {
-      position: unset;
-      background: none;
-      display: flex;
-      gap: 2em;
-      height: auto;
-      width: auto;
-      transform: translateX(0%);
-  
-      li a {
-        font-size: 1.2rem;
-      }
-    }
-  
-    h1, p {
-      text-align: left;
-    }
-  
-    h1 img {
-      margin: 0;
-    }
-  
-    main {
-      width: 50%;
-    }
-  
-    .cat img {
-      margin-top: 0;
-      width: 40%;
-      height: 55%;
-      position: fixed;
-      z-index: 100;
-    }
-  
-    .cat-container {
-      position: absolute;
-      margin-left: auto;
-      right: 10em;
-      top: 25%;
-      left: 40em;
-    }
-
-    .wildcats-food
-    {
-      margin-left: auto;
-      margin-right: 20aem;
-      font-size: 5rem;
-    }
-
-    
   }
   
+  /* Desktop Styles */
   @media (min-width: 1280px) {
-    .wrapper {
-      margin: 0 auto;
-      max-width: 1200px;
-    }
-
-    .header {
-      padding: 0em;
+      .wrapper {
+          margin: 0 auto;
+          max-width: 1200px;
+      }
+    
+      .main-content {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+          padding: 2em;
+      }
+    
+      .hide-title {
+        display: block; 
+        margin-left: 10%;
+      }
+    
+      .hide-mobile {
+        display: none;
+      }
+    
+      h3{
+        margin-left: 10%; 
+      }
+      .wildcats-food,
+      h3,
+      .primary-cta {
+        text-align: left;
+      }
+  
+      .wildcats-food {
+        font-size: clamp(3em, 5vw, 7em); /* Minimum 2.5em, preferred 4vw, maximum 5em */
+        transition: font-size 0.2s ease; /* Smooth transition on resize */
+      }
+  
+      .primary-cta {
+        width: auto;
+        margin-top: 1em; /* Adjust vertical spacing if needed */
+        margin-right: 60%; 
+      }
+    
+      .cat {
+        width: 40%; /* Container for the image */
+        margin-left: 2em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    
+      .cat img {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
     }
   
-    .hide-hr {
-      display: block;
-    }
-  
-    a.primary-cta {
-      display: inline-block;
-      width: auto;
-    }
-  
-    .hide-title {
-      display: block;
-    }
-
-        .header-left {
-          margin-top: -100;
-    }
-
-    .cat img {
-      margin-top: 0;
-      width: 40%;
-      height: 60%;
-      z-index: 100;
-    }
-  
-    .cat-container {
-      position: absolute;
-      margin-left: auto;
-      margin-right: 25em;
-      top: 30%;
-      left: 55%;
-    }
-
-    .wildcats-food
-    {
-      margin-left: 0.2em;
-      margin-right: 20aem;
-      font-size: 6.5rem;
-    }
-
-  }

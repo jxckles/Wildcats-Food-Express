@@ -1,84 +1,99 @@
 .main-content {
     position: relative;
-    left: 4%;
-  }
-  
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin: 2em auto;
+}
 
-
-  
-  h3 {
-    text-align: left;
-  }
-
- 
-
-  .primary-cta {
+.primary-cta {
     background-color: #9b1410;
     padding: 1em;
-    width:30%;
+    width: 80%;
+    max-width: 300px;
     text-align: center;
     text-decoration: none;
     font-weight: bolder;
     font-size: 1.2rem;
     color: white;
     border-radius: 0.75em;
-    border-bottom: 300px;
-    &:hover {
-      text-decoration:underline;
-      font-size: 1.4rem;
-      }
+    margin: 1em 0;
+}
 
-    &:active{
-        color: #aa0303b6;
-      }
-  }
-  
-.rh1{
- 
+.primary-cta:hover {
+    text-decoration: underline;
+}
 
+.primary-cta:active {
+    color: #aa0303b6;
+}
+
+.rh1 {
     margin-top: 1em;
     margin-bottom: 0em;
     color: #9b1410;
     font-size: 1.35rem;
-
-    
-  .wildcats-foods
-  {
     text-align: center;
-  }
-    .wildcats-food
-    {
-      margin-top: 2em;
-      text-align: left;
-    }
 
-    .express {
-      color: #f2b54c;
-      display: block;
+    h3{
+      color: black;
     }
 }
 
-
-
-h3{
-  font-size: 2em;
-  font-weight: normal;
-  margin-bottom: 1.5em;
-  line-height: 1.5;
+.wildcats-foods,
+.wildcats-food {
+    margin: 0.5em 0;
+    text-align: center;
 }
 
-.CatImage {
-  position: absolute;
-  border-radius: 50%;
-  top: -150px;
-  right: -500px;
+.express-mobile {
+    color: #f2b54c;
 }
 
-.CatImage img {
-  width: 500px; /* Set the width of the image */
-  height: auto; /* Maintain aspect ratio */
-  display: block; /* Ensures no extra space is added below the image */
+h3 {
+    font-size: 1.5em;
+    font-weight: normal;
+    margin-bottom: 1.5em;
+    line-height: 1.5;
 }
 
+/* For mobile, ensure the cat image is under the primary CTA */
+.cat img {
+    margin-top: 1em;
+    width: 80%;
+}
 
-  
+@media (min-width: 600px) {
+    /* For tablet, position the cat image accordingly */
+    .cat img {
+        width: 60%;
+        margin-top: 2em;
+    }
+}
+
+@media (min-width: 1280px) {
+    /* For desktop, position the cat image to the right */
+    .main-content {
+        flex-direction: row;
+        justify-content: space-between;
+        text-align: left;
+    }
+
+    .primary-cta {
+        width: auto;
+        margin-right: 2em;
+    }
+
+    .cat {
+        width: 40%; /* Container for the image */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .cat img {
+        width: 100%;
+        height: auto;
+    }
+}
