@@ -11,7 +11,12 @@ import Dashboard from "./Components/Dashboard";
 import ForgotPassword from "./Components/ForgotPassword";
 import ResetPassword from "./Components/ResetPassword";
 import MenuAdminInterface from "./Components/MenuAdminInterface";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import toastify css
 
@@ -42,7 +47,7 @@ const AppLayout = () => {
   const location = useLocation();
   const isResetPassword = location.pathname === "/reset-password";
   const isAdminPage = location.pathname === "/admin";
-  
+
   if (isAdminPage) {
     return <MenuAdminInterface />; // Render only the Admin Interface
   }

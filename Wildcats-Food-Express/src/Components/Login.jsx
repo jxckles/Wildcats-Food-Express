@@ -20,7 +20,9 @@ const Login = () => {
         password,
       })
       .then((result) => {
-        if (result.data === "Success") {
+        if (result.data === "Admin") {
+          setTimeout(() => navigate("/admin"), 2000);
+        } else if (result.data === "Success") {
           toast.success("Login successful!");
           setTimeout(() => navigate("/dashboard"), 2000);
         } else {
@@ -30,11 +32,10 @@ const Login = () => {
         }
       })
       .catch((error) => {
-          toast.error("Login failed!", {
+        toast.error("Login failed!", {
           autoClose: 500,
         });
       });
-       
   };
 
   return (
