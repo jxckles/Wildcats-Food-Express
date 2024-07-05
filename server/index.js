@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const UserModel = require("./models/User");
+const MenuItem = require("./models/Menu");
 
 const app = express();
 
@@ -41,6 +42,35 @@ app.post("/Register", (req, res) => {
     }
   });
 });
+
+
+//Menu item route
+
+app.get("/menu", (req, res) => {
+  MenuItem.find()
+    .then((items) => res.json(items))
+    .catch((err) => res.status(400).json(err));
+});
+
+app.post("/menu", (req, res) => {
+  MenuItem.create(req.body)
+    .then((item) => res.json(item))
+    .catch((err) => res.status(400).json(err));
+});
+
+app.put("/menu/:id", (req, res) => {
+  MenuItem.findByIdAndUpdate(req.params.id, req.body, { new: true })
+    .then((item) => res.json(item))
+    .catch((err) => res.status(400).json(err));
+});
+
+app.delete("/menu/:id", (req, res) => {
+  MenuItem.findByIdAndDelete(req.params.id)
+    .then(() => res.json({ message: "Item deleted" }))
+    .catch((err) => res.status(400).json(err));
+});
+
+
 
 app.listen(5000, () => {
   console.log("Server is running on port 5000");
