@@ -1,7 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const User = require("./models/User");
 const UserModel = require("./models/User");
 
 const app = express();
@@ -17,7 +16,9 @@ app.post("/Login", (req, res) => {
   const { email, password } = req.body;
   UserModel.findOne({ email: email }).then((user) => {
     if (user) {
-      if (user.password === password) {
+      if (user.email == "admin@gmail.com" && user.password == "admin") {
+        res.json("Admin");
+      } else if (user.password === password) {
         res.json("Success");
       } else {
         res.json("Incorrect password");
