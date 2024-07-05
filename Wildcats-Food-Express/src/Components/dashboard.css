@@ -1,15 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;400&display=swap');
 
 * {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 body {
   background: white;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 .menu {
@@ -52,7 +52,8 @@ body {
 .menu-text h1 {
   font-size: 2rem; /* Font size for h1 */
   color:  #990000; /* Color for h1 */
-  margin: 0;
+  text-align: left; /* Left align h2 */
+    margin-left: 0; 
 }
 
 .menu-text h2 {
@@ -63,7 +64,7 @@ body {
 }
 
 .search-input {
-  width: 80%; /* Adjust as needed */
+  width: 100%; /* Adjust as needed */
   max-width: 1000px; /* Adjust as needed */
   padding: 15px;
   font-size: 1.2rem;
