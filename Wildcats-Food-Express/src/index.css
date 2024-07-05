@@ -156,6 +156,7 @@ body {
   
       .wildcats-food {
         font-size: clamp(3em, 5vw, 7em); /* Minimum 2.5em, preferred 4vw, maximum 5em */
+        font-weight:1000;
         transition: font-size 0.2s ease; /* Smooth transition on resize */
       }
   
