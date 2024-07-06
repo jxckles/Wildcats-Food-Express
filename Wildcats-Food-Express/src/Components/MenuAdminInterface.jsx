@@ -24,9 +24,14 @@ const MenuAdminInterface = () => {
   const fetchMenuItems = async () => {
     try {
       const response = await axios.get("http://localhost:5000/menu");
-      setMenuItems(response.data);
+      const menuData = response.data.map((item) => ({
+        ...item,
+        image: item.image ? `http://localhost:5000/${item.image}` : null,
+      }));
+      setMenuItems(menuData);
     } catch (error) {
       console.error("Error fetching menu items:", error);
+      // Consider setting an error state and displaying it to the user
     }
   };
 
@@ -45,7 +50,10 @@ const MenuAdminInterface = () => {
   const handleInputChange = (e) => {
     const { name, value, type } = e.target;
     if (type === "file") {
-      setCurrentItem({ ...currentItem, [name]: e.target.files[0] });
+      setCurrentItem({
+        ...currentItem,
+        [name]: e.target.files[0],
+      });
     } else {
       setCurrentItem({ ...currentItem, [name]: value });
     }
@@ -53,41 +61,66 @@ const MenuAdminInterface = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const newItem = {
-      ...currentItem,
-      id: currentItem.id || Date.now(),
-    };
+    // Add validation for form data here if needed
+    const formData = new FormData();
+    formData.append("name", currentItem.name);
+    formData.append("price", currentItem.price);
+    formData.append("quantity", currentItem.quantity);
+    if (currentItem.image && currentItem.image instanceof File) {
+      formData.append("image", currentItem.image);
+    }
 
     try {
       if (currentItem.id) {
-        // Update existing item
         await axios.put(
           `http://localhost:5000/menu/${currentItem.id}`,
-          newItem
-        );
-        setMenuItems(
-          menuItems.map((item) => (item.id === currentItem.id ? newItem : item))
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
         );
       } else {
-        // Add new item
         const response = await axios.post(
           "http://localhost:5000/menu",
-          newItem
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
         );
-        setMenuItems([...menuItems, response.data]);
+        setMenuItems([
+          ...menuItems,
+          {
+            ...response.data,
+            image: response.data.image
+              ? `http://localhost:5000/${response.data.image}`
+              : null,
+          },
+        ]);
       }
       closeModal();
     } catch (error) {
       console.error("Error saving menu item:", error);
+      // Consider setting an error state and displaying it to the user
     }
   };
 
   const handleDelete = async (id) => {
+    // Check if the ID is valid and the item exists
+    const itemExists = menuItems.some((item) => item.id === id);
+    if (!id || !itemExists) {
+      console.error("Invalid or non-existent ID for deletion");
+      return;
+    }
     try {
       await axios.delete(`http://localhost:5000/menu/${id}`);
       setMenuItems(menuItems.filter((item) => item.id !== id));
     } catch (error) {
       console.error("Error deleting menu item:", error);
+      // Consider setting an error state and displaying it to the user
     }
   };
 
@@ -146,48 +179,61 @@ const MenuAdminInterface = () => {
         </div>
         <div className="menu-items">
           {filteredMenuItems.length > 0 ? (
-            filteredMenuItems.map((item) => (
-              <div className="menu-item" key={item.id}>
-                <div className="menu-image-container">
-                  {item.image ? (
-                    <img
-                      src={URL.createObjectURL(item.image)}
-                      alt={item.name}
-                      className="menu-image"
-                    />
-                  ) : (
-                    <div className="menu-image-placeholder">No Image</div>
-                  )}
+            filteredMenuItems.map(
+              (
+                item,
+                index // Use index as part of key if necessary
+              ) => (
+                <div className="menu-item" key={item.id || index}>
+                  <div className="menu-image-container">
+                    {item.image ? (
+                      typeof item.image === "string" ? (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="menu-image"
+                        />
+                      ) : (
+                        <img
+                          src={URL.createObjectURL(item.image)}
+                          alt={item.name}
+                          className="menu-image"
+                        />
+                      )
+                    ) : (
+                      <div className="menu-image-placeholder">No Image</div>
+                    )}
+                  </div>
+                  <div className="menu-details">
+                    <p className="menu-name">{item.name}</p>
+                    <p className="menu-price">Php {item.price}</p>
+                    <p
+                      className={`menu-quantity ${
+                        item.quantity === 0 ? "sold-out" : ""
+                      }`}
+                    >
+                      {item.quantity > 0
+                        ? `Available: ${item.quantity}`
+                        : "Sold Out"}
+                    </p>
+                  </div>
+                  <div className="menu-actions">
+                    <button
+                      onClick={() => openModal(item)}
+                      className="action-link"
+                    >
+                      edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(item.id)}
+                      className="action-link"
+                    >
+                      delete
+                    </button>
+                  </div>
                 </div>
-                <div className="menu-details">
-                  <p className="menu-name">{item.name}</p>
-                  <p className="menu-price">Php {item.price}</p>
-                  <p
-                    className={`menu-quantity ${
-                      item.quantity === 0 ? "sold-out" : ""
-                    }`}
-                  >
-                    {item.quantity > 0
-                      ? `Available: ${item.quantity}`
-                      : "Sold Out"}
-                  </p>
-                </div>
-                <div className="menu-actions">
-                  <button
-                    onClick={() => openModal(item)}
-                    className="action-link"
-                  >
-                    edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(item.id)}
-                    className="action-link"
-                  >
-                    delete
-                  </button>
-                </div>
-              </div>
-            ))
+              )
+            )
           ) : (
             <p className="no-results">No menu item/s {searchTerm} added.</p>
           )}
