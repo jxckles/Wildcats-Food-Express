@@ -11,7 +11,7 @@ const MainAdminInterface = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('menu');
   const [orders, setOrders] = useState([
-    { id: '22-4355-566', name: 'Juan Dela Cruz', preparedBy: '', status: '' }
+    { id: '22-4355-566', name: 'Juan Dela Cruz', product: '', preparedBy: '', status: '' }
   ]);
   const [reportSearchTerm, setReportSearchTerm] = useState('');
   const [reportDate, setReportDate] = useState('');
@@ -113,6 +113,12 @@ const MainAdminInterface = () => {
     // Implement logout logic here
   };
 
+  const handleProductChange = (orderId, productId) => {
+    setOrders(orders.map(order => 
+      order.id === orderId ? { ...order, product: productId } : order
+    ));
+  };
+
   const toggleCartMenu = () => {
     setIsCartMenuOpen(!isCartMenuOpen);
   };
@@ -130,6 +136,7 @@ const MainAdminInterface = () => {
             <tr>
               <th>Order Number</th>
               <th>Name</th>
+              <th>Product</th>
               <th>Prepared By</th>
               <th>Status</th>
             </tr>
@@ -139,6 +146,17 @@ const MainAdminInterface = () => {
               <tr key={order.id}>
                 <td>{order.id}</td>
                 <td>{order.name}</td>
+                <td>
+                  <select 
+                    value={order.product || ''} 
+                    onChange={(e) => handleProductChange(order.id, e.target.value)}
+                  >
+                    <option value="">Select product</option>
+                    {menuItems.map((item) => (
+                      <option key={item.id} value={item.id}>{item.name}</option>
+                    ))}
+                  </select>
+                </td>
                 <td>
                   <select 
                     value={order.preparedBy} 
@@ -169,7 +187,6 @@ const MainAdminInterface = () => {
       </div>
     );
   };
-
   const renderReports = () => {
     const currentYear = new Date().getFullYear();
     const months = [
