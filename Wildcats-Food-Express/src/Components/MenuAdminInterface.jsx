@@ -13,6 +13,10 @@ const MainAdminInterface = () => {
   const [orders, setOrders] = useState([
     { id: '22-4355-566', name: 'Juan Dela Cruz', preparedBy: '', status: '' }
   ]);
+  const [reportSearchTerm, setReportSearchTerm] = useState('');
+  const [reportDate, setReportDate] = useState('');
+  const [reportMonth, setReportMonth] = useState('');
+  const [reportYear, setReportYear] = useState('');
 
   const openModal = (item = { id: null, name: '', price: '', image: null, quantity: 0 }) => {
     setCurrentItem(item);
@@ -41,12 +45,10 @@ const MainAdminInterface = () => {
     };
     
     if (currentItem.id) {
-      // Update existing item
       setMenuItems(menuItems.map(item => 
         item.id === currentItem.id ? newItem : item
       ));
     } else {
-      // Add new item
       setMenuItems([...menuItems, newItem]);
     }
     closeModal();
@@ -74,6 +76,15 @@ const MainAdminInterface = () => {
     setOrders(orders.map(order => 
       order.id === orderId ? { ...order, status } : order
     ));
+  };
+
+  const handleReportSearch = (e) => {
+    setReportSearchTerm(e.target.value);
+  };
+
+  const handleDownloadReport = () => {
+    console.log('Downloading report...', { reportDate, reportMonth, reportYear, reportSearchTerm });
+    // Implement the actual download functionality here
   };
 
   const filteredMenuItems = menuItems.filter(item =>
@@ -123,6 +134,80 @@ const MainAdminInterface = () => {
                 </td>
               </tr>
             ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
+  const renderReports = () => {
+    const currentYear = new Date().getFullYear();
+    const months = [
+      'January', 'February', 'March', 'April', 'May', 'June', 
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+  
+    return (
+      <div className="admin-reports">
+        <h2>Admin Reports</h2>
+        <div className="report-search-container">
+          <input 
+            type="text" 
+            placeholder="Search Report" 
+            className="report-search-input" 
+            value={reportSearchTerm}
+            onChange={handleReportSearch}
+          />
+        </div>
+        <div className="report-filters">
+          <div className="filter-group">
+            <label>Filters</label>
+            <select 
+              value={reportDate} 
+              onChange={(e) => setReportDate(e.target.value)}
+            >
+              <option value="">Day</option>
+              {[...Array(31)].map((_, i) => (
+                <option key={i} value={i + 1}>{i + 1}</option>
+              ))}
+            </select>
+            <select 
+              value={reportMonth} 
+              onChange={(e) => setReportMonth(e.target.value)}
+            >
+              <option value="">Month</option>
+              {months.map((month, index) => (
+                <option key={index} value={index + 1}>{month}</option>
+              ))}
+            </select>
+            <select 
+              value={reportYear} 
+              onChange={(e) => setReportYear(e.target.value)}
+            >
+              <option value="">Year</option>
+              {[...Array(10)].map((_, i) => (
+                <option key={i} value={currentYear + i}>{currentYear + i}</option>
+              ))}
+            </select>
+          </div>
+          <button onClick={handleDownloadReport} className="download-report-btn">Download Report</button>
+        </div>
+        <table className="report-table">
+          <thead>
+            <tr>
+              <th>Order Number</th>
+              <th>Date Ordered</th>
+              <th>Status</th>
+              <th>Prepared by</th>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Total Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colSpan="7" className="no-data">No data available</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -195,7 +280,7 @@ const MainAdminInterface = () => {
           </>
         )}
         {activeTab === 'orders' && renderOrderTracking()}
-        {activeTab === 'reports' && <div>Reports Content</div>}
+        {activeTab === 'reports' && renderReports()}
         {activeTab === 'userRoles' && <div>User Roles Content</div>}
 
         {isModalOpen && (
