@@ -33,13 +33,30 @@
 .admin-nav {
   display: flex;
   justify-content: flex-start;
-  gap: 15px;
+  gap: 20px;
   margin-top: 10px;
   margin-left: 20px;
 }
 
 .menu-button{
-  width: 85px;
+  display: block;
+  width: 400px;
+}
+
+.add-menu-button {
+  background-color: #990000;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  width: 100%;
+  max-width: 160px;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
 }
 
 
@@ -92,8 +109,10 @@
 
 .search-input {
   padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  color: #990000;
+  background-color: #ffcfa2;
+  border: 1px solid #ffcfa2;
+  border-radius: 25px;
   width: 100%;
   max-width: 500px;
 }
@@ -192,8 +211,9 @@
   width: 300px;
 }
 
-.modal h2 {
+.todays-order {
   margin-top: 0;
+  text-align: left;
 }
 
 .modal form {
@@ -239,6 +259,29 @@
   font-style: italic;
 }
 
+.order-tracking {
+  padding: 20px;
+}
+
+.order-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.order-table th, .order-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.order-table th {
+  background-color: #f2f2f2;
+}
+
+.order-table select {
+  width: 100%;
+  padding: 5px;
+}
 /* Media Queries */
 @media (max-width: 768px) {
   .admin-header {
