@@ -16,15 +16,23 @@ mongoose.connect(
 app.post("/Login", (req, res) => {
   const { email, password } = req.body;
   UserModel.findOne({ email: email }).then((user) => {
-    if (user) {
-      if (user.email == "admin@gmail.com" && user.password == "admin") {
+    if (user.email == "admin@gmail.com") {
+      if (user.password === password) {
         res.json("Admin");
-      } else if (user.password === password) {
+      } 
+      else  {
+        res.json("Incorrect password"); 
+      } 
+    }
+    else if(user){
+      if(user.password === password){
         res.json("Success");
-      } else {
-        res.json("Incorrect password");
       }
-    } else {
+      else{
+        res.json("Incorrect password")
+      }
+    } 
+    else {
       res.json("User does not exist");
     }
   });
