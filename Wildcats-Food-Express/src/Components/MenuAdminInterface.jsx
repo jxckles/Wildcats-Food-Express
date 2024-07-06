@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './MenuAdminInterface.css';
 import logo from '/logo.svg';
 import profileIcon from '/cat_profile.svg';
-import cartIcon from '/menu.svg';
+import cartIcon from '/hamburger-menu.svg';
 
 const MainAdminInterface = () => {
   const [menuItems, setMenuItems] = useState([]);
@@ -17,6 +17,8 @@ const MainAdminInterface = () => {
   const [reportDate, setReportDate] = useState('');
   const [reportMonth, setReportMonth] = useState('');
   const [reportYear, setReportYear] = useState('');
+  const [interfaceType, setInterfaceType] = useState('admin');
+  const [isCartMenuOpen, setIsCartMenuOpen] = useState(false);
 
   const openModal = (item = { id: null, name: '', price: '', image: null, quantity: 0 }) => {
     setCurrentItem(item);
@@ -26,12 +28,21 @@ const MainAdminInterface = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setCurrentItem({ id: null, name: '', price: '', image: null, quantity: 0 });
+    if (activeTab === 'userRoles') {
+      setActiveTab('menu');
+    }
   };
 
   const handleInputChange = (e) => {
     const { name, value, type } = e.target;
     if (type === 'file') {
       setCurrentItem({ ...currentItem, [name]: e.target.files[0] });
+    } else if (name === 'price' || name === 'quantity') {
+      // Ensure non-negative numbers for price and quantity
+      const numValue = parseFloat(value);
+      if (!isNaN(numValue) && numValue >= 0) {
+        setCurrentItem({ ...currentItem, [name]: value });
+      }
     } else {
       setCurrentItem({ ...currentItem, [name]: value });
     }
@@ -64,6 +75,11 @@ const MainAdminInterface = () => {
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
+    if (tab === 'userRoles') {
+      setIsModalOpen(true);
+    } else {
+      setIsModalOpen(false);
+    }
   };
 
   const handleAssignStaff = (orderId, staff) => {
@@ -84,7 +100,21 @@ const MainAdminInterface = () => {
 
   const handleDownloadReport = () => {
     console.log('Downloading report...', { reportDate, reportMonth, reportYear, reportSearchTerm });
-    // Implement the actual download functionality here
+  };
+
+  const handleInterfaceChange = (type) => {
+    setInterfaceType(type);
+    setIsModalOpen(false);
+    setActiveTab('menu'); // Reset to the menu tab when switching interfaces
+  };
+
+  const handleLogout = () => {
+    console.log('Logging out...');
+    // Implement logout logic here
+  };
+
+  const toggleCartMenu = () => {
+    setIsCartMenuOpen(!isCartMenuOpen);
   };
 
   const filteredMenuItems = menuItems.filter(item =>
@@ -214,128 +244,168 @@ const MainAdminInterface = () => {
     );
   };
 
-  return (
-    <div className="admin-interface">
-      <header className="admin-header">
-        <div className="logo-and-nav">
-          <div className="logo-section">
-            <img src={profileIcon} alt="Cat Logo" className="cat_profile" />
-            <img src={logo} alt="Wildcat Food Express Logo" className="logo-image" />
-          </div>
-          <nav className="admin-nav">
-            <button onClick={() => handleTabChange('menu')} className="nav-link menu-button">Add Menu</button>
-            <button onClick={() => handleTabChange('orders')} className="nav-link">Orders</button>
-            <button onClick={() => handleTabChange('reports')} className="nav-link">Reports</button>
-            <button onClick={() => handleTabChange('userRoles')} className="nav-link">User Roles</button>
-          </nav>
+  const renderUserRolesModal = () => {
+    return (
+      <div className="modal-overlay">
+        <div className="modal user-roles-modal">
+          <h3>Select Interface</h3>
+          <button onClick={() => handleInterfaceChange('admin')}>Admin Interface</button>
+          <button onClick={() => handleInterfaceChange('client')}>Client Interface</button>
+          <button onClick={closeModal}>Cancel</button>
         </div>
-        <div className="admin-profile">
-          <span>Admin Interface</span>
-          <img src={cartIcon} alt="Cart" className="cart-icon" />
-        </div>
-      </header>
-      <main className="admin-main">
-        {activeTab === 'menu' && (
-          <>
-            <div className="search-container">
-              <input 
-                type="text" 
-                placeholder="Search Menu" 
-                className="search-input" 
-                value={searchTerm}
-                onChange={handleSearch}
-              />
+      </div>
+    );
+  };
+
+  const renderAdminInterface = () => {
+    return (
+      <div className="admin-interface">
+        <header className="admin-header">
+          <div className="logo-and-nav">
+            <div className="logo-section">
+              <img src={profileIcon} alt="Cat Logo" className="cat_profile" />
+              <img src={logo} alt="Wildcat Food Express Logo" className="logo-image" />
             </div>
-            <button onClick={() => openModal()} className="add-menu-button">Add New Menu</button>
-            <div className="menu-items">
-              {filteredMenuItems.length > 0 ? (
-                filteredMenuItems.map((item) => (
-                  <div className="menu-item" key={item.id}>
-                    <div className="menu-image-container">
-                      {item.image ? (
-                        <img 
-                          src={URL.createObjectURL(item.image)} 
-                          alt={item.name} 
-                          className="menu-image"
-                        />
-                      ) : (
-                        <div className="menu-image-placeholder">No Image</div>
-                      )}
-                    </div>
-                    <div className="menu-details">
-                      <p className="menu-name">{item.name}</p>
-                      <p className="menu-price">Php {item.price}</p>
-                      <p className={`menu-quantity ${item.quantity === 0 ? 'sold-out' : ''}`}>{item.quantity > 0 ? `Available: ${item.quantity}` : 'Sold Out'}</p>
-                    </div>
-                    <div className="menu-actions">
-                      <button onClick={() => openModal(item)} className="action-link">edit</button>
-                      <button onClick={() => handleDelete(item.id)} className="action-link">delete</button>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="no-results">No menu item/s {searchTerm} added.</p>
+            <nav className="admin-nav">
+              <button onClick={() => handleTabChange('menu')} className="nav-link menu-button">Add Menu</button>
+              <button onClick={() => handleTabChange('orders')} className="nav-link">Orders</button>
+              <button onClick={() => handleTabChange('reports')} className="nav-link">Reports</button>
+              <button onClick={() => handleTabChange('userRoles')} className="nav-link">User Roles</button>
+            </nav>
+          </div>
+          <div className="admin-profile">
+            <span className='admin-options'>Admin</span>
+            <div className="menu-container">
+              <img src={cartIcon} alt="Cart" className="cart-icon" onClick={toggleCartMenu} />
+              {isCartMenuOpen && (
+                <div className="cart-menu">
+                  <button onClick={handleLogout}>Logout</button>
+                </div>
               )}
             </div>
-          </>
-        )}
-        {activeTab === 'orders' && renderOrderTracking()}
-        {activeTab === 'reports' && renderReports()}
-        {activeTab === 'userRoles' && <div>User Roles Content</div>}
-
-        {isModalOpen && (
-          <div className="modal-overlay">
-            <div className="modal">
-              <h2>{currentItem.id ? 'Edit Item' : 'Add New Item'}</h2>
-              <form onSubmit={handleSubmit}>
-                <input
-                  type="text"
-                  name="name"
-                  value={currentItem.name}
-                  onChange={handleInputChange}
-                  placeholder="Item Name"
-                  required
-                />
-                <input
-                  type="number"
-                  name="price"
-                  value={currentItem.price}
-                  onChange={handleInputChange}
-                  placeholder="Price"
-                  required
-                />
-                <input
-                  type="number"
-                  name="quantity"
-                  value={currentItem.quantity}
-                  onChange={handleInputChange}
-                  placeholder="Quantity"
-                  required
-                />
-                <div className="file-input-container">
-                  <label htmlFor="image">Choose Image:</label>
-                  <input
-                    type="file"
-                    id="image"
-                    name="image"
-                    onChange={handleInputChange}
-                    accept="image/*"
-                  />
-                </div>
-                {currentItem.image && (
-                  <p className="file-name">Selected file: {currentItem.image.name}</p>
-                )}
-                <div className="modal-actions">
-                  <button type="submit">Save</button>
-                  <button type="button" onClick={closeModal}>Cancel</button>
-                </div>
-              </form>
-            </div>
           </div>
-        )}
-      </main>
-    </div>
-  );
+        </header>
+        <main className="admin-main">
+          {activeTab === 'menu' && (
+            <>
+              <div className="search-container">
+                <input 
+                  type="text" 
+                  placeholder="Search Menu" 
+                  className="search-input" 
+                  value={searchTerm}
+                  onChange={handleSearch}
+                />
+              </div>
+              <button onClick={() => openModal()} className="add-menu-button">Add New Menu</button>
+              <div className="menu-items">
+                {filteredMenuItems.length > 0 ? (
+                  filteredMenuItems.map((item) => (
+                    <div className="menu-item" key={item.id}>
+                      <div className="menu-image-container">
+                        {item.image ? (
+                          <img 
+                            src={URL.createObjectURL(item.image)} 
+                            alt={item.name} 
+                            className="menu-image"
+                          />
+                        ) : (
+                          <div className="menu-image-placeholder">No Image</div>
+                        )}
+                      </div>
+                      <div className="menu-details">
+                        <p className="menu-name">{item.name}</p>
+                        <p className="menu-price">Php {item.price}</p>
+                        <p className={`menu-quantity ${item.quantity === 0 ? 'sold-out' : ''}`}>
+                          {item.quantity > 0 ? `Available: ${item.quantity}` : 'Sold Out'}
+                        </p>
+                      </div>
+                      <div className="menu-actions">
+                        <button onClick={() => openModal(item)} className="action-link">edit</button>
+                        <button onClick={() => handleDelete(item.id)} className="action-link">delete</button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="no-results">No menu item/s {searchTerm} added.</p>
+                )}
+              </div>
+            </>
+          )}
+          {activeTab === 'orders' && renderOrderTracking()}
+          {activeTab === 'reports' && renderReports()}
+          {isModalOpen && activeTab === 'userRoles' && renderUserRolesModal()}
+
+          {isModalOpen && activeTab !== 'userRoles' && (
+            <div className="modal-overlay">
+              <div className="modal">
+                <h2>{currentItem.id ? 'Edit Item' : 'Add New Item'}</h2>
+                <form onSubmit={handleSubmit}>
+                  <input
+                    type="text"
+                    name="name"
+                    value={currentItem.name}
+                    onChange={handleInputChange}
+                    placeholder="Item Name"
+                    required
+                  />
+                  <input
+                    type="number"
+                    name="price"
+                    value={currentItem.price}
+                    onChange={handleInputChange}
+                    placeholder="Price"
+                    min="0"
+                    step="0.01"
+                    required
+                  />
+                  <input
+                    type="number"
+                    name="quantity"
+                    value={currentItem.quantity}
+                    onChange={handleInputChange}
+                    placeholder="Quantity"
+                    min="0"
+                    step="1"
+                    required
+                  />
+                  <div className="file-input-container">
+                    <label htmlFor="image">Choose Image:</label>
+                    <input
+                      type="file"
+                      id="image"
+                      name="image"
+                      onChange={handleInputChange}
+                      accept="image/*"
+                    />
+                  </div>
+                  {currentItem.image && (
+                    <p className="file-name">Selected file: {currentItem.image.name}</p>
+                  )}
+                  <div className="modal-actions">
+                    <button type="submit">Save</button>
+                    <button type="button" onClick={closeModal}>Cancel</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+        </main>
+      </div>
+    );
+  };
+
+  const renderClientInterface = () => {
+    return (
+      <div className="client-interface">
+        <h1>Client Dashboard</h1>
+        <p>This is the client interface for admin users.</p>
+        <button onClick={() => handleInterfaceChange('admin')}>Switch to Admin Interface</button>
+      </div>
+    );
+  };
+
+  return interfaceType === 'admin' ? renderAdminInterface() : renderClientInterface();
 };
 
 export default MainAdminInterface;
