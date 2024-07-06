@@ -9,7 +9,7 @@ const MenuAdminInterface = () => {
   const [menuItems, setMenuItems] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState({
-    id: null,
+    _id: null,
     name: "",
     price: "",
     image: null,
@@ -29,6 +29,7 @@ const MenuAdminInterface = () => {
         image: item.image ? `http://localhost:5000/${item.image}` : null,
       }));
       setMenuItems(menuData);
+      console.log("Fetched menu items:", menuData); // Debug log
     } catch (error) {
       console.error("Error fetching menu items:", error);
       // Consider setting an error state and displaying it to the user
@@ -36,7 +37,7 @@ const MenuAdminInterface = () => {
   };
 
   const openModal = (
-    item = { id: null, name: "", price: "", image: null, quantity: 0 }
+    item = { _id: null, name: "", price: "", image: null, quantity: 0 }
   ) => {
     setCurrentItem(item);
     setIsModalOpen(true);
@@ -44,7 +45,7 @@ const MenuAdminInterface = () => {
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setCurrentItem({ id: null, name: "", price: "", image: null, quantity: 0 });
+    setCurrentItem({ _id: null, name: "", price: "", image: null, quantity: 0 });
   };
 
   const handleInputChange = (e) => {
@@ -61,7 +62,6 @@ const MenuAdminInterface = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add validation for form data here if needed
     const formData = new FormData();
     formData.append("name", currentItem.name);
     formData.append("price", currentItem.price);
@@ -69,17 +69,28 @@ const MenuAdminInterface = () => {
     if (currentItem.image && currentItem.image instanceof File) {
       formData.append("image", currentItem.image);
     }
-
+  
     try {
-      if (currentItem.id) {
-        await axios.put(
-          `http://localhost:5000/menu/${currentItem.id}`,
+      let updatedMenuItems;
+      if (currentItem._id) {
+        const response = await axios.put(
+          `http://localhost:5000/menu/${currentItem._id}`,
           formData,
           {
             headers: {
               "Content-Type": "multipart/form-data",
             },
           }
+        );
+        updatedMenuItems = menuItems.map((item) =>
+          item._id === currentItem._id
+            ? {
+                ...response.data,
+                image: response.data.image
+                  ? `http://localhost:5000/${response.data.image}`
+                  : null,
+              }
+            : item
         );
       } else {
         const response = await axios.post(
@@ -91,7 +102,7 @@ const MenuAdminInterface = () => {
             },
           }
         );
-        setMenuItems([
+        updatedMenuItems = [
           ...menuItems,
           {
             ...response.data,
@@ -99,28 +110,25 @@ const MenuAdminInterface = () => {
               ? `http://localhost:5000/${response.data.image}`
               : null,
           },
-        ]);
+        ];
       }
+      setMenuItems(updatedMenuItems);
       closeModal();
     } catch (error) {
       console.error("Error saving menu item:", error);
-      // Consider setting an error state and displaying it to the user
     }
   };
 
-  const handleDelete = async (id) => {
-    // Check if the ID is valid and the item exists
-    const itemExists = menuItems.some((item) => item.id === id);
-    if (!id || !itemExists) {
-      console.error("Invalid or non-existent ID for deletion");
-      return;
-    }
+  const handleDelete = async (_id) => {
     try {
-      await axios.delete(`http://localhost:5000/menu/${id}`);
-      setMenuItems(menuItems.filter((item) => item.id !== id));
+      const response = await axios.delete(`http://localhost:5000/menu/${_id}`);
+      if (response.status === 200) {
+        setMenuItems(menuItems.filter((item) => item._id !== _id));
+      } else {
+        console.error("Failed to delete menu item:", response.data.message);
+      }
     } catch (error) {
       console.error("Error deleting menu item:", error);
-      // Consider setting an error state and displaying it to the user
     }
   };
 
@@ -179,61 +187,56 @@ const MenuAdminInterface = () => {
         </div>
         <div className="menu-items">
           {filteredMenuItems.length > 0 ? (
-            filteredMenuItems.map(
-              (
-                item,
-                index // Use index as part of key if necessary
-              ) => (
-                <div className="menu-item" key={item.id || index}>
-                  <div className="menu-image-container">
-                    {item.image ? (
-                      typeof item.image === "string" ? (
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="menu-image"
-                        />
-                      ) : (
-                        <img
-                          src={URL.createObjectURL(item.image)}
-                          alt={item.name}
-                          className="menu-image"
-                        />
-                      )
+            filteredMenuItems.map((item, index) => (
+              <div className="menu-item" key={item._id || index}>
+                <div className="menu-image-container">
+                  {item.image ? (
+                    typeof item.image === "string" ? (
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="menu-image"
+                      />
                     ) : (
-                      <div className="menu-image-placeholder">No Image</div>
-                    )}
-                  </div>
-                  <div className="menu-details">
-                    <p className="menu-name">{item.name}</p>
-                    <p className="menu-price">Php {item.price}</p>
-                    <p
-                      className={`menu-quantity ${
-                        item.quantity === 0 ? "sold-out" : ""
-                      }`}
-                    >
-                      {item.quantity > 0
-                        ? `Available: ${item.quantity}`
-                        : "Sold Out"}
-                    </p>
-                  </div>
-                  <div className="menu-actions">
-                    <button
-                      onClick={() => openModal(item)}
-                      className="action-link"
-                    >
-                      edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(item.id)}
-                      className="action-link"
-                    >
-                      delete
-                    </button>
-                  </div>
+                      <img
+                        src={URL.createObjectURL(item.image)}
+                        alt={item.name}
+                        className="menu-image"
+                      />
+                    )
+                  ) : (
+                    <div className="menu-image-placeholder">No Image</div>
+                  )}
                 </div>
-              )
-            )
+                <div className="menu-details">
+                  <p className="menu-name">{item.name}</p>
+                  <p className="menu-price">Php {item.price}</p>
+                  <p
+                    className={`menu-quantity ${
+                      item.quantity === 0 ? "sold-out" : ""
+                    }`}
+                  >
+                    {item.quantity > 0
+                      ? `Available: ${item.quantity}`
+                      : "Sold Out"}
+                  </p>
+                </div>
+                <div className="menu-actions">
+                  <button
+                    onClick={() => openModal(item)}
+                    className="action-link"
+                  >
+                    edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(item._id)}
+                    className="action-link"
+                  >
+                    delete
+                  </button>
+                </div>
+              </div>
+            ))
           ) : (
             <p className="no-results">No menu item/s {searchTerm} added.</p>
           )}
@@ -242,7 +245,7 @@ const MenuAdminInterface = () => {
         {isModalOpen && (
           <div className="modal-overlay">
             <div className="modal">
-              <h2>{currentItem.id ? "Edit Item" : "Add New Item"}</h2>
+              <h2>{currentItem._id ? "Edit Item" : "Add New Item"}</h2>
               <form onSubmit={handleSubmit}>
                 <input
                   type="text"
