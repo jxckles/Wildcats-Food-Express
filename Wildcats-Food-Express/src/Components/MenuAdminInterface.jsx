@@ -4,6 +4,7 @@ import "./MenuAdminInterface.css";
 import logo from "/logo.svg";
 import profileIcon from "/cat_profile.svg";
 import cartIcon from "/hamburger-menu.svg";
+import { useNavigate } from "react-router-dom";
 
 const MainAdminInterface = () => {
   const [menuItems, setMenuItems] = useState([]);
@@ -16,6 +17,7 @@ const MainAdminInterface = () => {
     quantity: 0,
   });
 
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("menu");
   const [orders, setOrders] = useState([
@@ -211,7 +213,7 @@ const MainAdminInterface = () => {
 
   const handleLogout = () => {
     console.log("Logging out...");
-    // Implement logout logic here
+    setTimeout(() => navigate("/login", { replace: true }), 2000);
   };
 
   const handleProductChange = (orderId, productId) => {
