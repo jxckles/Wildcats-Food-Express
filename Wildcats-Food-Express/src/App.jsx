@@ -11,6 +11,7 @@ import Dashboard from "./Components/Dashboard";
 import ForgotPassword from "./Components/ForgotPassword";
 import ResetPassword from "./Components/ResetPassword";
 import MenuAdminInterface from "./Components/MenuAdminInterface";
+import ClientInterface from "./Components/ClientInterface"; // Import ClientInterface
 import {
   BrowserRouter as Router,
   Routes,
@@ -18,7 +19,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; // Import toastify css
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
@@ -42,14 +43,18 @@ function App() {
   );
 }
 
-// Layout component to handle different headers and layouts
 const AppLayout = () => {
   const location = useLocation();
   const isResetPassword = location.pathname === "/reset-password";
   const isAdminPage = location.pathname === "/admin";
+  const isClientInterface = location.pathname === "/client-interface";
 
   if (isAdminPage) {
-    return <MenuAdminInterface />; // Render only the Admin Interface
+    return <MenuAdminInterface />;
+  }
+
+  if (isClientInterface) {
+    return <ClientInterface />; // Render only the Client Interface
   }
 
   const headerComponent = isResetPassword ? <SimpleHeader /> : <Header />;
@@ -66,6 +71,7 @@ const AppLayout = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/admin" element={<MenuAdminInterface />} />
+        <Route path="/client-interface" element={<ClientInterface />} />
       </Routes>
       <Footer />
     </div>

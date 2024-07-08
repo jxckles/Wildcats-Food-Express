@@ -4,7 +4,9 @@ import "./MenuAdminInterface.css";
 import logo from "/logo.svg";
 import profileIcon from "/cat_profile.svg";
 import cartIcon from "/hamburger-menu.svg";
+import ClientInterface from './ClientInterface';
 import { useNavigate } from "react-router-dom";
+
 
 const MainAdminInterface = () => {
   const [menuItems, setMenuItems] = useState([]);
@@ -381,7 +383,7 @@ const MainAdminInterface = () => {
       <div className="modal-overlay">
         <div className="modal user-roles-modal">
           <h3>My Roles</h3>
-          <button onClick={() => handleInterfaceChange("client")}>
+          <button onClick={() => navigate('/client-interface')}>
             Client Interface
           </button>
           <button onClick={closeModal}>Cancel</button>
@@ -589,21 +591,9 @@ const MainAdminInterface = () => {
     );
   };
 
-  const renderClientInterface = () => {
-    return (
-      <div className="client-interface">
-        <h1>Client Dashboard</h1>
-        <p>This is the client interface for admin users.</p>
-        <button onClick={() => handleInterfaceChange("admin")}>
-          Switch to Admin Interface
-        </button>
-      </div>
-    );
-  };
 
-  return interfaceType === "admin"
-    ? renderAdminInterface()
-    : renderClientInterface();
+
+  return <div className="admin-interface">{renderAdminInterface()}</div>;
 };
 
 export default MainAdminInterface;
