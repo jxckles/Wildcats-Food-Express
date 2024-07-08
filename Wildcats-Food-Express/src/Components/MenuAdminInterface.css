@@ -105,6 +105,8 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   padding: 10px;
+  width: 140px;
+  height: 55px;
   z-index: 1000;
 }
 
@@ -444,6 +446,57 @@
 .admin-options{
   color: #990000;
 }
+
+/* Add these styles to your existing AdminInterface.css file */
+
+.order-tracking {
+  margin-top: 20px;
+}
+
+.todays-order {
+  color: #990000;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.order-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.order-table th,
+.order-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+.order-table th {
+  background-color: #f2f2f2;
+  color: #990000;
+}
+
+.order-table select {
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.delete-order-btn {
+  background-color: #990000;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.delete-order-btn:hover {
+  background-color: #7a0000;
+}
+
+
 /* Media Queries */
 @media (max-width: 768px) {
   .admin-header {
