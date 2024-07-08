@@ -102,24 +102,19 @@ const ClientInterface = () => {
     const order = {
       schoolId,
       items: cart,
-      totalCost: calculateTotal(),
       status: "Pending",
     };
 
     try {
-      await axios.post("http://localhost:5000/orders", order);
+      const response = await axios.post("http://localhost:5000/orders", order);
       setCart([]);
       setSchoolId("");
-      fetchOrders();
+      fetchOrders(); // Refresh orders after placing new order
       alert("Order placed successfully!");
     } catch (error) {
       console.error("Error placing order:", error);
       alert("Failed to place order. Please try again.");
     }
-  };
-
-  const calculateTotal = () => {
-    return cart.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
   const toggleCartMenu = () => {
@@ -245,7 +240,6 @@ const ClientInterface = () => {
               <th>Order ID</th>
               <th>School ID</th>
               <th>Items</th>
-              <th>Total Cost</th>
               <th>Status</th>
             </tr>
           </thead>
@@ -255,7 +249,6 @@ const ClientInterface = () => {
                 <td>{order._id}</td>
                 <td>{order.schoolId}</td>
                 <td>{order.items.map((item) => `${item.name} (${item.quantity})`).join(", ")}</td>
-                <td>₱{order.totalCost.toFixed(2)}</td>
                 <td>{order.status}</td>
               </tr>
             ))}
@@ -277,6 +270,10 @@ const ClientInterface = () => {
         </div>
       </div>
     );
+  };
+
+  const calculateTotal = () => {
+    return cart.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
   return (
