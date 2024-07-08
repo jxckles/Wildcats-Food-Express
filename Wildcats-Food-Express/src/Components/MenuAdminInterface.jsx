@@ -4,7 +4,6 @@ import "./MenuAdminInterface.css";
 import logo from "/logo.svg";
 import profileIcon from "/cat_profile.svg";
 import cartIcon from "/hamburger-menu.svg";
-import ClientInterface from './ClientInterface';
 import { useNavigate } from "react-router-dom";
 
 
