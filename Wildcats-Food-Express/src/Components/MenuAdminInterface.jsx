@@ -24,11 +24,12 @@ const MainAdminInterface = () => {
     {
       id: "22-4355-566",
       name: "Juan Dela Cruz",
-      product: "",
+      product: "Fried Chicken", 
       preparedBy: "",
       status: "",
     },
-  ]);
+  ]);  
+  
   const [reportSearchTerm, setReportSearchTerm] = useState("");
   const [reportDate, setReportDate] = useState("");
   const [reportMonth, setReportMonth] = useState("");
@@ -216,13 +217,6 @@ const MainAdminInterface = () => {
     setTimeout(() => navigate("/login", { replace: true }), 2000);
   };
 
-  const handleProductChange = (orderId, productId) => {
-    setOrders(
-      orders.map((order) =>
-        order.id === orderId ? { ...order, product: productId } : order
-      )
-    );
-  };
 
   const toggleCartMenu = () => {
     setIsCartMenuOpen(!isCartMenuOpen);
@@ -251,21 +245,7 @@ const MainAdminInterface = () => {
               <tr key={order.id}>
                 <td>{order.id}</td>
                 <td>{order.name}</td>
-                <td>
-                  <select
-                    value={order.product || ""}
-                    onChange={(e) =>
-                      handleProductChange(order.id, e.target.value)
-                    }
-                  >
-                    <option value="">Select product</option>
-                    {menuItems.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.name}
-                      </option>
-                    ))}
-                  </select>
-                </td>
+                <td>{order.product}</td>
                 <td>
                   <select
                     value={order.preparedBy}
@@ -299,8 +279,7 @@ const MainAdminInterface = () => {
         </table>
       </div>
     );
-  };
-  const renderReports = () => {
+  };  const renderReports = () => {
     const currentYear = new Date().getFullYear();
     const months = [
       "January",
@@ -401,10 +380,7 @@ const MainAdminInterface = () => {
     return (
       <div className="modal-overlay">
         <div className="modal user-roles-modal">
-          <h3>Select Interface</h3>
-          <button onClick={() => handleInterfaceChange("admin")}>
-            Admin Interface
-          </button>
+          <h3>My Roles</h3>
           <button onClick={() => handleInterfaceChange("client")}>
             Client Interface
           </button>
