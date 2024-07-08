@@ -11,7 +11,7 @@ import Dashboard from "./Components/Dashboard";
 import ForgotPassword from "./Components/ForgotPassword";
 import ResetPassword from "./Components/ResetPassword";
 import MenuAdminInterface from "./Components/MenuAdminInterface";
-import ClientInterface from "./Components/ClientInterface"; // Import ClientInterface
+import ClientInterface from "./Components/ClientInterface";
 import {
   BrowserRouter as Router,
   Routes,
@@ -48,32 +48,33 @@ const AppLayout = () => {
   const isResetPassword = location.pathname === "/reset-password";
   const isAdminPage = location.pathname === "/admin";
   const isClientInterface = location.pathname === "/client-interface";
+  const isDashboard = location.pathname === "/dashboard";
 
   if (isAdminPage) {
     return <MenuAdminInterface />;
   }
 
   if (isClientInterface) {
-    return <ClientInterface />; // Render only the Client Interface
+    return <ClientInterface />;
+  }
+
+  if (isDashboard) {
+    return <Dashboard />;
   }
 
   const headerComponent = isResetPassword ? <SimpleHeader /> : <Header />;
 
   return (
     <div className="wrap">
-      {headerComponent}
-      {!isResetPassword}
-      <Routes>
+      {!isDashboard && headerComponent}
+      {!isResetPassword && !isDashboard && <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/admin" element={<MenuAdminInterface />} />
-        <Route path="/client-interface" element={<ClientInterface />} />
-      </Routes>
-      <Footer />
+      </Routes>}
+      {!isDashboard && <Footer />}
     </div>
   );
 };
