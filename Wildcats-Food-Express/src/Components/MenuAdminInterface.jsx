@@ -35,7 +35,7 @@ const MainAdminInterface = () => {
   const [reportDate, setReportDate] = useState("");
   const [reportMonth, setReportMonth] = useState("");
   const [reportYear, setReportYear] = useState("");
-  const [interfaceType, setInterfaceType] = useState("admin");
+  const [setInterfaceType] = useState("admin");
   const [isCartMenuOpen, setIsCartMenuOpen] = useState(false);
 
   useEffect(() => {
