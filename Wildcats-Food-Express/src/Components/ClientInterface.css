@@ -180,6 +180,9 @@
     padding: 5px 10px;
     border-radius: 4px;
     cursor: pointer;
+        &:active{
+            background-color: #b86565;
+        }
   }
   
   .add-to-cart-btn:disabled {
