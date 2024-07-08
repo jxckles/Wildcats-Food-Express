@@ -294,6 +294,9 @@
   width: 100%;
   border-collapse: collapse;
 }
+.order-table tr {
+  color: #8b0101;
+  }
 
 .order-table th, .order-table td {
   border: 1px solid #ddd;
@@ -399,6 +402,10 @@
 
 .user-roles-modal h3 {
   margin-bottom: 20px;
+  color: #990000;
+  margin-left: 80px;
+  font-size: 1.5em;
+  font-weight: bold;
 }
 
 .user-roles-modal button {
