@@ -13,10 +13,8 @@ app.use(express.json());
 app.use(cors());
 
 // Static folder for images
-app.use(
-  "/public/Images",
-  express.static(path.join(__dirname, "public/Images"))
-);
+
+app.use("/Images", express.static(path.join(__dirname, "public/Images")));
 
 mongoose.connect(
   "mongodb+srv://castroy092003:7xiHqTSiUKH0ZIf4@wildcats-food-express.7w2snhk.mongodb.net/User?retryWrites=true&w=majority&appName=Wildcats-Food-Express"
@@ -28,7 +26,7 @@ const storage = multer.diskStorage({
     cb(null, "public/Images");
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname)); // Appending extension
+    cb(null, Date.now() + path.extname(file.originalname));
   },
 });
 
@@ -37,23 +35,15 @@ const upload = multer({ storage: storage });
 app.post("/Login", (req, res) => {
   const { email, password } = req.body;
   UserModel.findOne({ email: email }).then((user) => {
-    if (user.email == "admin@gmail.com") {
-      if (user.password === password) {
+    if (user) {
+      if (user.email == "admin@gmail.com" && user.password == "admin") {
         res.json("Admin");
-      } 
-      else  {
-        res.json("Incorrect password"); 
-      } 
-    }
-    else if(user){
-      if(user.password === password){
+      } else if (user.password === password) {
         res.json("Success");
+      } else {
+        res.json("Incorrect password");
       }
-      else{
-        res.json("Incorrect password")
-      }
-    } 
-    else {
+    } else {
       res.json("User does not exist");
     }
   });

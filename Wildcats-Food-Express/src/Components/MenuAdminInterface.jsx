@@ -6,7 +6,6 @@ import profileIcon from "/cat_profile.svg";
 import cartIcon from "/hamburger-menu.svg";
 import { useNavigate } from "react-router-dom";
 
-
 const MainAdminInterface = () => {
   const [menuItems, setMenuItems] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,12 +24,12 @@ const MainAdminInterface = () => {
     {
       id: "22-4355-566",
       name: "Juan Dela Cruz",
-      product: "Fried Chicken", 
+      product: "Fried Chicken",
       preparedBy: "",
       status: "",
     },
-  ]);  
-  
+  ]);
+
   const [reportSearchTerm, setReportSearchTerm] = useState("");
   const [reportDate, setReportDate] = useState("");
   const [reportMonth, setReportMonth] = useState("");
@@ -47,13 +46,14 @@ const MainAdminInterface = () => {
       const response = await axios.get("http://localhost:5000/menu");
       const menuData = response.data.map((item) => ({
         ...item,
-        image: item.image ? `http://localhost:5000/${item.image}` : null,
+        image: item.image
+          ? `http://localhost:5000/Images/${item.image.split("\\").pop()}` // Ensures only the file name is appended
+          : null,
       }));
       setMenuItems(menuData);
-      console.log("Fetched menu items:", menuData); // Debug log
+      console.log("Fetched menu items:", menuData);
     } catch (error) {
       console.error("Error fetching menu items:", error);
-      // Consider setting an error state and displaying it to the user
     }
   };
 
@@ -120,11 +120,14 @@ const MainAdminInterface = () => {
             ? {
                 ...response.data,
                 image: response.data.image
-                  ? `http://localhost:5000/${response.data.image}`
+                  ? `http://localhost:5000/Images/${response.data.image
+                      .split("/")
+                      .pop()}`
                   : null,
               }
             : item
         );
+        window.location.reload();
       } else {
         const response = await axios.post(
           "http://localhost:5000/menu",
@@ -140,7 +143,9 @@ const MainAdminInterface = () => {
           {
             ...response.data,
             image: response.data.image
-              ? `http://localhost:5000/${response.data.image}`
+              ? `http://localhost:5000/Images/${response.data.image
+                  .split("/")
+                  .pop()}`
               : null,
           },
         ];
@@ -218,7 +223,6 @@ const MainAdminInterface = () => {
     setTimeout(() => navigate("/login", { replace: true }), 2000);
   };
 
-
   const toggleCartMenu = () => {
     setIsCartMenuOpen(!isCartMenuOpen);
   };
@@ -280,7 +284,8 @@ const MainAdminInterface = () => {
         </table>
       </div>
     );
-  };  const renderReports = () => {
+  };
+  const renderReports = () => {
     const currentYear = new Date().getFullYear();
     const months = [
       "January",
@@ -382,7 +387,7 @@ const MainAdminInterface = () => {
       <div className="modal-overlay">
         <div className="modal user-roles-modal">
           <h3>My Roles</h3>
-          <button onClick={() => navigate('/client-interface')}>
+          <button onClick={() => navigate("/client-interface")}>
             Client Interface
           </button>
           <button onClick={closeModal}>Cancel</button>
@@ -589,8 +594,6 @@ const MainAdminInterface = () => {
       </div>
     );
   };
-
-
 
   return <div className="admin-interface">{renderAdminInterface()}</div>;
 };
