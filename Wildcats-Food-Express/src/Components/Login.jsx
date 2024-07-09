@@ -1,11 +1,12 @@
 // src/components/Login.jsx
 import React from "react";
 import "./Login.css";
+import "./ToastStyles.css";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import catProfile from "/cat_profile.svg"; // Update the path to your cat profile image
+import catProfile from "/cat_profile.svg";
 
 const Login = () => {
   const [email, setEmail] = React.useState("");
@@ -21,26 +22,44 @@ const Login = () => {
       })
       .then((result) => {
         if (result.data === "Admin") {
-          toast.success("Login successful!", {
-            autoClose: 500,
-          });
+          showSuccessToast("Login successful!");
           setTimeout(() => navigate("/admin"), 2000);
         } else if (result.data === "Success") {
-          toast.success("Login successful!", {
-          autoClose: 500,
-        });
+          showSuccessToast("Login successful!");
           setTimeout(() => navigate("/dashboard"), 2000);
         } else {
-          toast.error(result.data, {
-            autoClose: 500,
-          });
+          showErrorToast(result.data);
         }
       })
       .catch((error) => {
-        toast.error("Login failed!", {
-          autoClose: 500,
-        });
+        showErrorToast("Login failed!");
       });
+  };
+
+  const showSuccessToast = (message) => {
+    toast.success(message, {
+      position: "top-center",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+    });
+  };
+
+  const showErrorToast = (message) => {
+    toast.error(message, {
+      position: "top-center",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+    });
   };
 
   return (
@@ -67,7 +86,7 @@ const Login = () => {
           <button type="submit">Log in</button>
         </form>
         <p className="reset_password">
-          <a href="/forgot-password">Forgot password?</a> {/* Updated link */}
+          <a href="/forgot-password">Forgot password?</a>
         </p>
         <p className="no_account">
           No account yet? <a href="/signup">Sign up here instead.</a>
