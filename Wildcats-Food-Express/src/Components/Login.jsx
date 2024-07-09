@@ -21,9 +21,14 @@ const Login = () => {
       })
       .then((result) => {
         if (result.data === "Admin") {
+          toast.success("Login successful!", {
+            autoClose: 500,
+          });
           setTimeout(() => navigate("/admin"), 2000);
         } else if (result.data === "Success") {
-          toast.success("Login successful!");
+          toast.success("Login successful!", {
+          autoClose: 500,
+        });
           setTimeout(() => navigate("/dashboard"), 2000);
         } else {
           toast.error(result.data, {
