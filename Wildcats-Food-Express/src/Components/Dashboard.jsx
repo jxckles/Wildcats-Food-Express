@@ -154,34 +154,72 @@ const UserInterface = () => {
             onChange={handleSearch}
           />
         </div>
-        <div className="menu-items">
-          {filteredMenuItems.map((item) => (
-            <div className="menu-item" key={item._id}>
-              <div className="menu-image-container">
-                {item.image ? (
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="menu-image"
-                  />
-                ) : (
-                  <div className="menu-image-placeholder">No Image</div>
-                )}
+        <div className="menu-and-summary-container">
+          <div className="menu-items">
+            {filteredMenuItems.map((item) => (
+              <div className="menu-item" key={item._id}>
+                <div className="menu-image-container">
+                  {item.image ? (
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="menu-image"
+                    />
+                  ) : (
+                    <div className="menu-image-placeholder">No Image</div>
+                  )}
+                </div>
+                <div className="menu-details">
+                  <p className="menu-name">{item.name}</p>
+                  <p className="menu-price">₱{item.price.toFixed(2)}</p>
+                  <p className="menu-quantity">Available: {item.quantity}</p>
+                </div>
+                <button
+                  onClick={() => handleAddToCart(item)}
+                  disabled={item.quantity === 0}
+                  className="add-to-cart-btn"
+                >
+                  Add to Cart
+                </button>
               </div>
-              <div className="menu-details">
-                <p className="menu-name">{item.name}</p>
-                <p className="menu-price">₱{item.price.toFixed(2)}</p>
-                <p className="menu-quantity">Available: {item.quantity}</p>
+            ))}
+          </div>
+
+          {/* Moved Order Summary Section */}
+          <div className="order-summary">
+            <h2>Order Summary</h2>
+            <div className="orders-tab">
+              <input
+                type="text"
+                placeholder="Enter School ID (xx-xxxx-xxx)"
+                value={schoolId}
+                onChange={(e) => setSchoolId(e.target.value)}
+                className="school-id-input"
+              />
+              <div className="cart-items">
+                {cart.map((item) => (
+                  <div key={item._id} className="cart-item">
+                    <span>{item.name}</span>
+                    <span>₱{item.price.toFixed(2)}</span>
+                    <div className="quantity-controls">
+                      <button onClick={() => handleRemoveFromCart(item)}>-</button>
+                      <span>{item.quantity}</span>
+                      <button onClick={() => handleAddToCart(item)}>+</button>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <button
-                onClick={() => handleAddToCart(item)}
-                disabled={item.quantity === 0}
-                className="add-to-cart-btn"
-              >
-                Add to Cart
-              </button>
+              <div className="order-actions">
+                <p>Total: ₱{calculateTotal().toFixed(2)}</p>
+                <button onClick={handleCancelOrder} className="cancel-order-btn">
+                  Cancel Order
+                </button>
+                <button onClick={handlePlaceOrder} className="place-order-btn">
+                  Place Order
+                </button>
+              </div>
             </div>
-          ))}
+          </div>
         </div>
       </div>
     );
@@ -190,61 +228,8 @@ const UserInterface = () => {
   const renderOrders = () => {
     return (
       <div className="orders-tab">
-        <h2>Your Order</h2>
-        <input
-          type="text"
-          placeholder="Enter School ID (xx-xxxx-xxx)"
-          value={schoolId}
-          onChange={(e) => setSchoolId(e.target.value)}
-          className="school-id-input"
-        />
-        <div className="cart-items">
-          {cart.map((item) => (
-            <div key={item._id} className="cart-item">
-              <span>{item.name}</span>
-              <span>₱{item.price.toFixed(2)}</span>
-              <div className="quantity-controls">
-                <button onClick={() => handleRemoveFromCart(item)}>-</button>
-                <span>{item.quantity}</span>
-                <button onClick={() => handleAddToCart(item)}>+</button>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="order-summary">
-          <p>Total: ₱{calculateTotal().toFixed(2)}</p>
-          <button onClick={handleCancelOrder} className="cancel-order-btn">
-            Cancel Order
-          </button>
-          <button onClick={handlePlaceOrder} className="place-order-btn">
-            Place Order
-          </button>
-        </div>
-        <div className="receipt-preview">
-          <h3>Receipt Preview</h3>
-          <p>School ID: {schoolId}</p>
-          <ul>
-            {cart.map((item) => (
-              <li key={item._id}>
-                {item.name} x {item.quantity} - ₱
-                {(item.price * item.quantity).toFixed(2)}
-              </li>
-            ))}
-          </ul>
-          <p>Total: ₱{calculateTotal().toFixed(2)}</p>
-          <button onClick={() => window.print()} className="print-receipt-btn">
-            Print Receipt
-          </button>
-        </div>
-      </div>
-    );
-  };
-
-  const renderOrderStatus = () => {
-    return (
-      <div className="order-status-tab">
-        <h2>Order Status</h2>
-        <table className="order-status-table">
+        <h2>Your Orders</h2>
+        <table className="orders-table">
           <thead>
             <tr>
               <th>Order ID</th>
@@ -257,19 +242,26 @@ const UserInterface = () => {
             {orders.map((order) => (
               <tr key={order._id}>
                 <td>{order._id}</td>
-                <td>{order.schoolId}</td>
-                <td>
-                  {order.items
-                    .map((item) => `${item.name} (${item.quantity})`)
-                    .join(", ")}
-                </td>
+                <td>{formatDate(order.dateOrdered)}</td>
                 <td>{order.status}</td>
+                <td>
+                  <button onClick={() => viewOrderDetails(order._id)}>View Details</button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
     );
+  };
+
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('en-US', options);
+  };
+
+  const viewOrderDetails = (orderId) => {
+    // Implement logic to view detailed order information
   };
 
   const renderUserRolesModal = () => {
@@ -280,7 +272,6 @@ const UserInterface = () => {
           <button onClick={handleAdminInterfaceChange}>Edit Profile</button>
           <button onClick={handleAdminInterfaceChange}>My Orders</button>
           <button onClick={handleAdminInterfaceChange}>Track My Order</button>
-
           <button onClick={closeUserRolesModal}>Cancel</button>
         </div>
       </div>
@@ -291,6 +282,29 @@ const UserInterface = () => {
     return cart.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
+  const renderChangePassword = () => {
+    return (
+      
+      <div className="change-password-tab">
+        <div className="change-password-form">
+          <h2>Change Password</h2>
+          <div className="form-group">
+            <label>Old Password:</label>
+            <input type="password" />
+          </div>
+          <div className="form-group">
+            <label>New Password:</label>
+            <input type="password" />
+          </div>
+          <div className="form-group">
+            <label>Confirm New Password:</label>
+            <input type="password" />
+          </div>
+          <button className="submit-btn">Submit</button>
+        </div>
+      </div>
+    );
+  };
   return (
     <div className="user-interface">
       <header className="user-header">
@@ -308,7 +322,7 @@ const UserInterface = () => {
               onClick={() => setActiveTab("menus")}
               className={`nav-link ${activeTab === "menus" ? "active" : ""}`}
             >
-              Menus
+              Food Menu
             </button>
             <button
               onClick={() => setActiveTab("orders")}
@@ -317,12 +331,12 @@ const UserInterface = () => {
               My Orders
             </button>
             <button
-              onClick={() => setActiveTab("orderStatus")}
+              onClick={() => setActiveTab("changePassword")}
               className={`nav-link ${
-                activeTab === "orderStatus" ? "active" : ""
+                activeTab === "changePassword" ? "active" : ""
               }`}
             >
-              Order Status
+              Change Password
             </button>
           </nav>
         </div>
@@ -348,7 +362,7 @@ const UserInterface = () => {
       <main className="user-main">
         {activeTab === "menus" && renderMenus()}
         {activeTab === "orders" && renderOrders()}
-        {activeTab === "orderStatus" && renderOrderStatus()}
+        {activeTab === "changePassword" && renderChangePassword()}
       </main>
       {isUserRolesModalOpen && renderUserRolesModal()}
     </div>
