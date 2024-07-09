@@ -233,9 +233,9 @@ const UserInterface = () => {
           <thead>
             <tr>
               <th>Order ID</th>
-              <th>School ID</th>
-              <th>Items</th>
+              <th>Date Ordered</th>
               <th>Status</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -272,10 +272,15 @@ const UserInterface = () => {
           <button onClick={handleAdminInterfaceChange}>Edit Profile</button>
           <button onClick={handleAdminInterfaceChange}>My Orders</button>
           <button onClick={handleAdminInterfaceChange}>Track My Order</button>
+          <button onClick={handleLogout}>Logout</button>
           <button onClick={closeUserRolesModal}>Cancel</button>
         </div>
       </div>
     );
+  };
+
+  const handleLogout = () => {
+    navigate('/login');
   };
 
   const calculateTotal = () => {
@@ -284,7 +289,6 @@ const UserInterface = () => {
 
   const renderChangePassword = () => {
     return (
-      
       <div className="change-password-tab">
         <div className="change-password-form">
           <h2>Change Password</h2>
@@ -305,6 +309,7 @@ const UserInterface = () => {
       </div>
     );
   };
+
   return (
     <div className="user-interface">
       <header className="user-header">
