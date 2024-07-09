@@ -25,7 +25,14 @@ const ClientInterface = () => {
   const fetchMenuItems = async () => {
     try {
       const response = await axios.get("http://localhost:5000/menu");
-      setMenuItems(response.data);
+      const menuData = response.data.map((item) => ({
+        ...item,
+        image: item.image
+          ? `http://localhost:5000/Images/${item.image.split("\\").pop()}`
+          : null,
+      }));
+      setMenuItems(menuData);
+      console.log("Fetched menu items:", menuData);
     } catch (error) {
       console.error("Error fetching menu items:", error);
     }
