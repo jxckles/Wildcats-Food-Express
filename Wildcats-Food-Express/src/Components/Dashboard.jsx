@@ -25,7 +25,14 @@ const UserInterface = () => {
   const fetchMenuItems = async () => {
     try {
       const response = await axios.get("http://localhost:5000/menu");
-      setMenuItems(response.data);
+      const menuData = response.data.map((item) => ({
+        ...item,
+        image: item.image
+          ? `http://localhost:5000/Images/${item.image.split("\\").pop()}`
+          : null,
+      }));
+      setMenuItems(menuData);
+      console.log("Fetched menu items:", menuData);
     } catch (error) {
       console.error("Error fetching menu items:", error);
     }
@@ -129,15 +136,13 @@ const UserInterface = () => {
     setIsUserRolesModalOpen(false);
   };
 
-  const handleAdminInterfaceChange = () => {
-    
-  };
+  const handleAdminInterfaceChange = () => {};
 
   const renderMenus = () => {
     const filteredMenuItems = menuItems.filter((item) =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  
+
     return (
       <div className="menus-tab">
         <div className="search-container">
@@ -154,7 +159,11 @@ const UserInterface = () => {
             <div className="menu-item" key={item._id}>
               <div className="menu-image-container">
                 {item.image ? (
-                  <img src={item.image} alt={item.name} className="menu-image" />
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="menu-image"
+                  />
                 ) : (
                   <div className="menu-image-placeholder">No Image</div>
                 )}
@@ -217,7 +226,8 @@ const UserInterface = () => {
           <ul>
             {cart.map((item) => (
               <li key={item._id}>
-                {item.name} x {item.quantity} - ₱{(item.price * item.quantity).toFixed(2)}
+                {item.name} x {item.quantity} - ₱
+                {(item.price * item.quantity).toFixed(2)}
               </li>
             ))}
           </ul>
@@ -229,7 +239,6 @@ const UserInterface = () => {
       </div>
     );
   };
-  
 
   const renderOrderStatus = () => {
     return (
@@ -249,7 +258,11 @@ const UserInterface = () => {
               <tr key={order._id}>
                 <td>{order._id}</td>
                 <td>{order.schoolId}</td>
-                <td>{order.items.map((item) => `${item.name} (${item.quantity})`).join(", ")}</td>
+                <td>
+                  {order.items
+                    .map((item) => `${item.name} (${item.quantity})`)
+                    .join(", ")}
+                </td>
                 <td>{order.status}</td>
               </tr>
             ))}
@@ -264,15 +277,9 @@ const UserInterface = () => {
       <div className="modal-overlay">
         <div className="modal user-roles-modal">
           <h3>My Profile</h3>
-          <button onClick={handleAdminInterfaceChange}>
-            Edit Profile
-          </button>
-          <button onClick={handleAdminInterfaceChange}>
-            My Orders
-          </button>
-          <button onClick={handleAdminInterfaceChange}>
-            Track My Order
-          </button>
+          <button onClick={handleAdminInterfaceChange}>Edit Profile</button>
+          <button onClick={handleAdminInterfaceChange}>My Orders</button>
+          <button onClick={handleAdminInterfaceChange}>Track My Order</button>
 
           <button onClick={closeUserRolesModal}>Cancel</button>
         </div>
@@ -311,14 +318,18 @@ const UserInterface = () => {
             </button>
             <button
               onClick={() => setActiveTab("orderStatus")}
-              className={`nav-link ${activeTab === "orderStatus" ? "active" : ""}`}
+              className={`nav-link ${
+                activeTab === "orderStatus" ? "active" : ""
+              }`}
             >
               Order Status
             </button>
           </nav>
         </div>
         <div className="user-profile">
-          <span className="user-options" onClick={openUserRolesModal}>My Profile</span>
+          <span className="user-options" onClick={openUserRolesModal}>
+            My Profile
+          </span>
           <div className="menu-container">
             <img
               src={cartIcon}
