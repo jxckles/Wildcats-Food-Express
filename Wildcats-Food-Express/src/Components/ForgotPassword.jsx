@@ -10,12 +10,13 @@ import { useNavigate } from "react-router-dom";
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const navigate = useNavigate();
+
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
       .post("http://localhost:5000/forgot-password", { email })
       .then((response) => {
-        if (response.data === "Success") {
+        if (response.data.status === true) {
           toast.success("Password reset link sent to your email!");
           navigate("/login");
         } else {

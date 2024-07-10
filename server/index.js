@@ -44,13 +44,17 @@ app.post("/Login", (req, res) => {
   const { email, password } = req.body;
   UserModel.findOne({ email: email }).then((user) => {
     if (user) {
-      const role = user.role; // assuming role is stored in the user document
-      const accessToken = jwt.sign({ email: email, role: role }, "jwt-access-token-secret-key", { expiresIn: '1m' });
-      const refreshToken = jwt.sign({ email: email, role: role }, "jwt-refresh-access-token-secret-key", { expiresIn: '1m' });
-      res.cookie('accessToken', accessToken, { maxAge: 15 * 60 * 1000 });
-      res.cookie('refreshToken', refreshToken, { maxAge: 7 * 24 * 60 * 60 * 1000, httpOnly: true, secure: true, sameSite: 'strict' });
-
-      return res.json({ role });
+      // Directly compare passwords (not recommended)
+      if (password === user.password) {
+        const role = user.role;
+        const accessToken = jwt.sign({ email: email, role: role }, "jwt-access-token-secret-key", { expiresIn: '1m' });
+        const refreshToken = jwt.sign({ email: email, role: role }, "jwt-refresh-access-token-secret-key", { expiresIn: '1m' });
+        res.cookie('accessToken', accessToken, { maxAge: 15 * 60 * 1000 });
+        res.cookie('refreshToken', refreshToken, { maxAge: 7 * 24 * 60 * 60 * 1000, httpOnly: true, secure: true, sameSite: 'strict' });
+        return res.json({ role });
+      } else {
+        return res.json("Incorrect password");
+      }
     } else {
       return res.json("User does not exist");
     }
