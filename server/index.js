@@ -116,6 +116,7 @@ app.get("/dashboard", verifyUser, (req, res) => {
   return res.json({ valid: true, message: "Welcome User", role: req.role });
 });
 
+
 app.post("/logout", (req, res) => {
   res.clearCookie("accessToken", { path: '/' });
   res.clearCookie("refreshToken", { path: '/' });
