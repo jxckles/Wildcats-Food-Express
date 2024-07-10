@@ -42,6 +42,10 @@ form {
   align-items: center;
   margin-bottom: 15px;
   width: 100%;
+  ::placeholder{
+    color: #990000;
+    opacity: 80%;
+  }
 }
 
 /* Label styling */
