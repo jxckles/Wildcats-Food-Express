@@ -43,6 +43,7 @@ const upload = multer({ storage: storage });
 app.post("/Login", (req, res) => {
   const { email, password } = req.body;
   UserModel.findOne({ email: email }).then((user) => {
+
     if (user) {
       // Directly compare passwords (not recommended)
       if (password === user.password) {

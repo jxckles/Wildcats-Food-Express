@@ -14,6 +14,7 @@ const Signup = () => {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
+  const [schoolId, setSchoolId] = React.useState("");
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
@@ -24,6 +25,13 @@ const Signup = () => {
       return;
     }
 
+    // Validate school ID format
+    const schoolIdRegex = /^\d{2}-\d{4}-\d{3}$/;
+    if (!schoolIdRegex.test(schoolId)) {
+      toast.error("Invalid school ID format. Please use xx-xxxx-xxx format.");
+      return;
+    }
+
     axios
       .post("http://localhost:5000/Register", {
         firstName,
@@ -31,6 +39,7 @@ const Signup = () => {
         courseYear,
         email,
         password,
+        schoolId,
       })
       .then((response) => {
         if (response.data === "Email already exists") {
@@ -58,6 +67,7 @@ const Signup = () => {
               type="text"
               name="firstName"
               required
+              placeholder="John"
               onChange={(e) => setFirstName(e.target.value)}
             />
           </div>
@@ -67,6 +77,7 @@ const Signup = () => {
               type="text"
               name="lastName"
               required
+              placeholder="Doe"
               onChange={(e) => setLastName(e.target.value)}
             />
           </div>
@@ -80,11 +91,23 @@ const Signup = () => {
             />
           </div>
           <div className="form-group">
+            <label>School ID:</label>
+            <input
+              type="text"
+              name="schoolId"
+              required
+              placeholder="xx-xxxx-xxx"
+              pattern="\d{2}-\d{4}-\d{3}"
+              onChange={(e) => setSchoolId(e.target.value)}
+            />
+          </div>
+          <div className="form-group">
             <label>Email:</label>
             <input
               type="email"
               name="email"
               required
+              placeholder="john.doe@cit.edu"
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>

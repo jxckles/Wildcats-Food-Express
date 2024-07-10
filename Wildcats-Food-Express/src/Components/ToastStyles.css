@@ -1,0 +1,14 @@
+/* ToastStyles.css */
+.Toastify__toast-theme--colored.Toastify__toast--success {
+    background-color: #4caf50;
+  }
+  
+  .Toastify__toast-theme--colored.Toastify__toast--error {
+    background-color: #f44336;
+  }
+  
+  .Toastify__toast {
+    font-family: 'Your Preferred Font', sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+  }

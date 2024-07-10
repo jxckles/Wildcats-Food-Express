@@ -16,6 +16,7 @@ const MainAdminInterface = () => {
     image: null,
     quantity: 0,
   });
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
@@ -59,7 +60,7 @@ const MainAdminInterface = () => {
 
   useEffect(() => {
     fetchMenuItems();
-  }, []);
+  }, [refreshKey]);
 
   const fetchMenuItems = async () => {
     try {
@@ -67,7 +68,7 @@ const MainAdminInterface = () => {
       const menuData = response.data.map((item) => ({
         ...item,
         image: item.image
-          ? `http://localhost:5000/Images/${item.image.split("\\").pop()}` // Ensures only the file name is appended
+          ? `http://localhost:5000/Images/${item.image.split("\\").pop()}`
           : null,
       }));
       setMenuItems(menuData);
@@ -103,7 +104,6 @@ const MainAdminInterface = () => {
     if (type === "file") {
       setCurrentItem({ ...currentItem, [name]: e.target.files[0] });
     } else if (name === "price" || name === "quantity") {
-      // Ensure non-negative numbers for price and quantity
       const numValue = parseFloat(value);
       if (!isNaN(numValue) && numValue >= 0) {
         setCurrentItem({ ...currentItem, [name]: value });
@@ -124,9 +124,8 @@ const MainAdminInterface = () => {
     }
 
     try {
-      let updatedMenuItems;
       if (currentItem._id) {
-        const response = await axios.put(
+        await axios.put(
           `http://localhost:5000/menu/${currentItem._id}`,
           formData,
           {
@@ -135,43 +134,15 @@ const MainAdminInterface = () => {
             },
           }
         );
-        updatedMenuItems = menuItems.map((item) =>
-          item._id === currentItem._id
-            ? {
-                ...response.data,
-                image: response.data.image
-                  ? `http://localhost:5000/Images/${response.data.image
-                      .split("/")
-                      .pop()}`
-                  : null,
-              }
-            : item
-        );
-        window.location.reload();
       } else {
-        const response = await axios.post(
-          "http://localhost:5000/menu",
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-        updatedMenuItems = [
-          ...menuItems,
-          {
-            ...response.data,
-            image: response.data.image
-              ? `http://localhost:5000/Images/${response.data.image
-                  .split("/")
-                  .pop()}`
-              : null,
+        await axios.post("http://localhost:5000/menu", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
           },
-        ];
+        });
       }
-      setMenuItems(updatedMenuItems);
       closeModal();
+      setRefreshKey((oldKey) => oldKey + 1);
     } catch (error) {
       console.error("Error saving menu item:", error);
     }
@@ -235,7 +206,7 @@ const MainAdminInterface = () => {
   const handleInterfaceChange = (type) => {
     setInterfaceType(type);
     setIsModalOpen(false);
-    setActiveTab("menu"); // Reset to the menu tab when switching interfaces
+    setActiveTab("menu");
   };
 
   const handleLogout = async () => {
@@ -313,21 +284,12 @@ const MainAdminInterface = () => {
       </div>
     );
   };
+
   const renderReports = () => {
     const currentYear = new Date().getFullYear();
     const months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
     ];
 
     return (
@@ -499,22 +461,18 @@ const MainAdminInterface = () => {
               <div className="menu-items">
                 {filteredMenuItems.length > 0 ? (
                   filteredMenuItems.map((item) => (
-                    <div className="menu-item" key={item._id || index}>
+                    <div className="menu-item" key={item._id}>
                       <div className="menu-image-container">
                         {item.image ? (
-                          typeof item.image === "string" ? (
-                            <img
-                              src={item.image}
-                              alt={item.name}
-                              className="menu-image"
-                            />
-                          ) : (
-                            <img
-                              src={URL.createObjectURL(item.image)}
-                              alt={item.name}
-                              className="menu-image"
-                            />
-                          )
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="menu-image"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = 'path/to/placeholder/image.jpg';
+                            }}
+                          />
                         ) : (
                           <div className="menu-image-placeholder">No Image</div>
                         )}
@@ -559,8 +517,7 @@ const MainAdminInterface = () => {
           {activeTab === "orders" && renderOrderTracking()}
           {activeTab === "reports" && renderReports()}
           {isModalOpen && activeTab === "userRoles" && renderUserRolesModal()}
-
-          {isModalOpen && activeTab !== "userRoles" && (
+	  {isModalOpen && activeTab !== "userRoles" && (
             <div className="modal-overlay">
               <div className="modal">
                 <h2>{currentItem._id ? "Edit Item" : "Add New Item"}</h2>
