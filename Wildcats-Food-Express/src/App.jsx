@@ -67,13 +67,15 @@ const AppLayout = () => {
   return (
     <div className="wrap">
       {!isDashboard && headerComponent}
-      {!isResetPassword && !isDashboard && <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-      </Routes>}
+      {!isResetPassword && !isDashboard && (
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
+        </Routes>
+      )}
       {!isDashboard && <Footer />}
     </div>
   );

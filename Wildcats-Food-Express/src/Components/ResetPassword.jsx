@@ -1,13 +1,20 @@
 // src/Components/ResetPassword.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./ResetPassword.css";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 
-const ResetPassword = ({ token }) => {
+const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const navigate = useNavigate();
+  const { token } = useParams();
+
+  useEffect(() => {
+    console.log("Token", token);
+  }, [token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,20 +25,21 @@ const ResetPassword = ({ token }) => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/reset-password",
-        {
-          newPassword,
-          token,
-        }
+        `http://localhost:5000/reset-password/${token}`,
+        { password: newPassword } // Ensure correct field name and value
       );
-      if (response.data === "Password reset successful!") {
-        toast.success("Password reset successful!");
-        // Redirect or show success message
+
+      if (response.data.status) {
+        toast.success(response.data.message);
+        navigate("/login");
       } else {
-        toast.error("Password reset failed!");
+        toast.error(response.data.message);
       }
     } catch (error) {
       console.error("Password reset error:", error);
+      if (error.response) {
+        console.error("Server response:", error.response.data);
+      }
       toast.error("Password reset failed!");
     }
   };
