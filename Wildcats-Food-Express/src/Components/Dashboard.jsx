@@ -308,8 +308,17 @@ const UserInterface = () => {
     );
   };
 
-  const handleLogout = () => {
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await axios.post(
+        "http://localhost:5000/logout",
+        {},
+        { withCredentials: true }
+      );
+      navigate("/login", { replace: true });
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
   };
 
   const calculateTotal = () => {
