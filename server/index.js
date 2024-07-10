@@ -6,11 +6,17 @@ const path = require("path");
 const fs = require("fs"); // Import fs module
 const UserModel = require("./models/User");
 const MenuItem = require("./models/Menu");
-
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+app.use(cookieParser());
+app.use(cors({
+  origin: ["http://localhost:5173"],
+  credentials: true
+}));
+
 
 // Static folder for images
 
@@ -36,18 +42,108 @@ app.post("/Login", (req, res) => {
   const { email, password } = req.body;
   UserModel.findOne({ email: email }).then((user) => {
     if (user) {
-      if (user.email == "admin@gmail.com" && user.password == "admin") {
-        res.json("Admin");
-      } else if (user.password === password) {
-        res.json("Success");
-      } else {
-        res.json("Incorrect password");
-      }
+      const role = user.role; // assuming role is stored in the user document
+      const accessToken = jwt.sign({ email: email, role: role }, "jwt-access-token-secret-key", { expiresIn: '1m' });
+      const refreshToken = jwt.sign({ email: email, role: role }, "jwt-refresh-access-token-secret-key", { expiresIn: '1m' });
+      res.cookie('accessToken', accessToken, { maxAge: 15 * 60 * 1000 });
+      res.cookie('refreshToken', refreshToken, { maxAge: 7 * 24 * 60 * 60 * 1000, httpOnly: true, secure: true, sameSite: 'strict' });
+
+      return res.json({ role });
     } else {
-      res.json("User does not exist");
+      return res.json("User does not exist");
     }
+  }).catch(err => {
+    return res.status(500).json({ message: 'Server error' });
   });
 });
+
+const verifyUser = (req, res, next) => {
+  const accessToken = req.cookies.accessToken;
+  if (!accessToken) {
+    return res.status(401).json({ valid: false, message: "Access token missing" });
+  }
+
+  jwt.verify(accessToken, "jwt-access-token-secret-key", (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ valid: false, message: "Invalid access token" });
+    }
+
+    req.email = decoded.email;
+    req.role = decoded.role;
+
+    next();
+  });
+};
+
+
+const renewToken = (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) {
+    return res.json({ valid: false, message: "No Refresh Token" });
+  } else {
+    jwt.verify(refreshToken, 'jwt-refresh-access-token-secret-key', (err, decoded) => {
+      if (err) {
+        return res.json({ valid: false, message: "Invalid Refresh Token" });
+      } else {
+        const accessToken = jwt.sign({ email: decoded.email, role: decoded.role }, "jwt-access-token-secret-key", { expiresIn: '1m' });
+        res.cookie('accessToken', accessToken, { maxAge: 60000 });
+        req.email = decoded.email;
+        req.role = decoded.role;
+        return true;
+      }
+    });
+  }
+}
+
+
+app.get("/admin", verifyUser, (req, res) => {
+  if (req.role !== 'Admin') {
+    return res.status(403).json({ valid: false, message: "Forbidden: Admins only" });
+  }
+  return res.json({ valid: true, message: "Welcome Admin", role: req.role });
+});
+
+app.get("/dashboard", verifyUser, (req, res) => {
+  if (req.role !== 'User') {
+    return res.status(403).json({ valid: false, message: "Forbidden: Users only" });
+  }
+  return res.json({ valid: true, message: "Welcome User", role: req.role });
+});
+
+app.post("/logout", (req, res) => {
+  res.clearCookie("accessToken", { path: '/' });
+  res.clearCookie("refreshToken", { path: '/' });
+  return res.json({ message: "Logged out successfully" });
+});
+
+
+
+
+
+/*
+app.get('/admin', async (req, res) => {
+  try {
+    const adminData = await someAsyncFunction();
+
+    if (!adminData.valid) {
+      return res.status(401).json({ valid: false, message: 'Unauthorized' });
+    }
+
+    // Set cookie
+    res.cookie('adminSession', adminData.sessionId, { httpOnly: true });
+
+    // Send response
+    res.status(200).json({ valid: true, message: 'Authorized', data: adminData });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+app.get('/dashboard', (req, res) => {
+  return res.json({valid: true, message: "Authorized"})
+}) 
+ */
 
 app.post("/Register", (req, res) => {
   const { email } = req.body;

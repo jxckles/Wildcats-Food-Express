@@ -37,6 +37,26 @@ const MainAdminInterface = () => {
   const [setInterfaceType] = useState("admin");
   const [isCartMenuOpen, setIsCartMenuOpen] = useState(false);
 
+  const [message, setMessage] = useState();
+
+  axios.defaults.withCredentials = true;
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/admin")
+      .then((res) => {
+        if (res.data.valid) {
+          setMessage(res.data.message);
+        } else {
+          navigate("/login");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        navigate("/login");
+      });
+  }, []);
+
   useEffect(() => {
     fetchMenuItems();
   }, []);
@@ -218,9 +238,17 @@ const MainAdminInterface = () => {
     setActiveTab("menu"); // Reset to the menu tab when switching interfaces
   };
 
-  const handleLogout = () => {
-    console.log("Logging out...");
-    setTimeout(() => navigate("/login", { replace: true }), 2000);
+  const handleLogout = async () => {
+    try {
+      await axios.post(
+        "http://localhost:5000/logout",
+        {},
+        { withCredentials: true }
+      );
+      navigate("/login", { replace: true });
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
   };
 
   const toggleCartMenu = () => {

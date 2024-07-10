@@ -6,6 +6,7 @@ const UserSchema = new mongoose.Schema({
   courseYear: String,
   email: String,
   password: String,
+  role: {type: String, enum: ['Admin', 'User'], default: 'User'},
 });
 
 

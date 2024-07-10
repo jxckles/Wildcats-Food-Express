@@ -12,6 +12,7 @@ const Login = () => {
   const [password, setPassword] = React.useState("");
   const navigate = useNavigate();
 
+  axios.defaults.withCredentials = true;
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
@@ -20,21 +21,21 @@ const Login = () => {
         password,
       })
       .then((result) => {
-        if (result.data === "Admin") {
-          setTimeout(() => navigate("/admin"), 2000);
-        } else if (result.data === "Success") {
-          toast.success("Login successful!");
-          setTimeout(() => navigate("/dashboard"), 2000);
-        } else {
-          toast.error(result.data, {
-            autoClose: 500,
+        axios
+          .post("http://localhost:5000/Login", { email, password })
+          .then((res) => {
+            if (res.data.role === "Admin") {
+              navigate("/admin");
+            } else if (res.data.role === "User") {
+              navigate("/dashboard");
+            } else {
+              alert("Login failed");
+            }
+          })
+          .catch((err) => {
+            console.error(err);
+            alert("Login failed");
           });
-        }
-      })
-      .catch((error) => {
-        toast.error("Login failed!", {
-          autoClose: 500,
-        });
       });
   };
 

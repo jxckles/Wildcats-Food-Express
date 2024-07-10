@@ -17,6 +17,28 @@ const UserInterface = () => {
   const [isUserRolesModalOpen, setIsUserRolesModalOpen] = useState(false);
   const navigate = useNavigate();
 
+  /* FOR AUTHENTICATION */
+  const [message, setMessage] = useState();
+
+  axios.defaults.withCredentials = true;
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/dashboard")
+      .then((res) => {
+        if (res.data.valid) {
+          setMessage(res.data.message);
+        } else {
+          navigate("/login");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        navigate("/login");
+      });
+  }, []);
+  /* ----------- */
+
   useEffect(() => {
     fetchMenuItems();
     fetchOrders();
@@ -202,7 +224,9 @@ const UserInterface = () => {
                     <span>{item.name}</span>
                     <span>₱{item.price.toFixed(2)}</span>
                     <div className="quantity-controls">
-                      <button onClick={() => handleRemoveFromCart(item)}>-</button>
+                      <button onClick={() => handleRemoveFromCart(item)}>
+                        -
+                      </button>
                       <span>{item.quantity}</span>
                       <button onClick={() => handleAddToCart(item)}>+</button>
                     </div>
@@ -211,7 +235,10 @@ const UserInterface = () => {
               </div>
               <div className="order-actions">
                 <p>Total: ₱{calculateTotal().toFixed(2)}</p>
-                <button onClick={handleCancelOrder} className="cancel-order-btn">
+                <button
+                  onClick={handleCancelOrder}
+                  className="cancel-order-btn"
+                >
                   Cancel Order
                 </button>
                 <button onClick={handlePlaceOrder} className="place-order-btn">
@@ -245,7 +272,9 @@ const UserInterface = () => {
                 <td>{formatDate(order.dateOrdered)}</td>
                 <td>{order.status}</td>
                 <td>
-                  <button onClick={() => viewOrderDetails(order._id)}>View Details</button>
+                  <button onClick={() => viewOrderDetails(order._id)}>
+                    View Details
+                  </button>
                 </td>
               </tr>
             ))}
@@ -256,8 +285,8 @@ const UserInterface = () => {
   };
 
   const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString('en-US', options);
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(dateString).toLocaleDateString("en-US", options);
   };
 
   const viewOrderDetails = (orderId) => {
@@ -280,7 +309,7 @@ const UserInterface = () => {
   };
 
   const handleLogout = () => {
-    navigate('/login');
+    navigate("/login");
   };
 
   const calculateTotal = () => {
