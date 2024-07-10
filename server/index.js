@@ -9,6 +9,8 @@ const MenuItem = require("./models/Menu");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const app = express();
+const nodemailer = require("nodemailer")
+
 
 app.use(express.json());
 app.use(cookieParser());
@@ -117,33 +119,67 @@ app.post("/logout", (req, res) => {
 });
 
 
-
-
-
-/*
-app.get('/admin', async (req, res) => {
+app.post('/forgot-password', async (req, res) => {
+  const { email } = req.body;
   try {
-    const adminData = await someAsyncFunction();
-
-    if (!adminData.valid) {
-      return res.status(401).json({ valid: false, message: 'Unauthorized' });
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      return res.json({ message: "User not registered" });
     }
 
-    // Set cookie
-    res.cookie('adminSession', adminData.sessionId, { httpOnly: true });
+    const token = jwt.sign({ id: user._id }, "jwt-access-token-secret-key", { expiresIn: '5m' });
 
-    // Send response
-    res.status(200).json({ valid: true, message: 'Authorized', data: adminData });
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    var transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'wildcatfoodexpress@gmail.com',
+        pass: 'rofq crlc rvam atah'
+      }
+    });
+
+    var mailOptions = {
+      from: 'wildcatfoodexpress@gmail.com',
+      to: email,
+      subject: 'Reset Password',
+      text: `http://localhost:5173/reset-password/${token}`
+    };
+
+    transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+        return res.json({ message: "Error sending email" });
+      } else {
+        return res.json({ status: true, message: "Email sent" });
+      }
+    });
+
+  } catch (err) {
+    console.log(err);
   }
 });
 
 
-app.get('/dashboard', (req, res) => {
-  return res.json({valid: true, message: "Authorized"})
-}) 
- */
+app.post('/reset-password/:token', async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+
+  try {
+    const decoded = jwt.verify(token, "jwt-access-token-secret-key");
+    const user = await UserModel.findById(decoded.id);
+    if (!user) {
+      return res.status(400).json({ message: "Invalid token or user does not exist" });
+    }
+    user.password = password;
+    await user.save();
+    res.json({ status: true, message: "Password reset successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ message: "Invalid or expired token" });
+  }
+});
+
+
+
+
 
 app.post("/Register", (req, res) => {
   const { email } = req.body;

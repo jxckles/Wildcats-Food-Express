@@ -1,27 +1,29 @@
 // src/components/ForgotPassword.jsx
-import React, { useState } from 'react';
-import './ForgotPassword.css';
-import catProfile from '/cat_profile.svg'; // Update the path if necessary
-import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import React, { useState } from "react";
+import "./ForgotPassword.css";
+import catProfile from "/cat_profile.svg"; // Update the path if necessary
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 
 const ForgotPassword = () => {
-  const [email, setEmail] = useState('');
-
+  const [email, setEmail] = useState("");
+  const navigate = useNavigate();
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
-      .post('http://localhost:5000/forgot-password', { email })
+      .post("http://localhost:5000/forgot-password", { email })
       .then((response) => {
-        if (response.data === 'Success') {
-          toast.success('Password reset link sent to your email!');
+        if (response.data === "Success") {
+          toast.success("Password reset link sent to your email!");
+          navigate("/login");
         } else {
           toast.error(response.data);
         }
       })
       .catch((error) => {
-        toast.error('Failed to send reset link!');
+        toast.error("Failed to send reset link!");
       });
   };
 
