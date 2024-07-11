@@ -12,9 +12,17 @@ const UserInterface = () => {
   const [activeTab, setActiveTab] = useState("menus");
   const [cart, setCart] = useState([]);
   const [schoolId, setSchoolId] = useState("");
-  const [orders, setOrders] = useState([]);
   const [isCartMenuOpen, setIsCartMenuOpen] = useState(false);
   const [isUserRolesModalOpen, setIsUserRolesModalOpen] = useState(false);
+  const [orders, setOrders] = useState([
+    {
+      id: "22-3456-345",
+      date: "2024-06-07",
+      amount: "₱120.00",
+      product: "Burger & Fries",
+      status: "Pending",
+    }
+  ]);
   const navigate = useNavigate();
 
   /* FOR AUTHENTICATION */
@@ -269,15 +277,17 @@ const UserInterface = () => {
             <tr>
               <th>Order ID</th>
               <th>Date Ordered</th>
+              <th>Total Amount</th>
               <th>Product</th>
               <th>Status</th>
             </tr>
           </thead>
           <tbody>
             {orders.map((order) => (
-              <tr key={order._id}>
-                <td>{order._id}</td>
-                <td>{formatDate(order.dateOrdered)}</td>
+              <tr key={order.id}>
+                <td>{order.id}</td>
+                <td>{formatDate(order.date)}</td>
+                <td>{order.amount}</td>
                 <td>{order.product}</td>
                 <td>{order.status}</td>
               </tr>
