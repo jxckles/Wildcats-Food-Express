@@ -22,10 +22,10 @@ const Login = () => {
         password,
       })
       .then((result) => {
-
         axios
           .post("http://localhost:5000/Login", { email, password })
           .then((res) => {
+            localStorage.setItem("userID", res.data.userID);
             if (res.data.role === "Admin") {
               navigate("/admin");
             } else if (res.data.role === "User") {
