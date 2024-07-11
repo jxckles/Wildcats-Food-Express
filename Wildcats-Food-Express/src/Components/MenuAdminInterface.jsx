@@ -237,7 +237,7 @@ const MainAdminInterface = () => {
         <table className="order-table">
           <thead>
             <tr>
-              <th>Order Number</th>
+              <th>Order ID</th>
               <th>Name</th>
               <th>Total Amount</th>
               <th>Product</th>
