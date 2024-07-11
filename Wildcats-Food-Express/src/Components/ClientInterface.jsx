@@ -169,7 +169,15 @@ const ClientInterface = () => {
               <div className="menu-details">
                 <p className="menu-name">{item.name}</p>
                 <p className="menu-price">₱{item.price.toFixed(2)}</p>
-                <p className="menu-quantity">Available: {item.quantity}</p>
+                <p
+                          className={`menu-quantity ${
+                            item.quantity === 0 ? "sold-out" : ""
+                          }`}
+                        >
+                          {item.quantity > 0
+                            ? `Available: ${item.quantity}`
+                            : "Sold Out"}
+                        </p>
               </div>
               <button
                 onClick={() => handleAddToCart(item)}

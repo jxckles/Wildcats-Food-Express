@@ -479,7 +479,7 @@ const MainAdminInterface = () => {
                       </div>
                       <div className="menu-details">
                         <p className="menu-name">{item.name}</p>
-                        <p className="menu-price">Php {item.price}</p>
+                        <p className="menu-price">₱{item.price.toFixed(2)}</p>
                         <p
                           className={`menu-quantity ${
                             item.quantity === 0 ? "sold-out" : ""
