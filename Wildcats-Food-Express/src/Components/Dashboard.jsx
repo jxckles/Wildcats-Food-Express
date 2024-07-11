@@ -269,8 +269,8 @@ const UserInterface = () => {
             <tr>
               <th>Order ID</th>
               <th>Date Ordered</th>
+              <th>Product</th>
               <th>Status</th>
-              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -278,12 +278,8 @@ const UserInterface = () => {
               <tr key={order._id}>
                 <td>{order._id}</td>
                 <td>{formatDate(order.dateOrdered)}</td>
+                <td>{order.product}</td>
                 <td>{order.status}</td>
-                <td>
-                  <button onClick={() => viewOrderDetails(order._id)}>
-                    View Details
-                  </button>
-                </td>
               </tr>
             ))}
           </tbody>
@@ -297,9 +293,6 @@ const UserInterface = () => {
     return new Date(dateString).toLocaleDateString("en-US", options);
   };
 
-  const viewOrderDetails = (orderId) => {
-    // Implement logic to view detailed order information
-  };
 
   const renderUserRolesModal = () => {
     return (

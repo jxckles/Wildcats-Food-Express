@@ -254,7 +254,6 @@ const ClientInterface = () => {
             <tr>
               <th>Order ID</th>
               <th>School ID</th>
-              <th>Items</th>
               <th>Status</th>
             </tr>
           </thead>
@@ -263,7 +262,6 @@ const ClientInterface = () => {
               <tr key={order._id}>
                 <td>{order._id}</td>
                 <td>{order.schoolId}</td>
-                <td>{order.items.map((item) => `${item.name} (${item.quantity})`).join(", ")}</td>
                 <td>{order.status}</td>
               </tr>
             ))}

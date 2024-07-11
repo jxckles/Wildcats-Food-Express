@@ -239,6 +239,7 @@ const MainAdminInterface = () => {
             <tr>
               <th>Order Number</th>
               <th>Name</th>
+              <th>Total Amount</th>
               <th>Product</th>
               <th>Prepared By</th>
               <th>Status</th>
@@ -249,6 +250,7 @@ const MainAdminInterface = () => {
               <tr key={order.id}>
                 <td>{order.id}</td>
                 <td>{order.name}</td>
+                <td>{order.amount}</td>
                 <td>{order.product}</td>
                 <td>
                   <select
