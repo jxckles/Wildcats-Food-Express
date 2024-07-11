@@ -21,7 +21,7 @@ const UserInterface = () => {
       amount: "₱120.00",
       product: "Burger & Fries",
       status: "Pending",
-    }
+    },
   ]);
   const navigate = useNavigate();
 
@@ -72,6 +72,7 @@ const UserInterface = () => {
     try {
       const response = await axios.get("http://localhost:5000/orders");
       setOrders(response.data);
+      console.log("Fetched orders:", response.data);
     } catch (error) {
       console.error("Error fetching orders:", error);
     }
@@ -137,19 +138,31 @@ const UserInterface = () => {
     }
 
     const order = {
-      schoolId,
-      items: cart,
+      userId: localStorage.getItem("userID"),
+      menusOrdered: cart.map((item) => ({
+        itemName: item.name,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+      studentNumber: schoolId,
       status: "Pending",
+      totalPrice: calculateTotal(),
     };
+
+    console.log("Order Payload:", JSON.stringify(order, null, 2));
 
     try {
       const response = await axios.post("http://localhost:5000/orders", order);
+      console.log("Order placed successfully:", response.data);
       setCart([]);
       setSchoolId("");
-      fetchOrders(); // Refresh orders after placing new order
+      fetchOrders();
       alert("Order placed successfully!");
     } catch (error) {
-      console.error("Error placing order:", error);
+      console.error(
+        "Error placing order:",
+        error.response ? error.response.data : error.message
+      );
       alert("Failed to place order. Please try again.");
     }
   };
@@ -203,14 +216,14 @@ const UserInterface = () => {
                   <p className="menu-name">{item.name}</p>
                   <p className="menu-price">₱{item.price.toFixed(2)}</p>
                   <p
-                          className={`menu-quantity ${
-                            item.quantity === 0 ? "sold-out" : ""
-                          }`}
-                        >
-                          {item.quantity > 0
-                            ? `Available: ${item.quantity}`
-                            : "Sold Out"}
-                        </p>
+                    className={`menu-quantity ${
+                      item.quantity === 0 ? "sold-out" : ""
+                    }`}
+                  >
+                    {item.quantity > 0
+                      ? `Available: ${item.quantity}`
+                      : "Sold Out"}
+                  </p>
                 </div>
                 <button
                   onClick={() => handleAddToCart(item)}
@@ -303,7 +316,6 @@ const UserInterface = () => {
     return new Date(dateString).toLocaleDateString("en-US", options);
   };
 
-
   const renderUserRolesModal = () => {
     return (
       <div className="modal-overlay">
@@ -311,10 +323,14 @@ const UserInterface = () => {
           <h3>My Profile</h3>
           <button onClick={handleAdminInterfaceChange}>Edit Profile</button>
           <button onClick={handleAdminInterfaceChange}>My Orders</button>
-          <button onClick={() => {
-          setActiveTab("trackOrder");
-          closeUserRolesModal();
-        }}>Track My Order</button>
+          <button
+            onClick={() => {
+              setActiveTab("trackOrder");
+              closeUserRolesModal();
+            }}
+          >
+            Track My Order
+          </button>
           <button onClick={handleLogout}>Logout</button>
           <button onClick={closeUserRolesModal}>Cancel</button>
         </div>
@@ -367,23 +383,23 @@ const UserInterface = () => {
       <div className="track-order-tab">
         <h2>My Order Status</h2>
         <table className="order-table">
-        <thead>
-          <tr>
-            <th>Order Number</th>
-            <th>Date Ordered</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {orders.map(order => (
-            <tr key={order._id}>
-              <td>{order.orderNumber}</td>
-              <td>{new Date(order.dateOrdered).toLocaleDateString()}</td>
-              <td>{order.status}</td>
+          <thead>
+            <tr>
+              <th>Order Number</th>
+              <th>Date Ordered</th>
+              <th>Status</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {orders.map((order) => (
+              <tr key={order._id}>
+                <td>{order.orderNumber}</td>
+                <td>{new Date(order.dateOrdered).toLocaleDateString()}</td>
+                <td>{order.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     );
   };
