@@ -6,19 +6,20 @@ const path = require("path");
 const fs = require("fs"); // Import fs module
 const UserModel = require("./models/User");
 const MenuItem = require("./models/Menu");
+const Order = require("./models/Order");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const app = express();
-const nodemailer = require("nodemailer")
-
+const nodemailer = require("nodemailer");
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({
-  origin: ["http://localhost:5173"],
-  credentials: true
-}));
-
+app.use(
+  cors({
+    origin: ["http://localhost:5173"],
+    credentials: true,
+  })
+);
 
 // Static folder for images
 
@@ -42,37 +43,56 @@ const upload = multer({ storage: storage });
 
 app.post("/Login", (req, res) => {
   const { email, password } = req.body;
-  UserModel.findOne({ email: email }).then((user) => {
-
-    if (user) {
-      // Directly compare passwords (not recommended)
-      if (password === user.password) {
-        const role = user.role;
-        const accessToken = jwt.sign({ email: email, role: role }, "jwt-access-token-secret-key", { expiresIn: '1m' });
-        const refreshToken = jwt.sign({ email: email, role: role }, "jwt-refresh-access-token-secret-key", { expiresIn: '1m' });
-        res.cookie('accessToken', accessToken, { maxAge: 15 * 60 * 1000 });
-        res.cookie('refreshToken', refreshToken, { maxAge: 7 * 24 * 60 * 60 * 1000, httpOnly: true, secure: true, sameSite: 'strict' });
-        return res.json({ role });
+  UserModel.findOne({ email: email })
+    .then((user) => {
+      if (user) {
+        // Directly compare passwords (not recommended)
+        if (password === user.password) {
+          const role = user.role;
+          const userId = user._id;
+          const accessToken = jwt.sign(
+            { email: email, role: role, userId: userId }, // Include userId in the token
+            "jwt-access-token-secret-key",
+            { expiresIn: "1m" }
+          );
+          const refreshToken = jwt.sign(
+            { email: email, role: role, userId: userId }, // Include userId in the token
+            "jwt-refresh-access-token-secret-key",
+            { expiresIn: "1h" }
+          );
+          res.cookie("accessToken", accessToken, { maxAge: 15 * 60 * 1000 });
+          res.cookie("refreshToken", refreshToken, {
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+            httpOnly: true,
+            secure: true,
+            sameSite: "strict",
+          });
+          return res.json({ role, userId }); // Optionally return userId to the client
+        } else {
+          return res.json("Incorrect password");
+        }
       } else {
-        return res.json("Incorrect password");
+        return res.json("User does not exist");
       }
-    } else {
-      return res.json("User does not exist");
-    }
-  }).catch(err => {
-    return res.status(500).json({ message: 'Server error' });
-  });
+    })
+    .catch((err) => {
+      return res.status(500).json({ message: "Server error" });
+    });
 });
 
 const verifyUser = (req, res, next) => {
   const accessToken = req.cookies.accessToken;
   if (!accessToken) {
-    return res.status(401).json({ valid: false, message: "Access token missing" });
+    return res
+      .status(401)
+      .json({ valid: false, message: "Access token missing" });
   }
 
   jwt.verify(accessToken, "jwt-access-token-secret-key", (err, decoded) => {
     if (err) {
-      return res.status(401).json({ valid: false, message: "Invalid access token" });
+      return res
+        .status(401)
+        .json({ valid: false, message: "Invalid access token" });
     }
 
     req.email = decoded.email;
@@ -82,50 +102,59 @@ const verifyUser = (req, res, next) => {
   });
 };
 
-
 const renewToken = (req, res) => {
   const refreshToken = req.cookies.refreshToken;
   if (!refreshToken) {
     return res.json({ valid: false, message: "No Refresh Token" });
   } else {
-    jwt.verify(refreshToken, 'jwt-refresh-access-token-secret-key', (err, decoded) => {
-      if (err) {
-        return res.json({ valid: false, message: "Invalid Refresh Token" });
-      } else {
-        const accessToken = jwt.sign({ email: decoded.email, role: decoded.role }, "jwt-access-token-secret-key", { expiresIn: '1m' });
-        res.cookie('accessToken', accessToken, { maxAge: 60000 });
-        req.email = decoded.email;
-        req.role = decoded.role;
-        return true;
+    jwt.verify(
+      refreshToken,
+      "jwt-refresh-access-token-secret-key",
+      (err, decoded) => {
+        if (err) {
+          return res.json({ valid: false, message: "Invalid Refresh Token" });
+        } else {
+          const accessToken = jwt.sign(
+            { email: decoded.email, role: decoded.role },
+            "jwt-access-token-secret-key",
+            { expiresIn: "1h" }
+          );
+          res.cookie("accessToken", accessToken, { maxAge: 60000 });
+          req.email = decoded.email;
+          req.role = decoded.role;
+          return true;
+        }
       }
-    });
+    );
   }
-}
-
+};
 
 app.get("/admin", verifyUser, (req, res) => {
-  if (req.role !== 'Admin') {
-    return res.status(403).json({ valid: false, message: "Forbidden: Admins only" });
+  if (req.role !== "Admin") {
+    return res
+      .status(403)
+      .json({ valid: false, message: "Forbidden: Admins only" });
   }
   return res.json({ valid: true, message: "Welcome Admin", role: req.role });
 });
 
 app.get("/dashboard", verifyUser, (req, res) => {
-  if (req.role !== 'User') {
-    return res.status(403).json({ valid: false, message: "Forbidden: Users only" });
+  if (req.role !== "User") {
+    return res
+      .status(403)
+      .json({ valid: false, message: "Forbidden: Users only" });
   }
   return res.json({ valid: true, message: "Welcome User", role: req.role });
 });
 
-
 app.post("/logout", (req, res) => {
-  res.clearCookie("accessToken", { path: '/' });
-  res.clearCookie("refreshToken", { path: '/' });
+  localStorage.removeItem("userId");
+  res.clearCookie("accessToken", { path: "/" });
+  res.clearCookie("refreshToken", { path: "/" });
   return res.json({ message: "Logged out successfully" });
 });
 
-
-app.post('/forgot-password', async (req, res) => {
+app.post("/forgot-password", async (req, res) => {
   const { email } = req.body;
   try {
     const user = await UserModel.findOne({ email });
@@ -133,38 +162,38 @@ app.post('/forgot-password', async (req, res) => {
       return res.json({ message: "User not registered" });
     }
 
-    const token = jwt.sign({ id: user._id }, "jwt-access-token-secret-key", { expiresIn: '5m' });
+    const token = jwt.sign({ id: user._id }, "jwt-access-token-secret-key", {
+      expiresIn: "5m",
+    });
 
     var transporter = nodemailer.createTransport({
-      service: 'gmail',
+      service: "gmail",
       auth: {
-        user: 'wildcatfoodexpress@gmail.com',
-        pass: 'rofq crlc rvam atah'
-      }
+        user: "wildcatfoodexpress@gmail.com",
+        pass: "rofq crlc rvam atah",
+      },
     });
 
     var mailOptions = {
-      from: 'wildcatfoodexpress@gmail.com',
+      from: "wildcatfoodexpress@gmail.com",
       to: email,
-      subject: 'Reset Password',
-      text: `http://localhost:5173/reset-password/${token}`
+      subject: "Reset Password",
+      text: `http://localhost:5173/reset-password/${token}`,
     };
 
-    transporter.sendMail(mailOptions, function(error, info){
+    transporter.sendMail(mailOptions, function (error, info) {
       if (error) {
         return res.json({ message: "Error sending email" });
       } else {
         return res.json({ status: true, message: "Email sent" });
       }
     });
-
   } catch (err) {
     console.log(err);
   }
 });
 
-
-app.post('/reset-password/:token', async (req, res) => {
+app.post("/reset-password/:token", async (req, res) => {
   const { token } = req.params;
   const { password } = req.body;
 
@@ -172,7 +201,9 @@ app.post('/reset-password/:token', async (req, res) => {
     const decoded = jwt.verify(token, "jwt-access-token-secret-key");
     const user = await UserModel.findById(decoded.id);
     if (!user) {
-      return res.status(400).json({ message: "Invalid token or user does not exist" });
+      return res
+        .status(400)
+        .json({ message: "Invalid token or user does not exist" });
     }
     user.password = password;
     await user.save();
@@ -182,10 +213,6 @@ app.post('/reset-password/:token', async (req, res) => {
     res.status(400).json({ message: "Invalid or expired token" });
   }
 });
-
-
-
-
 
 app.post("/Register", (req, res) => {
   const { email } = req.body;
@@ -261,6 +288,41 @@ app.delete("/menu/:id", async (req, res) => {
   } catch (err) {
     console.error("Error deleting menu item:", err); // Log the error
     res.status(400).json(err);
+  }
+});
+
+app.post("/orders", async (req, res) => {
+  const { userId, menusOrdered, studentNumber, status, totalPrice } = req.body;
+
+  console.log("Received Order Payload:", JSON.stringify(req.body, null, 2));
+
+  if (
+    !userId ||
+    !Array.isArray(menusOrdered) ||
+    !studentNumber ||
+    !totalPrice
+  ) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  try {
+    const newOrder = new Order({
+      userId,
+      menusOrdered,
+      studentNumber,
+      status,
+      totalPrice,
+    });
+
+    await newOrder.save();
+    res
+      .status(201)
+      .json({ message: "Order placed successfully", order: newOrder });
+  } catch (error) {
+    console.error("Error placing order:", error);
+    res
+      .status(500)
+      .json({ message: "Failed to place order. Please try again." });
   }
 });
 
