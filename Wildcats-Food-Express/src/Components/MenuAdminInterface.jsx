@@ -62,6 +62,26 @@ const MainAdminInterface = () => {
     const [setInterfaceType] = useState("admin");
   const [isCartMenuOpen, setIsCartMenuOpen] = useState(false);
 
+  const [message, setMessage] = useState();
+
+  axios.defaults.withCredentials = true;
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/admin")
+      .then((res) => {
+        if (res.data.valid) {
+          setMessage(res.data.message);
+        } else {
+          navigate("/login");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        navigate("/login");
+      });
+  }, []);
+
   useEffect(() => {
     fetchMenuItems();
   }, [refreshKey]);
