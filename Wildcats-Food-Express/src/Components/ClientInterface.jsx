@@ -252,7 +252,7 @@ const ClientInterface = () => {
         <table className="order-status-table">
           <thead>
             <tr>
-              <th>Order ID</th>
+              <th>Priority Number</th>
               <th>School ID</th>
               <th>Status</th>
             </tr>
