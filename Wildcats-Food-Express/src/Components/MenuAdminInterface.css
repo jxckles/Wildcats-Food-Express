@@ -78,6 +78,10 @@
   cursor: pointer;
   padding: 0;
   font: inherit;
+
+  &:hover{
+    color: white;
+  }
 }
 
 .admin-profile {
@@ -496,6 +500,23 @@
   background-color: #7a0000;
 }
 
+.order-subtabs {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.order-subtab {
+  padding: 10px 20px;
+  background-color: #990000;
+  border: none;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.order-subtab.active {
+  background-color: #d34444;
+  color: white;
+}
 
 /* Media Queries */
 @media (max-width: 768px) {

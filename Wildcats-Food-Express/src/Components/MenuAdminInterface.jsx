@@ -21,13 +21,37 @@ const MainAdminInterface = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("menu");
-  const [orders, setOrders] = useState([
+  const [orderSubTab, setOrderSubTab] = useState("online");
+  const [onlineOrders, setOnlineOrders] = useState([
     {
-      id: "22-4355-566",
-      name: "Juan Dela Cruz",
+      id: "22-3456-345",
+      name: "John Doe",
+      amount: "₱120.00",
+      product: "Burger & Fries",
+      status: "Pending",
+    },
+    {
+      id: "19-5455-678",
+      name: "Jane Smith",
+      amount: "₱30.00",
+      product: "Pizza",
+      status: "Pending",
+    },
+  ]);
+  const [customerOrders, setCustomerOrders] = useState([
+    {
+      id: "POS-001",
+      schoolID: "21-8877-890",
+      amount: "₱50.00",
       product: "Fried Chicken",
-      preparedBy: "",
-      status: "",
+      status: "Pending",
+    },
+    {
+      id: "POS-002",
+      schoolID: "19-2322-567",
+      amount: "₱40.00",
+      product: "Chicken Adobo",
+      status: "Pending",
     },
   ]);
 
@@ -35,28 +59,8 @@ const MainAdminInterface = () => {
   const [reportDate, setReportDate] = useState("");
   const [reportMonth, setReportMonth] = useState("");
   const [reportYear, setReportYear] = useState("");
-  const [setInterfaceType] = useState("admin");
+    const [setInterfaceType] = useState("admin");
   const [isCartMenuOpen, setIsCartMenuOpen] = useState(false);
-
-  const [message, setMessage] = useState();
-
-  axios.defaults.withCredentials = true;
-
-  useEffect(() => {
-    axios
-      .get("http://localhost:5000/admin")
-      .then((res) => {
-        if (res.data.valid) {
-          setMessage(res.data.message);
-        } else {
-          navigate("/login");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        navigate("/login");
-      });
-  }, []);
 
   useEffect(() => {
     fetchMenuItems();
@@ -72,7 +76,6 @@ const MainAdminInterface = () => {
           : null,
       }));
       setMenuItems(menuData);
-      console.log("Fetched menu items:", menuData);
     } catch (error) {
       console.error("Error fetching menu items:", error);
     }
@@ -94,9 +97,6 @@ const MainAdminInterface = () => {
       image: null,
       quantity: 0,
     });
-    if (activeTab === "userRoles") {
-      setActiveTab("menu");
-    }
   };
 
   const handleInputChange = (e) => {
@@ -170,24 +170,30 @@ const MainAdminInterface = () => {
     if (tab === "userRoles") {
       setIsModalOpen(true);
     } else {
-      setIsModalOpen(false);
+      setIsModalOpen(false);}
+    if (tab === "orders") {
+      setOrderSubTab("online");
     }
   };
 
-  const handleAssignStaff = (orderId, staff) => {
-    setOrders(
-      orders.map((order) =>
-        order.id === orderId ? { ...order, preparedBy: staff } : order
-      )
-    );
+  const handleOrderSubTabChange = (subTab) => {
+    setOrderSubTab(subTab);
   };
 
-  const handleStatusChange = (orderId, status) => {
-    setOrders(
-      orders.map((order) =>
-        order.id === orderId ? { ...order, status } : order
-      )
-    );
+  const handleStatusChange = (orderId, status, isOnline) => {
+    if (isOnline) {
+      setOnlineOrders(
+        onlineOrders.map((order) =>
+          order.id === orderId ? { ...order, status } : order
+        )
+      );
+    } else {
+      setCustomerOrders(
+        customerOrders.map((order) =>
+          order.id === orderId ? { ...order, status } : order
+        )
+      );
+    }
   };
 
   const handleReportSearch = (e) => {
@@ -233,56 +239,95 @@ const MainAdminInterface = () => {
   const renderOrderTracking = () => {
     return (
       <div className="order-tracking">
-        <h2 className="todays-order">Today's Order</h2>
-        <table className="order-table">
-          <thead>
-            <tr>
-              <th>Order ID</th>
-              <th>Name</th>
-              <th>Total Amount</th>
-              <th>Product</th>
-              <th>Prepared By</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order.id}>
-                <td>{order.id}</td>
-                <td>{order.name}</td>
-                <td>{order.amount}</td>
-                <td>{order.product}</td>
-                <td>
-                  <select
-                    value={order.preparedBy}
-                    onChange={(e) =>
-                      handleAssignStaff(order.id, e.target.value)
-                    }
-                  >
-                    <option value="">Click to assign</option>
-                    <option value="John Doe">John Doe</option>
-                    <option value="Jane Smith">Jane Smith</option>
-                    <option value="Mike Johnson">Mike Johnson</option>
-                  </select>
-                </td>
-                <td>
-                  <select
-                    value={order.status}
-                    onChange={(e) =>
-                      handleStatusChange(order.id, e.target.value)
-                    }
-                  >
-                    <option value="">Select status</option>
-                    <option value="Preparing">Preparing</option>
-                    <option value="Ready for Pickup">Ready for Pickup</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Cancelled">Cancelled</option>
-                  </select>
-                </td>
+        <h2 className="todays-order">Today's Orders</h2>
+        <div className="order-subtabs">
+          <button
+            className={`order-subtab ${orderSubTab === "online" ? "active" : ""}`}
+            onClick={() => handleOrderSubTabChange("online")}
+          >
+            Online Orders
+          </button>
+          <button
+            className={`order-subtab ${orderSubTab === "pos" ? "active" : ""}`}
+            onClick={() => handleOrderSubTabChange("pos")}
+          >
+            Customer Orders
+          </button>
+        </div>
+        {orderSubTab === "online" && (
+          <table className="order-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Name</th>
+                <th>Total Amount</th>
+                <th>Product</th>
+                <th>Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {onlineOrders.map((order) => (
+                <tr key={order.id}>
+                  <td>{order.id}</td>
+                  <td>{order.name}</td>
+                  <td>{order.amount}</td>
+                  <td>{order.product}</td>
+                  <td>
+                    <select
+                      value={order.status}
+                      onChange={(e) =>
+                        handleStatusChange(order.id, e.target.value, true)
+                      }
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Preparing">Preparing</option>
+                      <option value="Ready for Pickup">Ready for Pickup</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Cancelled">Cancelled</option>
+                    </select>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        {orderSubTab === "pos" && (
+          <table className="order-table">
+            <thead>
+              <tr>
+                <th>Priority Number</th>
+                <th>School ID</th>
+                <th>Total Amount</th>
+                <th>Product</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {customerOrders.map((order) => (
+                <tr key={order.id}>
+                  <td>{order.id}</td>
+                  <td>{order.schoolID}</td>
+                  <td>{order.amount}</td>
+                  <td>{order.product}</td>
+                  <td>
+                    <select
+                      value={order.status}
+                      onChange={(e) =>
+                        handleStatusChange(order.id, e.target.value, false)
+                      }
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Preparing">Preparing</option>
+                      <option value="Ready for Pickup">Ready for Pickup</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Cancelled">Cancelled</option>
+                    </select>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     );
   };
@@ -356,7 +401,6 @@ const MainAdminInterface = () => {
               <th>Order Number</th>
               <th>Date Ordered</th>
               <th>Status</th>
-              <th>Prepared by</th>
               <th>Product</th>
               <th>Quantity</th>
               <th>Total Price</th>
@@ -364,7 +408,7 @@ const MainAdminInterface = () => {
           </thead>
           <tbody>
             <tr>
-              <td colSpan="7" className="no-data">
+              <td colSpan="6" className="no-data">
                 No data available
               </td>
             </tr>
@@ -382,13 +426,18 @@ const MainAdminInterface = () => {
           <button onClick={() => navigate("/client-interface")}>
             Client Interface
           </button>
-          <button onClick={closeModal}>Cancel</button>
+          <button onClick={() => {
+            setActiveTab("menu");
+            setIsModalOpen(false);
+          }}>
+            Cancel
+          </button>
         </div>
       </div>
     );
   };
-
-  const renderAdminInterface = () => {
+  
+const renderAdminInterface = () => {
     return (
       <div className="admin-interface">
         <header className="admin-header">
@@ -519,7 +568,7 @@ const MainAdminInterface = () => {
           {activeTab === "orders" && renderOrderTracking()}
           {activeTab === "reports" && renderReports()}
           {isModalOpen && activeTab === "userRoles" && renderUserRolesModal()}
-	  {isModalOpen && activeTab !== "userRoles" && (
+          {isModalOpen && activeTab !== "userRoles" && (
             <div className="modal-overlay">
               <div className="modal">
                 <h2>{currentItem._id ? "Edit Item" : "Add New Item"}</h2>
