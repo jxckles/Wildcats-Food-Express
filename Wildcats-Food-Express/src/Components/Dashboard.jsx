@@ -308,7 +308,10 @@ const UserInterface = () => {
           <h3>My Profile</h3>
           <button onClick={handleAdminInterfaceChange}>Edit Profile</button>
           <button onClick={handleAdminInterfaceChange}>My Orders</button>
-          <button onClick={handleAdminInterfaceChange}>Track My Order</button>
+          <button onClick={() => {
+          setActiveTab("trackOrder");
+          closeUserRolesModal();
+        }}>Track My Order</button>
           <button onClick={handleLogout}>Logout</button>
           <button onClick={closeUserRolesModal}>Cancel</button>
         </div>
@@ -352,6 +355,32 @@ const UserInterface = () => {
           </div>
           <button className="submit-btn">Submit</button>
         </div>
+      </div>
+    );
+  };
+
+  const renderTrackMyOrder = () => {
+    return (
+      <div className="track-order-tab">
+        <h2>My Order Status</h2>
+        <table className="order-table">
+        <thead>
+          <tr>
+            <th>Order Number</th>
+            <th>Date Ordered</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {orders.map(order => (
+            <tr key={order._id}>
+              <td>{order.orderNumber}</td>
+              <td>{new Date(order.dateOrdered).toLocaleDateString()}</td>
+              <td>{order.status}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
       </div>
     );
   };
@@ -414,6 +443,7 @@ const UserInterface = () => {
         {activeTab === "menus" && renderMenus()}
         {activeTab === "orders" && renderOrders()}
         {activeTab === "changePassword" && renderChangePassword()}
+        {activeTab === "trackOrder" && renderTrackMyOrder()}
       </main>
       {isUserRolesModalOpen && renderUserRolesModal()}
     </div>
