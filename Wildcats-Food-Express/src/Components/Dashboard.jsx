@@ -360,6 +360,8 @@ const UserInterface = () => {
           <tr>
             <th>Order Number</th>
             <th>Date Ordered</th>
+            <th>Product</th>
+            <th>Prepared by</th>
             <th>Status</th>
           </tr>
         </thead>
