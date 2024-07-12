@@ -305,7 +305,11 @@ app.post("/orders", async (req, res) => {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
+    // Create a new order
     const newOrder = new Order({
       userId,
       menusOrdered,
@@ -314,25 +318,51 @@ app.post("/orders", async (req, res) => {
       totalPrice,
     });
 
-    await newOrder.save();
+    // Save the new order to the database
+    await newOrder.save({ session });
+
+    // Update the quantities of the ordered menu items
+    for (const orderedMenu of menusOrdered) {
+      // Find the menu item by name instead of ID
+      const menuItem = await MenuItem.findOne({
+        name: orderedMenu.itemName,
+      }).session(session);
+      if (!menuItem) {
+        throw new Error(
+          `Menu item with name ${orderedMenu.menuName} not found`
+        );
+      }
+      if (menuItem.quantity < orderedMenu.quantity) {
+        throw new Error(`Not enough quantity for menu item: ${menuItem.name}`);
+      }
+      menuItem.quantity -= orderedMenu.quantity; // Subtract the ordered quantity from the available quantity
+      await menuItem.save({ session }); // Save the updated menu item back to the database
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+
     res
       .status(201)
       .json({ message: "Order placed successfully", order: newOrder });
   } catch (error) {
-    console.error("Error placing order:", error);
-    res
-      .status(500)
-      .json({ message: "Failed to place order. Please try again." });
+    await session.abortTransaction();
+    session.endSession();
+    console.error("Error placing order:", error.message);
+    res.status(500).json({
+      message: `Failed to place order. Please try again. ${error.message}`,
+    });
   }
 });
 
 app.get("/orders", async (req, res) => {
   try {
-    const orders = await Order.find();
+    const userId = req.query.userId; // Or req.headers['userId'] if sent in headers
+    const orders = await Order.find({ userId: userId }); // Assuming 'userId' is the field name in the Order model
     res.json(orders);
   } catch (error) {
-    console.error("Error fetching orders:", error);
-    res.status(500).json({ message: "Failed to fetch orders" });
+    console.error("Error fetching user orders:", error);
+    res.status(500).json({ message: "Failed to fetch user orders" });
   }
 });
 

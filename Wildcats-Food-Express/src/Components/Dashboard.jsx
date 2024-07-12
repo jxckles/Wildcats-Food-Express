@@ -70,7 +70,10 @@ const UserInterface = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/orders");
+      const userId = localStorage.getItem("userID"); // Get user ID from localStorage
+      const response = await axios.get(
+        `http://localhost:5000/orders?userId=${userId}`
+      ); // Include userId in the request
       setOrders(response.data);
       console.log("Fetched orders:", response.data);
     } catch (error) {
@@ -291,17 +294,25 @@ const UserInterface = () => {
               <th>Order ID</th>
               <th>Date Ordered</th>
               <th>Total Amount</th>
-              <th>Product</th>
+              <th>Menus Ordered</th>
               <th>Status</th>
             </tr>
           </thead>
           <tbody>
             {orders.map((order) => (
               <tr key={order.id}>
-                <td>{order.id}</td>
-                <td>{formatDate(order.date)}</td>
-                <td>{order.amount}</td>
-                <td>{order.product}</td>
+                <td>{order.studentNumber}</td>
+                <td>{formatDate(order.dateOrdered)}</td>
+                <td>&#8369;{order.totalPrice}</td>
+                <td>
+                  {order.menusOrdered.map((menu, index) => (
+                    <div key={index} style={{ marginBottom: "10px" }}>
+                      {`${menu.itemName} (x${menu.quantity}) - \u20B1${
+                        menu.price * menu.quantity
+                      }`}
+                    </div>
+                  ))}
+                </td>
                 <td>{order.status}</td>
               </tr>
             ))}
@@ -393,7 +404,7 @@ const UserInterface = () => {
           <tbody>
             {orders.map((order) => (
               <tr key={order._id}>
-                <td>{order.orderNumber}</td>
+                <td>{order.studentNumber}</td>
                 <td>{new Date(order.dateOrdered).toLocaleDateString()}</td>
                 <td>{order.status}</td>
               </tr>
