@@ -59,7 +59,7 @@ const MainAdminInterface = () => {
   const [reportDate, setReportDate] = useState("");
   const [reportMonth, setReportMonth] = useState("");
   const [reportYear, setReportYear] = useState("");
-    const [setInterfaceType] = useState("admin");
+  const [setInterfaceType] = useState("admin");
   const [isCartMenuOpen, setIsCartMenuOpen] = useState(false);
 
   const [message, setMessage] = useState();
@@ -84,6 +84,7 @@ const MainAdminInterface = () => {
 
   useEffect(() => {
     fetchMenuItems();
+    fetchOrders();
   }, [refreshKey]);
 
   const fetchMenuItems = async () => {
@@ -98,6 +99,16 @@ const MainAdminInterface = () => {
       setMenuItems(menuData);
     } catch (error) {
       console.error("Error fetching menu items:", error);
+    }
+  };
+
+  const fetchOrders = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/orders");
+      onlineOrders(response.data);
+      console.log("Fetched orders:", response.data);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
     }
   };
 
@@ -190,7 +201,8 @@ const MainAdminInterface = () => {
     if (tab === "userRoles") {
       setIsModalOpen(true);
     } else {
-      setIsModalOpen(false);}
+      setIsModalOpen(false);
+    }
     if (tab === "orders") {
       setOrderSubTab("online");
     }
@@ -262,7 +274,9 @@ const MainAdminInterface = () => {
         <h2 className="todays-order">Today's Orders</h2>
         <div className="order-subtabs">
           <button
-            className={`order-subtab ${orderSubTab === "online" ? "active" : ""}`}
+            className={`order-subtab ${
+              orderSubTab === "online" ? "active" : ""
+            }`}
             onClick={() => handleOrderSubTabChange("online")}
           >
             Online Orders
@@ -355,8 +369,18 @@ const MainAdminInterface = () => {
   const renderReports = () => {
     const currentYear = new Date().getFullYear();
     const months = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
     ];
 
     return (
@@ -446,18 +470,20 @@ const MainAdminInterface = () => {
           <button onClick={() => navigate("/client-interface")}>
             Client Interface
           </button>
-          <button onClick={() => {
-            setActiveTab("menu");
-            setIsModalOpen(false);
-          }}>
+          <button
+            onClick={() => {
+              setActiveTab("menu");
+              setIsModalOpen(false);
+            }}
+          >
             Cancel
           </button>
         </div>
       </div>
     );
   };
-  
-const renderAdminInterface = () => {
+
+  const renderAdminInterface = () => {
     return (
       <div className="admin-interface">
         <header className="admin-header">
@@ -541,7 +567,7 @@ const renderAdminInterface = () => {
                             className="menu-image"
                             onError={(e) => {
                               e.target.onerror = null;
-                              e.target.src = 'path/to/placeholder/image.jpg';
+                              e.target.src = "path/to/placeholder/image.jpg";
                             }}
                           />
                         ) : (

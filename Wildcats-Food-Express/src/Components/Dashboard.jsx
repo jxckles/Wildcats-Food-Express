@@ -306,9 +306,11 @@ const UserInterface = () => {
                 <td>&#8369;{order.totalPrice}</td>
                 <td>
                   {order.menusOrdered.map((menu, index) => (
-                    <div
-                      key={index}
-                    >{`${menu.itemName} (x${menu.quantity})`}</div>
+                    <div key={index} style={{ marginBottom: "10px" }}>
+                      {`${menu.itemName} (x${menu.quantity}) - \u20B1${
+                        menu.price * menu.quantity
+                      }`}
+                    </div>
                   ))}
                 </td>
                 <td>{order.status}</td>
