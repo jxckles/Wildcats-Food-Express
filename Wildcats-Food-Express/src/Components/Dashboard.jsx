@@ -357,7 +357,7 @@ const UserInterface = () => {
         <h2>My Order Status</h2>
         <table className="order-table">
         <thead>
-          <tr>s
+          <tr>
             <th>Order Number</th>
             <th>Date Ordered</th>
             <th>Status</th>
