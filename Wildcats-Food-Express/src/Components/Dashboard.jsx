@@ -28,6 +28,11 @@ const UserInterface = () => {
   /* FOR AUTHENTICATION */
   const [message, setMessage] = useState();
 
+  //for change pass
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+
   axios.defaults.withCredentials = true;
 
   useEffect(() => {
@@ -183,6 +188,37 @@ const UserInterface = () => {
   };
 
   const handleAdminInterfaceChange = () => {};
+
+  //for change pass
+  const handleChangePassSubmit = async (e) => {
+    e.preventDefault();
+    if (newPassword !== confirmNewPassword) {
+      alert("New passwords do not match!");
+      return;
+    }
+    // Retrieve the user ID from localStorage
+    const userId = localStorage.getItem("userID");
+    if (!userId) {
+      alert("User ID not found. Please log in again.");
+      return;
+    }
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/change-password",
+        {
+          userId, // Include the userId in the request body
+          oldPassword,
+          newPassword,
+        }
+      );
+      alert("Password changed successfully!");
+      setOldPassword(""); //clear textfields
+      setNewPassword("");
+      setConfirmNewPassword("");
+    } catch (error) {
+      alert("Failed to change password.");
+    }
+  };
 
   const renderMenus = () => {
     const filteredMenuItems = menuItems.filter((item) =>
@@ -373,17 +409,31 @@ const UserInterface = () => {
           <h2>Change Password</h2>
           <div className="form-group">
             <label>Old Password:</label>
-            <input type="password" />
+            <input
+              type="password"
+              value={oldPassword}
+              onChange={(e) => setOldPassword(e.target.value)}
+            />
           </div>
           <div className="form-group">
             <label>New Password:</label>
-            <input type="password" />
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
           </div>
           <div className="form-group">
             <label>Confirm New Password:</label>
-            <input type="password" />
+            <input
+              type="password"
+              value={confirmNewPassword}
+              onChange={(e) => setConfirmNewPassword(e.target.value)}
+            />
           </div>
-          <button className="submit-btn">Submit</button>
+          <button className="submit-btn" onClick={handleChangePassSubmit}>
+            Submit
+          </button>
         </div>
       </div>
     );

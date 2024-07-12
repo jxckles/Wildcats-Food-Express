@@ -309,7 +309,7 @@ app.post("/orders", async (req, res) => {
   session.startTransaction();
 
   try {
-    // Create a new order
+    // create a new order
     const newOrder = new Order({
       userId,
       menusOrdered,
@@ -318,12 +318,12 @@ app.post("/orders", async (req, res) => {
       totalPrice,
     });
 
-    // Save the new order to the database
+    // save the new order to the database
     await newOrder.save({ session });
 
-    // Update the quantities of the ordered menu items
+    // update the quantities of the ordered menu items
     for (const orderedMenu of menusOrdered) {
-      // Find the menu item by name instead of ID
+      // find the menu item by name instead of ID
       const menuItem = await MenuItem.findOne({
         name: orderedMenu.itemName,
       }).session(session);
@@ -335,7 +335,7 @@ app.post("/orders", async (req, res) => {
       if (menuItem.quantity < orderedMenu.quantity) {
         throw new Error(`Not enough quantity for menu item: ${menuItem.name}`);
       }
-      menuItem.quantity -= orderedMenu.quantity; // Subtract the ordered quantity from the available quantity
+      menuItem.quantity -= orderedMenu.quantity;
       await menuItem.save({ session }); // Save the updated menu item back to the database
     }
 
@@ -357,12 +357,36 @@ app.post("/orders", async (req, res) => {
 
 app.get("/orders", async (req, res) => {
   try {
-    const userId = req.query.userId; // Or req.headers['userId'] if sent in headers
-    const orders = await Order.find({ userId: userId }); // Assuming 'userId' is the field name in the Order model
+    const userId = req.query.userId;
+    const orders = await Order.find({ userId: userId });
     res.json(orders);
   } catch (error) {
     console.error("Error fetching user orders:", error);
     res.status(500).json({ message: "Failed to fetch user orders" });
+  }
+});
+
+//for change password
+app.post("/change-password", async (req, res) => {
+  const { userId, oldPassword, newPassword } = req.body;
+
+  try {
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(404).send("User not found.");
+    }
+
+    if (user.password !== oldPassword) {
+      return res.status(400).send("Old password is incorrect.");
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    res.send("Password successfully changed.");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred.");
   }
 });
 
