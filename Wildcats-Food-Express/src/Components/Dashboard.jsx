@@ -3,7 +3,7 @@ import axios from "axios";
 import "./dashboard.css";
 import logo from "/logo.svg";
 import profileIcon from "/cat_profile.svg";
-import cartIcon from "/hamburger-menu.svg";
+import cartIcon from "/shopping_cart.svg";
 import { useNavigate } from "react-router-dom";
 
 const UserInterface = () => {
@@ -366,10 +366,10 @@ const UserInterface = () => {
   const renderUserRolesModal = () => {
     return (
       <div className="modal-overlay">
-        <div className="modal user-roles-modal">
-          <h3>My Profile</h3>
+        <div className="modal user-roles-modal-dashboard">
+          <h3>Options</h3>
           <button onClick={handleAdminInterfaceChange}>Edit Profile</button>
-          <button onClick={handleAdminInterfaceChange}>My Orders</button>
+          <button onClick={handleAdminInterfaceChange}>History</button>
           <button
             onClick={() => {
               setActiveTab("trackOrder");
@@ -502,13 +502,13 @@ const UserInterface = () => {
         </div>
         <div className="user-profile">
           <span className="user-options" onClick={openUserRolesModal}>
-            My Profile
+            User's Name Here
           </span>
-          <div className="menu-container">
+          <div className="menu-container-dashboard">
             <img
               src={cartIcon}
               alt="Cart"
-              className="cart-icon"
+              className="cart"
               onClick={toggleCartMenu}
             />
             {isCartMenuOpen && (
