@@ -379,10 +379,6 @@ const UserInterface = () => {
         <div className="modal user-roles-modal-dashboard">
           <h3>Options</h3>
           <button onClick={handleAdminInterfaceChange}>Edit Profile</button>
-          <button onClick={() => {
-            setActiveTab("history");
-            closeUserRolesModal();
-          }}>History</button>
           <button
             onClick={() => {
               setActiveTab("trackOrder");
@@ -391,6 +387,12 @@ const UserInterface = () => {
           >
             Track My Order
           </button>
+          <button onClick={() => {
+            setActiveTab("history");
+            closeUserRolesModal();
+          }}>
+            History
+            </button>
           <button onClick={handleLogout}>Logout</button>
           <button onClick={closeUserRolesModal}>Cancel</button>
         </div>
