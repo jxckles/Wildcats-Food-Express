@@ -27,16 +27,18 @@ const Login = () => {
           .then((res) => {
             localStorage.setItem("userID", res.data.userID);
             if (res.data.role === "Admin") {
-              navigate("/admin");
+              showSuccessToast("Login successful! Welcome Admin!");
+              setTimeout(() => navigate("/admin"), 2000);
             } else if (res.data.role === "User") {
-              navigate("/dashboard");
+              showSuccessToast("Login successful!");
+              setTimeout(() => navigate("/dashboard"), 2000);
             } else {
-              alert("Login failed");
+              showErrorToast("Login failed! Invalid Email or Password.");
             }
           })
           .catch((err) => {
             console.error(err);
-            alert("Login failed");
+            toast.error("Login error! Please check your connection.");
           });
       });
   };
@@ -44,12 +46,13 @@ const Login = () => {
   const showSuccessToast = (message) => {
     toast.success(message, {
       position: "top-center",
-      autoClose: 2000,
+      autoClose: 1000,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: true,
       draggable: true,
       progress: undefined,
+      closeButton:false,
       theme: "colored",
     });
   };
@@ -57,12 +60,13 @@ const Login = () => {
   const showErrorToast = (message) => {
     toast.error(message, {
       position: "top-center",
-      autoClose: 2000,
+      autoClose: 1500,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: true,
       draggable: true,
       progress: undefined,
+      closeButton:false,
       theme: "colored",
     });
   };

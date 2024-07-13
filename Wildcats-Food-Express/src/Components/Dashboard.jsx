@@ -377,7 +377,9 @@ const UserInterface = () => {
     return (
       <div className="modal-overlay">
         <div className="modal user-roles-modal-dashboard">
-          <h3>Options</h3>
+          <div className="options-h3">
+          Options
+          </div>
           <button onClick={handleAdminInterfaceChange}>Edit Profile</button>
           <button onClick={() => {
             setActiveTab("changePassword");
