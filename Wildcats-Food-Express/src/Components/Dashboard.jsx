@@ -322,9 +322,9 @@ const UserInterface = () => {
 
   const renderOrders = () => {
     return (
-      <div className="orders-tab">
+      <div className="orders-tab-user">
         <h2>Your Orders</h2>
-        <table className="orders-table">
+        <table className="orders-table-user">
           <thead>
             <tr>
               <th>Order ID</th>
@@ -442,8 +442,8 @@ const UserInterface = () => {
   const renderTrackMyOrder = () => {
     return (
       <div className="track-order-tab">
-        <h2>My Order Status</h2>
-        <table className="order-table">
+        <h2>My Order Status:</h2>
+        <table className="track-order-table">
           <thead>
             <tr>
               <th>Order Number</th>

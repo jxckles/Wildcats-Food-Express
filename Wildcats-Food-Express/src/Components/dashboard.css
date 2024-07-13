@@ -194,6 +194,7 @@
 .orders-tab {
   max-width: 600px;
   margin: 0 auto;
+  text-align: center;
 }
 
 .school-id-input {
@@ -297,6 +298,39 @@
   color: #990000;
 }
 
+.track-order-tab{
+  margin-top: 20px; 
+  padding: 0 200px; /* Add padding for better spacing */
+
+  h2{
+    text-align: left;
+    font-size: 2rem;
+  }
+}
+
+.track-order-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+
+.track-order-table th, .track-order-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.track-order-table th {
+  background-color: #f2f2f2;
+  color: #9c0000;
+  font-size: 1.2rem;
+}
+
+.track-order-table td{
+  font-size: 1.2rem;
+  color: #990000;
+}
+
 .user-options {
   color: #990000;
   font-weight: bold;
@@ -350,65 +384,51 @@
   text-align: center;
 }
 
-.orders-tab {
+.orders-tab-user {
   margin-top: 20px; 
-  padding: 0 20px; /* Add padding for better spacing */
+  padding: 0 200px; /* Add padding for better spacing */
   text-align: center;
 }
 
-.orders-table {
+.orders-tab-user h2 {
+  font-size: 2em;
+}
+
+.orders-table-user {
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
 }
 
-.orders-table th,
-.orders-table td {
+.orders-table-user th,
+.orders-table-user td {
   border: 1px solid #ddd;
   padding: 8px;
   text-align: center;
 }
 
-.orders-table th {
+.orders-table-user th {
   background-color: #f2f2f2; /* Light gray background for table headers */
+  font-size: 1.2em;
+  color: #9e0000;
 }
 
-.orders-table td {
-  font-size: 14px;
+.orders-table-user td {
+  font-size: 1em;
+  color: #990000;
 }
 
-.orders-table tbody tr:nth-child(even) {
+.orders-table-user tbody tr:nth-child(even) {
   background-color: #f9f9f9; /* Alternate row background color */
 }
 
-.orders-table tbody tr:hover {
+.orders-table-user tbody tr:hover {
   background-color: #e9e9e9; /* Hover state background color */
 }
 
-.orders-table th,
-.orders-table td:first-child {
+.orders-table-user th,
+.orders-table-user td:first-child {
   min-width: 150px; /* Ensure first column width is sufficient for ID */
-}
-
-.orders-table th:last-child,
-.orders-table td:last-child {
-  text-align: center; /* Center align actions column content */
-}
-
-.orders-table td button {
-  padding: 6px 12px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-}
-
-.orders-table td button:hover {
-  background-color: #0056b3;
-}
-
-.orders-table td button:focus {
-  outline: none;
 }
 
 .user-roles-modal-dashboard{
