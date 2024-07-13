@@ -53,16 +53,16 @@ app.post("/Login", (req, res) => {
           const accessToken = jwt.sign(
             { email: email, role: role },
             "jwt-access-token-secret-key",
-            { expiresIn: "1m" }
+            { expiresIn: "15m" } // Access token valid for 15 minutes
           );
           const refreshToken = jwt.sign(
             { email: email, role: role },
             "jwt-refresh-access-token-secret-key",
-            { expiresIn: "1h" }
+            { expiresIn: "2d" } // Refresh token valid for 2 days
           );
-          res.cookie("accessToken", accessToken, { maxAge: 15 * 60 * 1000 });
+          res.cookie("accessToken", accessToken, { maxAge: 15 * 60 * 1000 }); // 15 minutes
           res.cookie("refreshToken", refreshToken, {
-            maxAge: 7 * 24 * 60 * 60 * 1000,
+            maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
             httpOnly: true,
             secure: true,
             sameSite: "strict",
