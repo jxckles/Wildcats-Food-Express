@@ -3,7 +3,7 @@ import axios from "axios";
 import "./ClientInterface.css";
 import logo from "/logo.svg";
 import profileIcon from "/cat_profile.svg";
-import cartIcon from "/hamburger-menu.svg";
+import cartIcon from "/shopping_cart.svg";
 import { useNavigate } from "react-router-dom";
 
 const ClientInterface = () => {
@@ -328,7 +328,7 @@ const ClientInterface = () => {
             <img
               src={cartIcon}
               alt="Cart"
-              className="cart-icon"
+              className="cart-icon-client"
               onClick={toggleCartMenu}
             />
             {isCartMenuOpen && (

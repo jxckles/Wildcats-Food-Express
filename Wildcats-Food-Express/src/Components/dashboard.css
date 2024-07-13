@@ -300,7 +300,10 @@
 .user-options {
   color: #990000;
   font-weight: bold;
-  cursor: pointer;
+    &:hover{
+      cursor: pointer;
+      text-decoration-line: underline;
+    }
 }
 
 @media (max-width: 768px) {

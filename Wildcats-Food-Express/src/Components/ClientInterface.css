@@ -63,9 +63,9 @@
     gap: 10px;
   }
   
-  .cart-icon {
-    width: 25px;
-    height: 25px;
+  .cart-icon-client {
+    width: 30px;
+    height: 30px;
     cursor: pointer;
   }
   
@@ -304,6 +304,7 @@
     font-weight: bold;
         &:hover{
             cursor: pointer;
+            text-decoration-line: underline;
         }
 
         &:active{
