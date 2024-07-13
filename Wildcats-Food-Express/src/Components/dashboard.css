@@ -340,6 +340,80 @@
     }
 }
 
+/* Add these styles to your existing dashboard.css file */
+
+.history-tab {
+  margin-top: 20px;
+  padding: 0 200px;
+}
+
+.history-tab h2 {
+  text-align: left;
+  font-size: 2rem;
+  color: #990000;
+  margin-bottom: 20px;
+}
+
+.history-search {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.history-search select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-right: 10px;
+  font-size: 14px;
+}
+
+.history-search select:focus {
+  outline: none;
+  border-color: #990000;
+}
+
+.history-search input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 80px;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.history-table th,
+.history-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+.history-table th {
+  background-color: #f2f2f2;
+  color: #990000;
+  font-size: 1.1rem;
+}
+
+.history-table td {
+  font-size: 1rem;
+  color: #333;
+}
+
+.history-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.history-table tbody tr:hover {
+  background-color: #e9e9e9;
+}
+
+
+
 @media (max-width: 768px) {
   .user-header {
     flex-direction: column;

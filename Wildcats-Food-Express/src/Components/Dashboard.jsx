@@ -14,15 +14,11 @@ const UserInterface = () => {
   const [schoolId, setSchoolId] = useState("");
   const [isCartMenuOpen, setIsCartMenuOpen] = useState(false);
   const [isUserRolesModalOpen, setIsUserRolesModalOpen] = useState(false);
-  const [orders, setOrders] = useState([
-    {
-      id: "22-3456-345",
-      date: "2024-06-07",
-      amount: "₱120.00",
-      product: "Burger & Fries",
-      status: "Pending",
-    },
-  ]);
+  const [orders, setOrders] = useState([]);
+  const [historyOrders, setHistoryOrders] = useState([]);
+  const [searchDate, setSearchDate] = useState("");
+  const [searchMonth, setSearchMonth] = useState("");
+  const [searchYear, setSearchYear] = useState("");
   const navigate = useNavigate();
 
   /* FOR AUTHENTICATION */
@@ -50,7 +46,6 @@ const UserInterface = () => {
         navigate("/login");
       });
   }, []);
-  /* ----------- */
 
   useEffect(() => {
     fetchMenuItems();
@@ -75,16 +70,34 @@ const UserInterface = () => {
 
   const fetchOrders = async () => {
     try {
-      const userId = localStorage.getItem("userID"); // Get user ID from localStorage
+      const userId = localStorage.getItem("userID");
       const response = await axios.get(
         `http://localhost:5000/orders?userId=${userId}`
-      ); // Include userId in the request
+      );
       setOrders(response.data);
       console.log("Fetched orders:", response.data);
     } catch (error) {
       console.error("Error fetching orders:", error);
     }
   };
+
+  const fetchHistoryOrders = async () => {
+    try {
+      const userId = localStorage.getItem("userID");
+      const response = await axios.get(
+        `http://localhost:5000/history-orders?userId=${userId}`
+      );
+      setHistoryOrders(response.data);
+    } catch (error) {
+      console.error("Error fetching history orders:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "history") {
+      fetchHistoryOrders();
+    }
+  }, [activeTab]);
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
@@ -189,14 +202,12 @@ const UserInterface = () => {
 
   const handleAdminInterfaceChange = () => {};
 
-  //for change pass
   const handleChangePassSubmit = async (e) => {
     e.preventDefault();
     if (newPassword !== confirmNewPassword) {
       alert("New passwords do not match!");
       return;
     }
-    // Retrieve the user ID from localStorage
     const userId = localStorage.getItem("userID");
     if (!userId) {
       alert("User ID not found. Please log in again.");
@@ -206,13 +217,13 @@ const UserInterface = () => {
       const response = await axios.post(
         "http://localhost:5000/change-password",
         {
-          userId, // Include the userId in the request body
+          userId,
           oldPassword,
           newPassword,
         }
       );
       alert("Password changed successfully!");
-      setOldPassword(""); //clear textfields
+      setOldPassword("");
       setNewPassword("");
       setConfirmNewPassword("");
     } catch (error) {
@@ -275,7 +286,6 @@ const UserInterface = () => {
             ))}
           </div>
 
-          {/* Moved Order Summary Section */}
           <div className="order-summary">
             <h2>Order Summary</h2>
             <div className="orders-tab">
@@ -323,14 +333,14 @@ const UserInterface = () => {
   const renderOrders = () => {
     return (
       <div className="orders-tab-user">
-        <h2>Your Orders</h2>
+        <h2>Recent Orders</h2>
         <table className="orders-table-user">
           <thead>
             <tr>
               <th>Order ID</th>
               <th>Date Ordered</th>
-              <th>Total Amount</th>
               <th>Menus Ordered</th>
+              <th>Total Amount</th>
               <th>Status</th>
             </tr>
           </thead>
@@ -339,7 +349,6 @@ const UserInterface = () => {
               <tr key={order.id}>
                 <td>{order.studentNumber}</td>
                 <td>{formatDate(order.dateOrdered)}</td>
-                <td>&#8369;{order.totalPrice}</td>
                 <td>
                   {order.menusOrdered.map((menu, index) => (
                     <div key={index} style={{ marginBottom: "10px" }}>
@@ -349,6 +358,7 @@ const UserInterface = () => {
                     </div>
                   ))}
                 </td>
+                <td>&#8369;{order.totalPrice}</td>
                 <td>{order.status}</td>
               </tr>
             ))}
@@ -369,7 +379,10 @@ const UserInterface = () => {
         <div className="modal user-roles-modal-dashboard">
           <h3>Options</h3>
           <button onClick={handleAdminInterfaceChange}>Edit Profile</button>
-          <button onClick={handleAdminInterfaceChange}>History</button>
+          <button onClick={() => {
+            setActiveTab("history");
+            closeUserRolesModal();
+          }}>History</button>
           <button
             onClick={() => {
               setActiveTab("trackOrder");
@@ -465,6 +478,87 @@ const UserInterface = () => {
     );
   };
 
+  const renderHistory = () => {
+    const filteredOrders = historyOrders.filter(order => 
+      (order.status === "Completed" || order.status === "Cancelled") &&
+      (!searchDate || new Date(order.dateOrdered).getDate() === parseInt(searchDate)) &&
+      (!searchMonth || new Date(order.dateOrdered).getMonth() === parseInt(searchMonth)) &&
+      (!searchYear || new Date(order.dateOrdered).getFullYear() === parseInt(searchYear))
+    );
+  
+    const currentYear = new Date().getFullYear();
+    const years = Array.from({length: 5}, (_, i) => currentYear + i);
+    const months = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    const days = Array.from({length: 31}, (_, i) => i + 1);
+  
+    return (
+      <div className="history-tab">
+        <h2>Previous Orders</h2>
+        <div className="history-search">
+          <select
+            value={searchDate}
+            onChange={(e) => setSearchDate(e.target.value)}
+          >
+            <option value="">Day</option>
+            {days.map(day => (
+              <option key={day} value={day}>{day}</option>
+            ))}
+          </select>
+          <select
+            value={searchMonth}
+            onChange={(e) => setSearchMonth(e.target.value)}
+          >
+            <option value="">Month</option>
+            {months.map((month, index) => (
+              <option key={month} value={index}>{month}</option>
+            ))}
+          </select>
+          <select
+            value={searchYear}
+            onChange={(e) => setSearchYear(e.target.value)}
+          >
+            <option value="">Year</option>
+            {years.map(year => (
+              <option key={year} value={year}>{year}</option>
+            ))}
+          </select>
+        </div>
+        <table className="history-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Date Ordered</th>
+              <th>Menus Ordered</th>
+              <th>Total Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredOrders.map((order) => (
+              <tr key={order.id}>
+                <td>{order.studentNumber}</td>
+                <td>{formatDate(order.dateOrdered)}</td>
+                <td>
+                  {order.menusOrdered.map((menu, index) => (
+                    <div key={index} style={{ marginBottom: "10px" }}>
+                      {`${menu.itemName} (x${menu.quantity}) - \u20B1${
+                        menu.price * menu.quantity
+                      }`}
+                    </div>
+                  ))}
+                </td>
+                <td>&#8369;{order.totalPrice}</td>
+                <td>{order.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
   return (
     <div className="user-interface">
       <header className="user-header">
@@ -524,6 +618,7 @@ const UserInterface = () => {
         {activeTab === "orders" && renderOrders()}
         {activeTab === "changePassword" && renderChangePassword()}
         {activeTab === "trackOrder" && renderTrackMyOrder()}
+        {activeTab === "history" && renderHistory()}
       </main>
       {isUserRolesModalOpen && renderUserRolesModal()}
     </div>
