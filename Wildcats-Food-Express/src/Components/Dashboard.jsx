@@ -407,8 +407,10 @@ const UserInterface = () => {
         {},
         { withCredentials: true }
       );
+      alert("Logged Out!");
       navigate("/login", { replace: true });
     } catch (error) {
+      alert("Error logging out!");
       console.error("Error logging out:", error);
     }
   };
