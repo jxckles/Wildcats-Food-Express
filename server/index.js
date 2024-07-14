@@ -53,7 +53,7 @@ app.post("/Login", (req, res) => {
           const accessToken = jwt.sign(
             { email: email, role: role },
             "jwt-access-token-secret-key",
-            { expiresIn: "15m" } // Access token valid for 15 minutes
+            { expiresIn: "2d" } // Access token valid for 2 days
           );
           const refreshToken = jwt.sign(
             { email: email, role: role },
