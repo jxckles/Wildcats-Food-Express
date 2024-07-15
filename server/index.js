@@ -53,12 +53,12 @@ app.post("/Login", (req, res) => {
           const accessToken = jwt.sign(
             { email: email, role: role },
             "jwt-access-token-secret-key",
-            { expiresIn: "2d" } // Access token valid for 2 days
+            { expiresIn: "7d" } // Access token valid for 2 days
           );
           const refreshToken = jwt.sign(
             { email: email, role: role },
             "jwt-refresh-access-token-secret-key",
-            { expiresIn: "2d" } // Refresh token valid for 2 days
+            { expiresIn: "7d" } // Refresh token valid for 2 days
           );
           res.cookie("accessToken", accessToken, { maxAge: 15 * 60 * 1000 }); // 15 minutes
           res.cookie("refreshToken", refreshToken, {
@@ -145,6 +145,15 @@ app.get("/dashboard", verifyUser, (req, res) => {
       .json({ valid: false, message: "Forbidden: Users only" });
   }
   return res.json({ valid: true, message: "Welcome User", role: req.role });
+});
+
+app.get("/client-interface", verifyUser, (req, res) => {
+  if (req.role !== "Admin") {
+    return res
+      .status(403)
+      .json({ valid: false, message: "Forbidden: Admins only" });
+  }
+  return res.json({ valid: true, message: "Welcome Admin", role: req.role });
 });
 
 app.post("/logout", (req, res) => {

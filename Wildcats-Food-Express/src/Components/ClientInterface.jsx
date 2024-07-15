@@ -15,7 +15,32 @@ const ClientInterface = () => {
   const [orders, setOrders] = useState([]);
   const [isCartMenuOpen, setIsCartMenuOpen] = useState(false);
   const [isUserRolesModalOpen, setIsUserRolesModalOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [message, setMessage] = useState();
   const navigate = useNavigate();
+
+  axios.defaults.withCredentials = true;
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/admin")
+      .then((res) => {
+        if (res.data.valid) {
+          setMessage(res.data.message);
+        } else {
+          navigate("/login");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        navigate("/login");
+      });
+  }, []);
+
+  useEffect(() => {
+    fetchMenuItems();
+    fetchOrders();
+  }, [refreshKey]);
 
   useEffect(() => {
     fetchMenuItems();
@@ -137,7 +162,7 @@ const ClientInterface = () => {
   };
 
   const handleAdminInterfaceChange = () => {
-    navigate('/admin');
+    navigate("/admin");
   };
 
   const renderMenus = () => {
@@ -161,7 +186,11 @@ const ClientInterface = () => {
             <div className="menu-item" key={item._id}>
               <div className="menu-image-container">
                 {item.image ? (
-                  <img src={item.image} alt={item.name} className="menu-image" />
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="menu-image"
+                  />
                 ) : (
                   <div className="menu-image-placeholder">No Image</div>
                 )}
@@ -170,14 +199,14 @@ const ClientInterface = () => {
                 <p className="menu-name">{item.name}</p>
                 <p className="menu-price">₱{item.price.toFixed(2)}</p>
                 <p
-                          className={`menu-quantity ${
-                            item.quantity === 0 ? "sold-out" : ""
-                          }`}
-                        >
-                          {item.quantity > 0
-                            ? `Available: ${item.quantity}`
-                            : "Sold Out"}
-                        </p>
+                  className={`menu-quantity ${
+                    item.quantity === 0 ? "sold-out" : ""
+                  }`}
+                >
+                  {item.quantity > 0
+                    ? `Available: ${item.quantity}`
+                    : "Sold Out"}
+                </p>
               </div>
               <button
                 onClick={() => handleAddToCart(item)}
@@ -232,7 +261,8 @@ const ClientInterface = () => {
           <ul>
             {cart.map((item) => (
               <li key={item._id}>
-                {item.name} x {item.quantity} - ₱{(item.price * item.quantity).toFixed(2)}
+                {item.name} x {item.quantity} - ₱
+                {(item.price * item.quantity).toFixed(2)}
               </li>
             ))}
           </ul>
@@ -276,9 +306,7 @@ const ClientInterface = () => {
       <div className="modal-overlay">
         <div className="modal user-roles-modal">
           <h3>My Roles</h3>
-          <button onClick={handleAdminInterfaceChange}>
-            Admin Interface
-          </button>
+          <button onClick={handleAdminInterfaceChange}>Admin Interface</button>
           <button onClick={closeUserRolesModal}>Cancel</button>
         </div>
       </div>
@@ -316,14 +344,18 @@ const ClientInterface = () => {
             </button>
             <button
               onClick={() => setActiveTab("orderStatus")}
-              className={`nav-link ${activeTab === "orderStatus" ? "active" : ""}`}
+              className={`nav-link ${
+                activeTab === "orderStatus" ? "active" : ""
+              }`}
             >
               Order Status
             </button>
           </nav>
         </div>
         <div className="client-profile">
-          <span className="client-options" onClick={openUserRolesModal}>Client</span>
+          <span className="client-options" onClick={openUserRolesModal}>
+            Client
+          </span>
           <div className="menu-container">
             <img
               src={cartIcon}
