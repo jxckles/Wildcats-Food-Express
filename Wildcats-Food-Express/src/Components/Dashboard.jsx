@@ -30,10 +30,10 @@ const UserInterface = () => {
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
   const [userProfile, setUserProfile] = useState({
-    firstName: '',
-    lastName: '',
-    courseYear: '',
-    profilePicture: null
+    firstName: "",
+    lastName: "",
+    courseYear: "",
+    profilePicture: null,
   });
 
   const [user, setUser] = useState({
@@ -189,6 +189,7 @@ const UserInterface = () => {
 
     const order = {
       userId: localStorage.getItem("userID"),
+      userName: localStorage.getItem("userName"),
       menusOrdered: cart.map((item) => ({
         itemName: item.name,
         quantity: item.quantity,
@@ -222,22 +223,22 @@ const UserInterface = () => {
     try {
       const userId = localStorage.getItem("userID");
       const formData = new FormData();
-      formData.append('firstName', userProfile.firstName);
-      formData.append('lastName', userProfile.lastName);
-      formData.append('courseYear', userProfile.courseYear);
+      formData.append("firstName", userProfile.firstName);
+      formData.append("lastName", userProfile.lastName);
+      formData.append("courseYear", userProfile.courseYear);
       if (userProfile.profilePicture) {
         // Convert base64 to blob
         const response = await fetch(userProfile.profilePicture);
         const blob = await response.blob();
-        formData.append('profilePicture', blob, 'profile.jpg');
+        formData.append("profilePicture", blob, "profile.jpg");
       }
-      
+
       const response = await axios.put(
         `http://localhost:5000/update-profile/${userId}`,
         formData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
         }
       );
@@ -254,12 +255,11 @@ const UserInterface = () => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setUserProfile(prev => ({ ...prev, profilePicture: reader.result }));
+        setUserProfile((prev) => ({ ...prev, profilePicture: reader.result }));
       };
       reader.readAsDataURL(file);
     }
   };
-
 
   const toggleCartMenu = () => {
     setIsCartMenuOpen(!isCartMenuOpen);
@@ -450,27 +450,31 @@ const UserInterface = () => {
     return (
       <div className="modal-overlay">
         <div className="modal user-roles-modal-dashboard">
-          <div className="options-h3">
-          Options
-          </div>
-          <button onClick={() => {
-            setActiveTab("editProfile");
-            closeUserRolesModal();
-          }}>
-              Edit Profile
-            </button>
-          <button onClick={() => {
-            setActiveTab("changePassword");
-            closeUserRolesModal();
-          }}>
-              Change Password
-            </button>
-          <button onClick={() => {
-            setActiveTab("history");
-            closeUserRolesModal();
-          }}>
+          <div className="options-h3">Options</div>
+          <button
+            onClick={() => {
+              setActiveTab("editProfile");
+              closeUserRolesModal();
+            }}
+          >
+            Edit Profile
+          </button>
+          <button
+            onClick={() => {
+              setActiveTab("changePassword");
+              closeUserRolesModal();
+            }}
+          >
+            Change Password
+          </button>
+          <button
+            onClick={() => {
+              setActiveTab("history");
+              closeUserRolesModal();
+            }}
+          >
             History
-            </button>
+          </button>
           <button onClick={handleLogout}>Logout</button>
           <button onClick={closeUserRolesModal}>Cancel</button>
         </div>
@@ -485,6 +489,7 @@ const UserInterface = () => {
         {},
         { withCredentials: true }
       );
+      localStorage.clear();
       alert("Logged Out!");
       navigate("/login", { replace: true });
     } catch (error) {
@@ -561,21 +566,35 @@ const UserInterface = () => {
   };
 
   const renderHistory = () => {
-    const filteredOrders = historyOrders.filter(order => 
-      (order.status === "Completed" || order.status === "Cancelled") &&
-      (!searchDate || new Date(order.dateOrdered).getDate() === parseInt(searchDate)) &&
-      (!searchMonth || new Date(order.dateOrdered).getMonth() === parseInt(searchMonth)) &&
-      (!searchYear || new Date(order.dateOrdered).getFullYear() === parseInt(searchYear))
+    const filteredOrders = historyOrders.filter(
+      (order) =>
+        (order.status === "Completed" || order.status === "Cancelled") &&
+        (!searchDate ||
+          new Date(order.dateOrdered).getDate() === parseInt(searchDate)) &&
+        (!searchMonth ||
+          new Date(order.dateOrdered).getMonth() === parseInt(searchMonth)) &&
+        (!searchYear ||
+          new Date(order.dateOrdered).getFullYear() === parseInt(searchYear))
     );
-  
+
     const currentYear = new Date().getFullYear();
-    const years = Array.from({length: 5}, (_, i) => currentYear + i);
+    const years = Array.from({ length: 5 }, (_, i) => currentYear + i);
     const months = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
     ];
-    const days = Array.from({length: 31}, (_, i) => i + 1);
-  
+    const days = Array.from({ length: 31 }, (_, i) => i + 1);
+
     return (
       <div className="history-tab">
         <h2>Previous Orders</h2>
@@ -585,8 +604,10 @@ const UserInterface = () => {
             onChange={(e) => setSearchDate(e.target.value)}
           >
             <option value="">Day</option>
-            {days.map(day => (
-              <option key={day} value={day}>{day}</option>
+            {days.map((day) => (
+              <option key={day} value={day}>
+                {day}
+              </option>
             ))}
           </select>
           <select
@@ -595,7 +616,9 @@ const UserInterface = () => {
           >
             <option value="">Month</option>
             {months.map((month, index) => (
-              <option key={month} value={index}>{month}</option>
+              <option key={month} value={index}>
+                {month}
+              </option>
             ))}
           </select>
           <select
@@ -603,8 +626,10 @@ const UserInterface = () => {
             onChange={(e) => setSearchYear(e.target.value)}
           >
             <option value="">Year</option>
-            {years.map(year => (
-              <option key={year} value={year}>{year}</option>
+            {years.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
             ))}
           </select>
         </div>
@@ -642,67 +667,77 @@ const UserInterface = () => {
     );
   };
 
-
   const renderEditProfile = () => {
-  return (
-    <div className="edit-profile-tab">
-      <h2>Edit Profile</h2>
-      <form onSubmit={handleProfileUpdate}>
-        <div className="profile-picture-container">
-          {userProfile.profilePicture ? (
-            <img src={userProfile.profilePicture} alt="Profile" className="profile-picture" />
-          ) : (
-            <div className="profile-picture-placeholder">
-              <span>+</span>
-            </div>
-          )}
-          <input
-            type="file"
-            id="profilePicture"
-            accept="image/*"
-            onChange={handleFileChange}
-            style={{ display: 'none' }}
-          />
-          <label htmlFor="profilePicture" className="upload-button">
-            Change Picture
-          </label>
-        </div>
-        <div className="form-group">
-          <label htmlFor="firstName">First Name:</label>
-          <input
-            type="text"
-            id="firstName"
-            name="firstName"
-            value={userProfile.firstName}
-            onChange={(e) => setUserProfile({...userProfile, firstName: e.target.value})}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="lastName">Last Name:</label>
-          <input
-            type="text"
-            id="lastName"
-            name="lastName"
-            value={userProfile.lastName}
-            onChange={(e) => setUserProfile({...userProfile, lastName: e.target.value})}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="courseYear">Course/Year:</label>
-          <input
-            type="text"
-            id="courseYear"
-            name="courseYear"
-            value={userProfile.courseYear}
-            onChange={(e) => setUserProfile({...userProfile, courseYear: e.target.value})}
-          />
-        </div>
-        <button type="submit" className="submit-btn">Submit</button>
-      </form>
-    </div>
-  );
-};
-
+    return (
+      <div className="edit-profile-tab">
+        <h2>Edit Profile</h2>
+        <form onSubmit={handleProfileUpdate}>
+          <div className="profile-picture-container">
+            {userProfile.profilePicture ? (
+              <img
+                src={userProfile.profilePicture}
+                alt="Profile"
+                className="profile-picture"
+              />
+            ) : (
+              <div className="profile-picture-placeholder">
+                <span>+</span>
+              </div>
+            )}
+            <input
+              type="file"
+              id="profilePicture"
+              accept="image/*"
+              onChange={handleFileChange}
+              style={{ display: "none" }}
+            />
+            <label htmlFor="profilePicture" className="upload-button">
+              Change Picture
+            </label>
+          </div>
+          <div className="form-group">
+            <label htmlFor="firstName">First Name:</label>
+            <input
+              type="text"
+              id="firstName"
+              name="firstName"
+              value={userProfile.firstName}
+              onChange={(e) =>
+                setUserProfile({ ...userProfile, firstName: e.target.value })
+              }
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="lastName">Last Name:</label>
+            <input
+              type="text"
+              id="lastName"
+              name="lastName"
+              value={userProfile.lastName}
+              onChange={(e) =>
+                setUserProfile({ ...userProfile, lastName: e.target.value })
+              }
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="courseYear">Course/Year:</label>
+            <input
+              type="text"
+              id="courseYear"
+              name="courseYear"
+              value={userProfile.courseYear}
+              onChange={(e) =>
+                setUserProfile({ ...userProfile, courseYear: e.target.value })
+              }
+            />
+          </div>
+          <button type="submit" className="submit-btn">
+            Submit
+          </button>
+        </form>
+      </div>
+    );
+  };
 
   return (
     <div className="user-interface">
@@ -731,11 +766,12 @@ const UserInterface = () => {
             </button>
             <button
               onClick={() => setActiveTab("trackOrder")}
-              className={`nav-link ${activeTab === "trackOrder" ? "active" : ""}`}
+              className={`nav-link ${
+                activeTab === "trackOrder" ? "active" : ""
+              }`}
             >
-            Order Tracking
-          </button>
-
+              Order Tracking
+            </button>
           </nav>
         </div>
         <div className="user-profile">
