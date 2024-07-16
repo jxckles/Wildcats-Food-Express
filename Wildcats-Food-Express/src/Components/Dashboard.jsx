@@ -36,6 +36,11 @@ const UserInterface = () => {
     profilePicture: null
   });
 
+  const [user, setUser] = useState({
+    name: '',
+    profilePicture: null
+  });
+
   axios.defaults.withCredentials = true;
 
   useEffect(() => {
@@ -87,6 +92,23 @@ const UserInterface = () => {
       console.error("Error fetching orders:", error);
     }
   };
+
+  const fetchUserData = async () => {
+    try {
+      const userId = localStorage.getItem("userID");
+      const response = await axios.get(`http://localhost:5000/user/${userId}`);
+      setUser({
+        name: `${response.data.firstName} ${response.data.lastName}`,
+        profilePicture: response.data.profilePicture
+      });
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
 
   const fetchHistoryOrders = async () => {
     try {
@@ -717,9 +739,16 @@ const UserInterface = () => {
           </nav>
         </div>
         <div className="user-profile">
-          <span className="user-options" onClick={openUserRolesModal}>
-            User's Name Here
-          </span>
+          <div className="user-info" onClick={openUserRolesModal}>
+            {user.profilePicture ? (
+              <img src={user.profilePicture} alt="Profile" className="user-avatar" />
+            ) : (
+              <div className="default-avatar">
+                {user.name ? user.name.charAt(0).toUpperCase() : ''}
+              </div>
+            )}
+            <span className="user-name">{user.name || 'Users name'}</span>
+          </div>
           <div className="menu-container-dashboard">
             <img
               src={cartIcon}
