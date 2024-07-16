@@ -50,6 +50,7 @@ app.post("/Login", (req, res) => {
         if (password === user.password) {
           const role = user.role;
           const userID = user._id;
+          const userName = user.firstName + " " + user.lastName;
           const accessToken = jwt.sign(
             { email: email, role: role },
             "jwt-access-token-secret-key",
@@ -67,7 +68,7 @@ app.post("/Login", (req, res) => {
             secure: true,
             sameSite: "strict",
           });
-          return res.json({ role, userID });
+          return res.json({ role, userID, userName });
         } else {
           return res.json("Incorrect password");
         }
@@ -294,14 +295,15 @@ app.delete("/menu/:id", async (req, res) => {
 
     res.json({ message: "Item deleted" });
   } catch (err) {
-    console.error("Error deleting menu item:", err); // Log the error
+    console.error("Error deleting menu item:", err);
     res.status(400).json(err);
   }
 });
 
 //for placing orders
 app.post("/orders", async (req, res) => {
-  const { userId, menusOrdered, studentNumber, status, totalPrice } = req.body;
+  const { userId, userName, menusOrdered, studentNumber, status, totalPrice } =
+    req.body;
 
   console.log("Received Order Payload:", JSON.stringify(req.body, null, 2));
 
@@ -321,18 +323,18 @@ app.post("/orders", async (req, res) => {
     // create a new order
     const newOrder = new Order({
       userId,
+      userName,
       menusOrdered,
       studentNumber,
       status,
       totalPrice,
     });
 
-    // save the new order to the database
     await newOrder.save({ session });
 
     // update the quantities of the ordered menu items
     for (const orderedMenu of menusOrdered) {
-      // find the menu item by name instead of ID
+      // find the menu item
       const menuItem = await MenuItem.findOne({
         name: orderedMenu.itemName,
       }).session(session);
@@ -345,7 +347,7 @@ app.post("/orders", async (req, res) => {
         throw new Error(`Not enough quantity for menu item: ${menuItem.name}`);
       }
       menuItem.quantity -= orderedMenu.quantity;
-      await menuItem.save({ session }); // Save the updated menu item back to the database
+      await menuItem.save({ session });
     }
 
     await session.commitTransaction();
@@ -367,11 +369,18 @@ app.post("/orders", async (req, res) => {
 app.get("/orders", async (req, res) => {
   try {
     const userId = req.query.userId;
-    const orders = await Order.find({ userId: userId });
+    let orders;
+    //check if the user is the admin
+    if (userId === "668e8d77cfc185e3ac2d32a5") {
+      orders = await Order.find({});
+    } else {
+      console.log("Fetching orders for user:", userId);
+      orders = await Order.find({ userId: userId });
+    }
     res.json(orders);
   } catch (error) {
-    console.error("Error fetching user orders:", error);
-    res.status(500).json({ message: "Failed to fetch user orders" });
+    console.error("Error fetching orders:", error);
+    res.status(500).json({ message: "Failed to fetch orders" });
   }
 });
 

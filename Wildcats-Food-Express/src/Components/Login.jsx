@@ -26,6 +26,7 @@ const Login = () => {
           .post("http://localhost:5000/Login", { email, password })
           .then((res) => {
             localStorage.setItem("userID", res.data.userID);
+            localStorage.setItem("userName", res.data.userName);
             if (res.data.role === "Admin") {
               showSuccessToast("Login successful! Welcome Admin!");
               setTimeout(() => navigate("/admin"), 2000);
@@ -52,7 +53,7 @@ const Login = () => {
       pauseOnHover: true,
       draggable: true,
       progress: undefined,
-      closeButton:false,
+      closeButton: false,
       theme: "colored",
     });
   };
@@ -66,7 +67,7 @@ const Login = () => {
       pauseOnHover: true,
       draggable: true,
       progress: undefined,
-      closeButton:false,
+      closeButton: false,
       theme: "colored",
     });
   };

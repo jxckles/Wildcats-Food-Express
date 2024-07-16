@@ -104,8 +104,11 @@ const MainAdminInterface = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/orders");
-      onlineOrders(response.data);
+      const userId = localStorage.getItem("userID");
+      const response = await axios.get(
+        `http://localhost:5000/orders?userId=${userId}`
+      );
+      setOnlineOrders(response.data);
       console.log("Fetched orders:", response.data);
     } catch (error) {
       console.error("Error fetching orders:", error);
@@ -254,10 +257,9 @@ const MainAdminInterface = () => {
         {},
         { withCredentials: true }
       );
-      alert("Logged Out!");
+      localStorage.clear();
       navigate("/login", { replace: true });
     } catch (error) {
-      alert("Error logging out!");
       console.error("Error logging out:", error);
     }
   };
@@ -304,10 +306,18 @@ const MainAdminInterface = () => {
             <tbody>
               {onlineOrders.map((order) => (
                 <tr key={order.id}>
-                  <td>{order.id}</td>
-                  <td>{order.name}</td>
-                  <td>{order.amount}</td>
-                  <td>{order.product}</td>
+                  <td>{order.studentNumber}</td>
+                  <td>{order.userName}</td>
+                  <td>&#8369;{order.totalPrice}</td>
+                  <td>
+                    {order.menusOrdered.map((menu, index) => (
+                      <div key={index} style={{ marginBottom: "10px" }}>
+                        {`${menu.itemName} (x${menu.quantity}) - \u20B1${
+                          menu.price * menu.quantity
+                        }`}
+                      </div>
+                    ))}
+                  </td>
                   <td>
                     <select
                       value={order.status}
