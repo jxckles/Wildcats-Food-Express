@@ -29,6 +29,13 @@ const UserInterface = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
+  const [userProfile, setUserProfile] = useState({
+    firstName: '',
+    lastName: '',
+    courseYear: '',
+    profilePicture: null
+  });
+
   axios.defaults.withCredentials = true;
 
   useEffect(() => {
@@ -187,6 +194,50 @@ const UserInterface = () => {
       alert("Failed to place order. Please try again.");
     }
   };
+
+  const handleProfileUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      const userId = localStorage.getItem("userID");
+      const formData = new FormData();
+      formData.append('firstName', userProfile.firstName);
+      formData.append('lastName', userProfile.lastName);
+      formData.append('courseYear', userProfile.courseYear);
+      if (userProfile.profilePicture) {
+        // Convert base64 to blob
+        const response = await fetch(userProfile.profilePicture);
+        const blob = await response.blob();
+        formData.append('profilePicture', blob, 'profile.jpg');
+      }
+      
+      const response = await axios.put(
+        `http://localhost:5000/update-profile/${userId}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      alert("Profile updated successfully!");
+      closeUserRolesModal();
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("Failed to update profile. Please try again.");
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUserProfile(prev => ({ ...prev, profilePicture: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
 
   const toggleCartMenu = () => {
     setIsCartMenuOpen(!isCartMenuOpen);
@@ -380,7 +431,12 @@ const UserInterface = () => {
           <div className="options-h3">
           Options
           </div>
-          <button onClick={handleAdminInterfaceChange}>Edit Profile</button>
+          <button onClick={() => {
+            setActiveTab("editProfile");
+            closeUserRolesModal();
+          }}>
+              Edit Profile
+            </button>
           <button onClick={() => {
             setActiveTab("changePassword");
             closeUserRolesModal();
@@ -563,6 +619,69 @@ const UserInterface = () => {
       </div>
     );
   };
+
+
+  const renderEditProfile = () => {
+  return (
+    <div className="edit-profile-tab">
+      <h2>Edit Profile</h2>
+      <form onSubmit={handleProfileUpdate}>
+        <div className="profile-picture-container">
+          {userProfile.profilePicture ? (
+            <img src={userProfile.profilePicture} alt="Profile" className="profile-picture" />
+          ) : (
+            <div className="profile-picture-placeholder">
+              <span>+</span>
+            </div>
+          )}
+          <input
+            type="file"
+            id="profilePicture"
+            accept="image/*"
+            onChange={handleFileChange}
+            style={{ display: 'none' }}
+          />
+          <label htmlFor="profilePicture" className="upload-button">
+            Change Picture
+          </label>
+        </div>
+        <div className="form-group">
+          <label htmlFor="firstName">First Name:</label>
+          <input
+            type="text"
+            id="firstName"
+            name="firstName"
+            value={userProfile.firstName}
+            onChange={(e) => setUserProfile({...userProfile, firstName: e.target.value})}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="lastName">Last Name:</label>
+          <input
+            type="text"
+            id="lastName"
+            name="lastName"
+            value={userProfile.lastName}
+            onChange={(e) => setUserProfile({...userProfile, lastName: e.target.value})}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="courseYear">Course/Year:</label>
+          <input
+            type="text"
+            id="courseYear"
+            name="courseYear"
+            value={userProfile.courseYear}
+            onChange={(e) => setUserProfile({...userProfile, courseYear: e.target.value})}
+          />
+        </div>
+        <button type="submit" className="submit-btn">Submit</button>
+      </form>
+    </div>
+  );
+};
+
+
   return (
     <div className="user-interface">
       <header className="user-header">
@@ -622,6 +741,7 @@ const UserInterface = () => {
         {activeTab === "changePassword" && renderChangePassword()}
         {activeTab === "trackOrder" && renderTrackMyOrder()}
         {activeTab === "history" && renderHistory()}
+        {activeTab === "editProfile" && renderEditProfile()}
       </main>
       {isUserRolesModalOpen && renderUserRolesModal()}
     </div>
