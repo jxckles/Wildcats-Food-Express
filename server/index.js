@@ -467,7 +467,6 @@ app.put(
         courseYear,
       };
 
-      //if a profile picture was uploaded, add its path to the update data
       if (req.file) {
         updateData.profilePicture = `/Images/${req.file.filename}`;
       }

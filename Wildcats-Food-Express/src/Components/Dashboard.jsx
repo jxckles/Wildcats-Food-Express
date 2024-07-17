@@ -236,11 +236,14 @@ const UserInterface = () => {
       formData.append("firstName", userProfile.firstName);
       formData.append("lastName", userProfile.lastName);
       formData.append("courseYear", userProfile.courseYear);
-      if (userProfile.profilePicture) {
+
+      //check is the user selected a new pic
+      if (userProfile.profilePicture && isFileSelected) {
         // Convert base64 to blob
         const response = await fetch(userProfile.profilePicture);
         const blob = await response.blob();
         formData.append("profilePicture", blob, "profile.jpg");
+        setIsFileSelected(true);
       }
 
       const response = await axios.put(
@@ -262,10 +265,12 @@ const UserInterface = () => {
   };
 
   const [imagePreview, setImagePreview] = useState(userProfile.profilePicture);
+  const [isFileSelected, setIsFileSelected] = useState(false);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setIsFileSelected(true);
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
