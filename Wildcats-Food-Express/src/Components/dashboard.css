@@ -695,3 +695,113 @@
   font-weight: bold;
   color: #333;
 }
+
+.payment-container{
+  width: 100%;
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #ffffff;
+  box-shadow: 0 0 10px 10px rgba(0, 0, 0, 0.5);
+  border-radius: 30px;
+}
+
+.payment-container h1 {
+  text-align: center;
+  color: #800000;
+  margin-bottom: 20px;
+}
+
+.payment-content {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.order_summary{
+  width: 48%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+  border-radius: 15px;
+}
+
+.payment-form{
+  width: 48%;
+}
+
+.order_summary h2 {
+  color: #800000;
+  margin-bottom: 10px;
+}
+
+.order_summary p {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0;
+  padding: 10px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.payment-form h3{
+  margin-top: 30px;
+  margin-left: 100px;
+}
+.payment-form img {
+  width: 100px;
+  border-radius: 50%;
+  margin-top: -500px;
+  margin-left: 300px;
+}
+
+.order_summary hr {
+  border: 1px solid #e0e0e0;
+  margin: 40px 0;
+}
+
+.payment-form label {
+  font-weight: bold;
+}
+.payment-form label.NameLabel{
+  margin-right: 250px ;
+}
+.payment-form label.ReferenceLabel{
+  margin-right: 158px;
+}
+
+.payment-form label.AmountLabel{
+  margin-right: 199px;
+}
+
+.payment-form input.Name{
+  margin-top: -120px;
+}
+
+.payment-form input.Reference{
+  margin-top: -120px;
+}
+
+.payment-form input.Amount{
+  margin-top: -120px;
+}
+
+.upload-btn{
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #800000;
+  color: #fff;
+  cursor: pointer;
+  margin-top: 5px;
+  width: 100%;
+  max-width: 250px;
+}
+.submit-btn{
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #800000;
+  color: #fff;
+  cursor: pointer;
+  margin-top: 5px;
+  width: 100%;
+  max-width: 250px;
+}
