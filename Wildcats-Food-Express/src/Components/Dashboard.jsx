@@ -5,6 +5,7 @@ import logo from "/logo.svg";
 import profileIcon from "/cat_profile.svg";
 import cartIcon from "/shopping_cart.svg";
 import { useNavigate } from "react-router-dom";
+import gcashIcon from "/gcash.svg";
 
 const UserInterface = () => {
   const [menuItems, setMenuItems] = useState([]);
@@ -214,6 +215,7 @@ const UserInterface = () => {
       setSchoolId("");
       fetchOrders();
       alert("Order placed successfully!");
+      setActiveTab("payment");
     } catch (error) {
       console.error(
         "Error placing order:",
@@ -545,7 +547,45 @@ const UserInterface = () => {
   };
 
   const renderPaymentOrder = () => {
-    //Online Payment Logic Here
+    return (
+      <div className="payment-container">
+
+        <h1>Payment</h1>
+
+        <div className="payment-content">
+          <div className="order_summary">
+            <h2>Order Summary</h2>
+            <p>DISH HERE <span>PRICE HERE</span></p>
+            <hr />
+            <p>Total <span>TOTAL PRICE HERE</span></p>
+          </div>
+          <div className="payment-form">
+
+            <p>Send your Virtual payment to:</p>
+            <h3>GCASH</h3>
+            <img src={gcashIcon} alt="GcashLogo"/>
+
+            <hr className="gcash"/>
+
+            <form>
+              <label className="NameLabel">Name:</label>
+              <input type="text" name="name" className="Name" />
+
+              <label className="ReferenceLabel">Reference Number:</label>
+              <input type="text" name="referenceNumber" className="Reference" />
+
+              <label className="AmountLabel">Amount Sent:</label>
+              <input type="text" name="amountSent" className="Amount" />
+              
+              <button type="button" className="upload-btn">Upload Receipt</button>
+
+              <button type="submit" className="submit-btn">Submit</button>
+            </form>
+
+          </div>
+        </div>
+      </div>
+    );
   };
 
   const renderHistory = () => {
