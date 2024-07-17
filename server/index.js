@@ -408,6 +408,31 @@ app.post("/change-password", async (req, res) => {
   }
 });
 
+//history of orders
+async function getHistoryOrdersByUserId(userId) {
+  try {
+    const orders = await Order.find({ userId: userId });
+    return orders;
+  } catch (error) {
+    console.error("Error fetching orders from database:", error);
+    throw error;
+  }
+}
+
+app.get("/history-orders", async (req, res) => {
+  try {
+    const { userId } = req.query;
+    if (!userId) {
+      return res.status(400).send("UserID is required");
+    }
+    const orders = await getHistoryOrdersByUserId(userId);
+    res.json(orders);
+  } catch (error) {
+    console.error("Error fetching history orders:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 app.listen(5000, () => {
   console.log("Server is running on port 5000");
 });

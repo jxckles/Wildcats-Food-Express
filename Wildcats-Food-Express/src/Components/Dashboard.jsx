@@ -37,8 +37,8 @@ const UserInterface = () => {
   });
 
   const [user, setUser] = useState({
-    name: '',
-    profilePicture: null
+    name: "",
+    profilePicture: null,
   });
 
   axios.defaults.withCredentials = true;
@@ -99,7 +99,7 @@ const UserInterface = () => {
       const response = await axios.get(`http://localhost:5000/user/${userId}`);
       setUser({
         name: `${response.data.firstName} ${response.data.lastName}`,
-        profilePicture: response.data.profilePicture
+        profilePicture: response.data.profilePicture,
       });
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -113,6 +113,10 @@ const UserInterface = () => {
   const fetchHistoryOrders = async () => {
     try {
       const userId = localStorage.getItem("userID");
+      if (!userId) {
+        return;
+      }
+      console.log(`Fetching history orders for user ID: ${userId}`);
       const response = await axios.get(
         `http://localhost:5000/history-orders?userId=${userId}`
       );
@@ -124,6 +128,7 @@ const UserInterface = () => {
 
   useEffect(() => {
     if (activeTab === "history") {
+      console.log("Fetching history orders...");
       fetchHistoryOrders();
     }
   }, [activeTab]);
@@ -577,6 +582,8 @@ const UserInterface = () => {
           new Date(order.dateOrdered).getFullYear() === parseInt(searchYear))
     );
 
+    console.log("Rendering history orders:", filteredOrders);
+
     const currentYear = new Date().getFullYear();
     const years = Array.from({ length: 5 }, (_, i) => currentYear + i);
     const months = [
@@ -777,13 +784,17 @@ const UserInterface = () => {
         <div className="user-profile">
           <div className="user-info" onClick={openUserRolesModal}>
             {user.profilePicture ? (
-              <img src={user.profilePicture} alt="Profile" className="user-avatar" />
+              <img
+                src={user.profilePicture}
+                alt="Profile"
+                className="user-avatar"
+              />
             ) : (
               <div className="default-avatar">
-                {user.name ? user.name.charAt(0).toUpperCase() : ''}
+                {user.name ? user.name.charAt(0).toUpperCase() : ""}
               </div>
             )}
-            <span className="user-name">{user.name || 'Users name'}</span>
+            <span className="user-name">{user.name || "Users name"}</span>
           </div>
           <div className="menu-container-dashboard">
             <img
