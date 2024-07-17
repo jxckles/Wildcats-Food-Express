@@ -22,7 +22,6 @@ app.use(
 );
 
 // Static folder for images
-
 app.use("/Images", express.static(path.join(__dirname, "public/Images")));
 
 mongoose.connect(
@@ -229,7 +228,8 @@ app.post("/Register", (req, res) => {
     if (existingUser) {
       res.json("Email already exists");
     } else {
-      UserModel.create(req.body)
+      // Since profile picture is added later, it's initially set to null
+      UserModel.create({ ...req.body, profilePicture: null })
         .then((User) => res.json(User))
         .catch((err) => res.status(400).json(err));
     }
@@ -374,7 +374,6 @@ app.get("/orders", async (req, res) => {
     if (userId === "668e8d77cfc185e3ac2d32a5") {
       orders = await Order.find({});
     } else {
-      console.log("Fetching orders for user:", userId);
       orders = await Order.find({ userId: userId });
     }
     res.json(orders);
@@ -432,6 +431,66 @@ app.get("/history-orders", async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
+
+//get user data
+app.get("/user/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const user = await UserModel.findById(userId).exec();
+    if (user) {
+      res.json({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        courseYear: user.courseYear,
+        profilePicture: user.profilePicture,
+      });
+    } else {
+      res.status(404).send("User not found");
+    }
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+//updating user data
+app.put(
+  "/update-profile/:userId",
+  upload.single("profilePicture"),
+  async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const { firstName, lastName, courseYear } = req.body;
+      const updateData = {
+        firstName,
+        lastName,
+        courseYear,
+      };
+
+      //if a profile picture was uploaded, add its path to the update data
+      if (req.file) {
+        updateData.profilePicture = `/Images/${req.file.filename}`;
+      }
+
+      const updatedUser = await UserModel.findByIdAndUpdate(
+        userId,
+        updateData,
+        { new: true }
+      );
+      if (updatedUser) {
+        res.json({
+          message: "Profile updated successfully!",
+          user: updatedUser,
+        });
+      } else {
+        res.status(404).send("User not found");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      res.status(500).send("Internal Server Error");
+    }
+  }
+);
 
 app.listen(5000, () => {
   console.log("Server is running on port 5000");
