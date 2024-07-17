@@ -219,7 +219,7 @@ const UserInterface = () => {
         "Error placing order:",
         error.response ? error.response.data : error.message
       );
-      alert("Failed to place order. Please try again.");
+      alert("Failed to checkout order. Please try again.");
     }
   };
 
@@ -398,7 +398,7 @@ const UserInterface = () => {
                   Cancel Order
                 </button>
                 <button onClick={handlePlaceOrder} className="place-order-btn">
-                  Place Order
+                  Checkout
                 </button>
               </div>
             </div>
@@ -544,30 +544,8 @@ const UserInterface = () => {
     );
   };
 
-  const renderTrackMyOrder = () => {
-    return (
-      <div className="track-order-tab">
-        <h2>My Order Status:</h2>
-        <table className="track-order-table">
-          <thead>
-            <tr>
-              <th>Order Number</th>
-              <th>Date Ordered</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order._id}>
-                <td>{order.studentNumber}</td>
-                <td>{new Date(order.dateOrdered).toLocaleDateString()}</td>
-                <td>{order.status}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
+  const renderPaymentOrder = () => {
+    //Online Payment Logic Here
   };
 
   const renderHistory = () => {
@@ -772,12 +750,12 @@ const UserInterface = () => {
               My Orders
             </button>
             <button
-              onClick={() => setActiveTab("trackOrder")}
+              onClick={() => setActiveTab("payment")}
               className={`nav-link ${
-                activeTab === "trackOrder" ? "active" : ""
+                activeTab === "payment" ? "active" : ""
               }`}
             >
-              Order Tracking
+              Payment
             </button>
           </nav>
         </div>
@@ -815,7 +793,7 @@ const UserInterface = () => {
         {activeTab === "menus" && renderMenus()}
         {activeTab === "orders" && renderOrders()}
         {activeTab === "changePassword" && renderChangePassword()}
-        {activeTab === "trackOrder" && renderTrackMyOrder()}
+        {activeTab === "payment" && renderPaymentOrder()}
         {activeTab === "history" && renderHistory()}
         {activeTab === "editProfile" && renderEditProfile()}
       </main>

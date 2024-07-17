@@ -298,38 +298,6 @@
   color: #990000;
 }
 
-.track-order-tab{
-  margin-top: 20px; 
-  padding: 0 200px; /* Add padding for better spacing */
-
-  h2{
-    text-align: left;
-    font-size: 2rem;
-  }
-}
-
-.track-order-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-
-.track-order-table th, .track-order-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: center;
-}
-
-.track-order-table th {
-  background-color: #f2f2f2;
-  color: #9c0000;
-  font-size: 1.2rem;
-}
-
-.track-order-table td{
-  font-size: 1.2rem;
-  color: #990000;
-}
 
 .user-options {
   color: #990000;
