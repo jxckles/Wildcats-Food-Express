@@ -11,6 +11,7 @@ const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const app = express();
 const nodemailer = require("nodemailer");
+const ClientOrder = require("./models/ClientOrder");
 
 app.use(express.json());
 app.use(cookieParser());
@@ -300,6 +301,19 @@ app.delete("/menu/:id", async (req, res) => {
   }
 });
 
+
+app.get('/menu/:id/quantity', async (req, res) => {
+  try {
+    const item = await MenuItem.findById(req.params.id);
+    if (!item) {
+      return res.status(404).send({ message: 'Item not found' });
+    }
+    res.send({ quantity: item.quantity });
+  } catch (error) {
+    res.status(500).send({ message: 'Error fetching item quantity', error });
+  }
+});
+
 //for placing orders
 app.post("/orders", async (req, res) => {
   const { userId, userName, menusOrdered, studentNumber, status, totalPrice } =
@@ -383,7 +397,68 @@ app.get("/orders", async (req, res) => {
   }
 });
 
+//for client order interface; handle place order
+
+app.post('/clientorders', async (req, res) => {
+  try {
+    const { schoolId, items, status, priorityNumber } = req.body;
+
+    if (!schoolId || !items || !status) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const newOrder = new ClientOrder({
+      schoolId,
+      items,
+      status,
+      priorityNumber: priorityNumber || Math.floor(Math.random() * 1000000), // Generate if not provided
+    });
+
+    await newOrder.validate(); // Validate schema before saving
+    await newOrder.save();
+    res.status(201).json({ message: "Order placed successfully", order: newOrder });
+  } catch (error) {
+    if (error.name === 'ValidationError') {
+      const errors = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({ message: "Validation error", errors });
+    }
+    console.error("Error placing order:", error);
+    res.status(500).json({ message: "Failed to place order", error: error.message });
+  }
+});
+
+app.post('/update-quantity', async (req, res) => {
+  const { itemId, quantityChange } = req.body;
+
+  try {
+    const item = await MenuItem.findById(itemId);
+    if (!item) {
+      return res.status(404).json({ message: 'Item not found' });
+    }
+
+    item.quantity += quantityChange;
+    await item.save();
+
+    res.json({ message: 'Quantity updated', item });
+  } catch (error) {
+    console.error('Error updating quantity:', error);
+    res.status(500).json({ message: 'Server error', error });
+  }
+});
+
+app.get('/clientorders', async (req, res) => {
+  try {
+    const orders = await ClientOrder.find();
+    res.status(200).json(orders);
+  } catch (error) {
+    console.error("Error fetching client orders:", error);
+    res.status(500).json({ message: "Failed to fetch client orders", error: error.message });
+  }
+});
+
+
 //for change password
+
 app.post("/change-password", async (req, res) => {
   const { userId, oldPassword, newPassword } = req.body;
 

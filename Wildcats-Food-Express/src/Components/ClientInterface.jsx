@@ -1,3 +1,5 @@
+// ClientInterface.js
+
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./ClientInterface.css";
@@ -9,7 +11,9 @@ import { useNavigate } from "react-router-dom";
 const ClientInterface = () => {
   const [menuItems, setMenuItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState("menus");
+  const [activeTab, setActiveTab] = useState(
+    localStorage.getItem("activeTab") || "menus"
+  );
   const [cart, setCart] = useState([]);
   const [schoolId, setSchoolId] = useState("");
   const [orders, setOrders] = useState([]);
@@ -40,11 +44,13 @@ const ClientInterface = () => {
   useEffect(() => {
     fetchMenuItems();
     fetchOrders();
+    fetchClientOrders();
   }, [refreshKey]);
 
   useEffect(() => {
     fetchMenuItems();
     fetchOrders();
+    fetchClientOrders();
   }, []);
 
   const fetchMenuItems = async () => {
@@ -72,27 +78,58 @@ const ClientInterface = () => {
     }
   };
 
+  //fetch client orders
+
+  const fetchClientOrders = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/clientorders");
+      setOrders(response.data);
+    } catch (error) {
+      console.error("Error fetching client orders:", error);
+    }
+  };
+
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
   };
 
-  const handleAddToCart = (item) => {
-    const existingItem = cart.find((cartItem) => cartItem._id === item._id);
-    if (existingItem) {
-      setCart(
-        cart.map((cartItem) =>
-          cartItem._id === item._id
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem
-        )
+  const handleAddToCart = async (item) => {
+    try {
+      // Fetch the current available quantity from the database
+      const response = await axios.get(
+        `http://localhost:5000/menu/${item._id}/quantity`
       );
-    } else {
-      setCart([...cart, { ...item, quantity: 1 }]);
+      const availableQuantity = response.data.quantity;
+
+      if (availableQuantity > 0) {
+        // Check if the item is already in the cart
+        const existingItem = cart.find((cartItem) => cartItem._id === item._id);
+
+        if (existingItem) {
+          // Update the quantity of the existing item in the cart
+          setCart(
+            cart.map((cartItem) =>
+              cartItem._id === item._id
+                ? { ...cartItem, quantity: cartItem.quantity + 1 }
+                : cartItem
+            )
+          );
+        } else {
+          // Add the new item to the cart
+          setCart([...cart, { ...item, quantity: 1 }]);
+        }
+
+        // Decrease the available quantity in the database
+        await updateMenuItemQuantity(item._id, -1);
+      } else {
+        alert("This item is out of stock.");
+      }
+    } catch (error) {
+      console.error("Error fetching item quantity:", error);
     }
-    updateMenuItemQuantity(item._id, -1);
   };
 
-  const handleRemoveFromCart = (item) => {
+  const handleRemoveFromCart = async (item) => {
     const existingItem = cart.find((cartItem) => cartItem._id === item._id);
     if (existingItem.quantity === 1) {
       setCart(cart.filter((cartItem) => cartItem._id !== item._id));
@@ -105,22 +142,30 @@ const ClientInterface = () => {
         )
       );
     }
-    updateMenuItemQuantity(item._id, 1);
+    await updateMenuItemQuantity(item._id, 1);
   };
 
-  const updateMenuItemQuantity = (itemId, change) => {
-    setMenuItems(
-      menuItems.map((item) =>
-        item._id === itemId
-          ? { ...item, quantity: item.quantity + change }
-          : item
-      )
-    );
+  const updateMenuItemQuantity = async (itemId, change) => {
+    try {
+      await axios.post("http://localhost:5000/update-quantity", {
+        itemId,
+        quantityChange: change,
+      });
+      setMenuItems(
+        menuItems.map((item) =>
+          item._id === itemId
+            ? { ...item, quantity: item.quantity + change }
+            : item
+        )
+      );
+    } catch (error) {
+      console.error("Error updating menu item quantity:", error);
+    }
   };
 
   const handleCancelOrder = () => {
-    cart.forEach((item) => {
-      updateMenuItemQuantity(item._id, item.quantity);
+    cart.forEach(async (item) => {
+      await updateMenuItemQuantity(item._id, item.quantity);
     });
     setCart([]);
   };
@@ -131,20 +176,44 @@ const ClientInterface = () => {
       return;
     }
 
-    const order = {
-      schoolId,
-      items: cart,
-      status: "Pending",
+    // Function to generate a random priority number
+    const generateRandomPriorityNumber = () => {
+      return Math.floor(Math.random() * 1000000); // Adjust range as needed
     };
 
+    const order = {
+      schoolId,
+      items: cart.map((item) => ({
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+      })),
+      status: "Preparing",
+      priorityNumber: generateRandomPriorityNumber(),
+    };
+
+    console.log("Order to be placed:", order); // Log the order data
+
     try {
-      const response = await axios.post("http://localhost:5000/orders", order);
+      const response = await axios.post(
+        "http://localhost:5000/clientorders",
+        order,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Server response:", response.data); // Log the server response
       setCart([]);
       setSchoolId("");
       fetchOrders(); // Refresh orders after placing new order
       alert("Order placed successfully!");
     } catch (error) {
-      console.error("Error placing order:", error);
+      console.error(
+        "Error placing order:",
+        error.response?.data || error.message
+      ); // Log detailed error message
       alert("Failed to place order. Please try again.");
     }
   };
@@ -290,7 +359,7 @@ const ClientInterface = () => {
           <tbody>
             {orders.map((order) => (
               <tr key={order._id}>
-                <td>{order._id}</td>
+                <td>{order.priorityNumber}</td>
                 <td>{order.schoolId}</td>
                 <td>{order.status}</td>
               </tr>
