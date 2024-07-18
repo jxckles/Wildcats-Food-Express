@@ -17,6 +17,7 @@ const ClientInterface = () => {
   const [cart, setCart] = useState([]);
   const [schoolId, setSchoolId] = useState("");
   const [orders, setOrders] = useState([]);
+  const [clientorders, setClientOrders] = useState([]);
   const [isCartMenuOpen, setIsCartMenuOpen] = useState(false);
   const [isUserRolesModalOpen, setIsUserRolesModalOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -77,7 +78,7 @@ const ClientInterface = () => {
   const fetchClientOrders = async () => {
     try {
       const response = await axios.get("http://localhost:5000/clientorders");
-      setOrders(response.data);
+      setClientOrders(response.data);
     } catch (error) {
       console.error("Error fetching client orders:", error);
     }
@@ -351,11 +352,11 @@ const ClientInterface = () => {
             </tr>
           </thead>
           <tbody>
-            {orders.map((order) => (
-              <tr key={order._id}>
-                <td>{order.priorityNumber}</td>
-                <td>{order.schoolId}</td>
-                <td>{order.status}</td>
+            {clientorders.map((clientorders) => (
+              <tr key={clientorders._id}>
+                <td>{clientorders.priorityNumber}</td>
+                <td>{clientorders.schoolId}</td>
+                <td>{clientorders.status}</td>
               </tr>
             ))}
           </tbody>
