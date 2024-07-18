@@ -40,22 +40,7 @@ const MainAdminInterface = () => {
       status: "Pending",
     },
   ]);
-  const [customerOrders, setCustomerOrders] = useState([
-    {
-      id: "POS-001",
-      schoolID: "21-8877-890",
-      amount: "₱50.00",
-      product: "Fried Chicken",
-      status: "Pending",
-    },
-    {
-      id: "POS-002",
-      schoolID: "19-2322-567",
-      amount: "₱40.00",
-      product: "Chicken Adobo",
-      status: "Pending",
-    },
-  ]);
+  const [customerOrders, setCustomerOrders] = useState([]);
 
   const [reportSearchTerm, setReportSearchTerm] = useState("");
   const [reportDate, setReportDate] = useState("");
