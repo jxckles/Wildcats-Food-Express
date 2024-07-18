@@ -17,10 +17,14 @@ const ClientOrderSchema = new mongoose.Schema({
     default: 'Preparing',
   },
   priorityNumber: {
-    type: String,  // Changed to String
+    type: String,
     required: true,
     unique: true,
   },
+  totalPrice: {
+    type: Number,
+    required: true,
+  }
 }, {
   timestamps: true,
 });
@@ -31,7 +35,6 @@ ClientOrderSchema.pre('save', async function(next) {
     let orderWithSameNumber;
     let maxPriorityNumber = 0;
 
-    // Fetch the highest priorityNumber in the database
     const lastOrder = await mongoose.model('ClientOrder').findOne().sort({ priorityNumber: -1 }).exec();
     if (lastOrder && lastOrder.priorityNumber) {
       maxPriorityNumber = parseInt(lastOrder.priorityNumber, 10);
@@ -40,7 +43,6 @@ ClientOrderSchema.pre('save', async function(next) {
     const newPriorityNumber = maxPriorityNumber + 1;
     order.priorityNumber = String(newPriorityNumber).padStart(3, '0');  // Pad with leading zeros
 
-    // Ensure uniqueness
     orderWithSameNumber = await mongoose.model('ClientOrder').findOne({ priorityNumber: order.priorityNumber });
     while (orderWithSameNumber) {
       maxPriorityNumber += 1;

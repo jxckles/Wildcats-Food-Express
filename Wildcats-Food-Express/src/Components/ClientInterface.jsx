@@ -177,6 +177,10 @@ const ClientInterface = () => {
       return;
     }
 
+    const totalPrice = cart.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0
+    );
     // Function to generate a random priority number
     const generateRandomPriorityNumber = () => {
       return Math.floor(Math.random() * 1000000); // Adjust range as needed
@@ -191,6 +195,7 @@ const ClientInterface = () => {
       })),
       status: "Preparing",
       priorityNumber: generateRandomPriorityNumber(),
+      totalPrice,
     };
 
     console.log("Order to be placed:", order); // Log the order data
