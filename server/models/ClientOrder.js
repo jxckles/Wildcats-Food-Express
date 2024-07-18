@@ -13,11 +13,11 @@ const ClientOrderSchema = new mongoose.Schema({
   }],
   status: {
     type: String,
-    enum: ['Preparing', 'Completed'],
+    enum: ['Preparing', 'Ready for Pickup', 'Completed', 'Cancelled'],
     default: 'Preparing',
   },
   priorityNumber: {
-    type: Number,
+    type: String,  // Changed to String
     required: true,
     unique: true,
   },
@@ -28,13 +28,25 @@ const ClientOrderSchema = new mongoose.Schema({
 ClientOrderSchema.pre('save', async function(next) {
   const order = this;
   if (order.isNew) {
-    let randomNumber;
     let orderWithSameNumber;
-    do {
-      randomNumber = Math.floor(Math.random() * 1000000); // Generate a random number
-      orderWithSameNumber = await mongoose.model('ClientOrder').findOne({ priorityNumber: randomNumber });
-    } while (orderWithSameNumber);
-    order.priorityNumber = randomNumber;
+    let maxPriorityNumber = 0;
+
+    // Fetch the highest priorityNumber in the database
+    const lastOrder = await mongoose.model('ClientOrder').findOne().sort({ priorityNumber: -1 }).exec();
+    if (lastOrder && lastOrder.priorityNumber) {
+      maxPriorityNumber = parseInt(lastOrder.priorityNumber, 10);
+    }
+
+    const newPriorityNumber = maxPriorityNumber + 1;
+    order.priorityNumber = String(newPriorityNumber).padStart(3, '0');  // Pad with leading zeros
+
+    // Ensure uniqueness
+    orderWithSameNumber = await mongoose.model('ClientOrder').findOne({ priorityNumber: order.priorityNumber });
+    while (orderWithSameNumber) {
+      maxPriorityNumber += 1;
+      order.priorityNumber = String(maxPriorityNumber).padStart(3, '0');
+      orderWithSameNumber = await mongoose.model('ClientOrder').findOne({ priorityNumber: order.priorityNumber });
+    }
   }
   next();
 });

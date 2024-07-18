@@ -47,12 +47,6 @@ const ClientInterface = () => {
     fetchClientOrders();
   }, [refreshKey]);
 
-  useEffect(() => {
-    fetchMenuItems();
-    fetchOrders();
-    fetchClientOrders();
-  }, []);
-
   const fetchMenuItems = async () => {
     try {
       const response = await axios.get("http://localhost:5000/menu");
