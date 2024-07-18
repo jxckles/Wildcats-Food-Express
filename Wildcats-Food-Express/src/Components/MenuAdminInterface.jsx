@@ -215,19 +215,36 @@ const MainAdminInterface = () => {
     setOrderSubTab(subTab);
   };
 
-  const handleStatusChange = (orderId, status, isOnline) => {
-    if (isOnline) {
-      setOnlineOrders(
-        onlineOrders.map((order) =>
-          order.id === orderId ? { ...order, status } : order
-        )
+  const handleStatusChange = async (orderId, newStatus, isOnlineOrder) => {
+    try {
+      if (!orderId) {
+        throw new Error("Order ID is undefined");
+      }
+
+      const response = await axios.put(
+        `http://localhost:5000/orders/${orderId}/status`,
+        {
+          status: newStatus,
+        }
       );
-    } else {
-      setCustomerOrders(
-        customerOrders.map((order) =>
-          order.id === orderId ? { ...order, status } : order
-        )
-      );
+
+      const updatedOrder = response.data;
+
+      if (isOnlineOrder) {
+        setOnlineOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order._id === orderId ? updatedOrder : order
+          )
+        );
+      } else {
+        setCustomerOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order._id === orderId ? updatedOrder : order
+          )
+        );
+      }
+    } catch (error) {
+      console.error(`Error updating status for order ${orderId}:`, error);
     }
   };
 
@@ -322,7 +339,7 @@ const MainAdminInterface = () => {
                     <select
                       value={order.status}
                       onChange={(e) =>
-                        handleStatusChange(order.id, e.target.value, true)
+                        handleStatusChange(order._id, e.target.value, true)
                       }
                     >
                       <option value="Pending">Pending</option>

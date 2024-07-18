@@ -491,6 +491,29 @@ app.put(
   }
 );
 
+//order status
+app.put("/orders/:orderId/status", async (req, res) => {
+  const { orderId } = req.params;
+  const { status } = req.body;
+
+  try {
+    const order = await Order.findOneAndUpdate(
+      { _id: orderId },
+      { status },
+      { new: true }
+    );
+
+    if (!order) {
+      return res.status(404).send({ message: "Order not found" });
+    }
+
+    res.status(200).send(order);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: "Error updating order status" });
+  }
+});
+
 app.listen(5000, () => {
   console.log("Server is running on port 5000");
 });
