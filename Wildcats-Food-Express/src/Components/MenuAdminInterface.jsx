@@ -5,6 +5,8 @@ import logo from "/logo.svg";
 import profileIcon from "/cat_profile.svg";
 import cartIcon from "/hamburger-menu.svg";
 import { useNavigate } from "react-router-dom";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 const MainAdminInterface = () => {
   const [menuItems, setMenuItems] = useState([]);
@@ -61,7 +63,7 @@ const MainAdminInterface = () => {
   const [reportYear, setReportYear] = useState("");
   const [setInterfaceType] = useState("admin");
   const [isCartMenuOpen, setIsCartMenuOpen] = useState(false);
-
+  const [historyOrders, setHistoryOrders] = useState();
   const [message, setMessage] = useState();
 
   axios.defaults.withCredentials = true;
@@ -231,18 +233,32 @@ const MainAdminInterface = () => {
       const updatedOrder = response.data;
 
       if (isOnlineOrder) {
-        setOnlineOrders((prevOrders) =>
-          prevOrders.map((order) =>
-            order._id === orderId ? updatedOrder : order
-          )
-        );
+        if (newStatus === "Completed") {
+          setOnlineOrders((prevOrders) =>
+            prevOrders.filter((order) => order._id !== orderId)
+          );
+        } else {
+          setOnlineOrders((prevOrders) =>
+            prevOrders.map((order) =>
+              order._id === orderId ? updatedOrder : order
+            )
+          );
+        }
       } else {
-        setCustomerOrders((prevOrders) =>
-          prevOrders.map((order) =>
-            order._id === orderId ? updatedOrder : order
-          )
-        );
+        if (newStatus === "Completed") {
+          setCustomerOrders((prevOrders) =>
+            prevOrders.filter((order) => order._id !== orderId)
+          );
+        } else {
+          setCustomerOrders((prevOrders) =>
+            prevOrders.map((order) =>
+              order._id === orderId ? updatedOrder : order
+            )
+          );
+        }
       }
+
+      fetchOrders();
     } catch (error) {
       console.error(`Error updating status for order ${orderId}:`, error);
     }
@@ -253,12 +269,54 @@ const MainAdminInterface = () => {
   };
 
   const handleDownloadReport = () => {
-    console.log("Downloading report...", {
-      reportDate,
-      reportMonth,
-      reportYear,
-      reportSearchTerm,
+    const doc = new jsPDF();
+
+    //title and basic information
+    doc.setFontSize(18);
+    doc.text("Report", 15, 15);
+    doc.setFontSize(12);
+    doc.text(`Date: ${reportDate || "N/A"}`, 15, 25);
+    doc.text(`Month: ${reportMonth || "N/A"}`, 15, 35);
+    doc.text(`Year: ${reportYear || "N/A"}`, 15, 45);
+    doc.text(`Search Term: ${reportSearchTerm || "N/A"}`, 15, 55);
+
+    //table headers
+    const headers = [
+      { title: "Order Number", dataKey: "orderNumber" },
+      { title: "Date Ordered", dataKey: "dateOrdered" },
+      { title: "Status", dataKey: "status" },
+      { title: "Product", dataKey: "product" },
+      { title: "Quantity", dataKey: "quantity" },
+      { title: "Total Price", dataKey: "totalPrice" },
+    ];
+
+    const ordersData = [];
+
+    //data for the table
+    if (historyOrders) {
+      historyOrders.forEach((order, index) => {
+        ordersData.push({
+          orderNumber: order.studentNumber,
+          dateOrdered: new Date(order.dateOrdered).toLocaleString(),
+          status: order.status,
+          product: order.menusOrdered.map((menu) => menu.itemName).join(", "),
+          quantity: order.menusOrdered.map((menu) => menu.quantity).join(", "),
+          totalPrice: `₱${order.totalPrice.toFixed(2)}`,
+        });
+      });
+    }
+
+    //autoTable function to generate the table
+    doc.autoTable({
+      head: [headers.map((header) => header.title)],
+      body: ordersData.map((data) =>
+        headers.map((header) => data[header.dataKey])
+      ),
+      startY: 65,
+      styles: { overflow: "linebreak" },
     });
+
+    doc.save("report.pdf");
   };
 
   const handleInterfaceChange = (type) => {
@@ -288,6 +346,28 @@ const MainAdminInterface = () => {
   const filteredMenuItems = menuItems.filter((item) =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  //for reports
+  const fetchHistoryOrders = async () => {
+    try {
+      const userId = localStorage.getItem("userID");
+      if (!userId) {
+        return;
+      }
+      const response = await axios.get(
+        `http://localhost:5000/history-orders?userId=${userId}`
+      );
+      setHistoryOrders(response.data);
+    } catch (error) {
+      console.error("Error fetching history orders:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "reports") {
+      fetchHistoryOrders();
+    }
+  }, [activeTab]);
 
   const renderOrderTracking = () => {
     return (
@@ -321,36 +401,44 @@ const MainAdminInterface = () => {
               </tr>
             </thead>
             <tbody>
-              {onlineOrders.map((order) => (
-                <tr key={order.id}>
-                  <td>{order.studentNumber}</td>
-                  <td>{order.userName}</td>
-                  <td>&#8369;{order.totalPrice}</td>
-                  <td>
-                    {order.menusOrdered.map((menu, index) => (
-                      <div key={index} style={{ marginBottom: "10px" }}>
-                        {`${menu.itemName} (x${menu.quantity}) - \u20B1${
-                          menu.price * menu.quantity
-                        }`}
-                      </div>
-                    ))}
-                  </td>
-                  <td>
-                    <select
-                      value={order.status}
-                      onChange={(e) =>
-                        handleStatusChange(order._id, e.target.value, true)
-                      }
-                    >
-                      <option value="Pending">Pending</option>
-                      <option value="Preparing">Preparing</option>
-                      <option value="Ready for Pickup">Ready for Pickup</option>
-                      <option value="Completed">Completed</option>
-                      <option value="Cancelled">Cancelled</option>
-                    </select>
-                  </td>
+              {onlineOrders.length > 0 ? (
+                onlineOrders.map((order) => (
+                  <tr key={order._id}>
+                    <td>{order.studentNumber}</td>
+                    <td>{order.userName}</td>
+                    <td>&#8369;{order.totalPrice}</td>
+                    <td>
+                      {order.menusOrdered.map((menu, index) => (
+                        <div key={index} style={{ marginBottom: "10px" }}>
+                          {`${menu.itemName} (x${menu.quantity}) - ₱${
+                            menu.price * menu.quantity
+                          }`}
+                        </div>
+                      ))}
+                    </td>
+                    <td>
+                      <select
+                        value={order.status}
+                        onChange={(e) =>
+                          handleStatusChange(order._id, e.target.value, true)
+                        }
+                      >
+                        <option value="Pending">Pending</option>
+                        <option value="Preparing">Preparing</option>
+                        <option value="Ready for Pickup">
+                          Ready for Pickup
+                        </option>
+                        <option value="Completed">Completed</option>
+                        <option value="Cancelled">Cancelled</option>
+                      </select>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5">No online orders available</td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         )}
@@ -366,28 +454,36 @@ const MainAdminInterface = () => {
               </tr>
             </thead>
             <tbody>
-              {customerOrders.map((order) => (
-                <tr key={order.id}>
-                  <td>{order.id}</td>
-                  <td>{order.schoolID}</td>
-                  <td>{order.amount}</td>
-                  <td>{order.product}</td>
-                  <td>
-                    <select
-                      value={order.status}
-                      onChange={(e) =>
-                        handleStatusChange(order.id, e.target.value, false)
-                      }
-                    >
-                      <option value="Pending">Pending</option>
-                      <option value="Preparing">Preparing</option>
-                      <option value="Ready for Pickup">Ready for Pickup</option>
-                      <option value="Completed">Completed</option>
-                      <option value="Cancelled">Cancelled</option>
-                    </select>
-                  </td>
+              {customerOrders.length > 0 ? (
+                customerOrders.map((order) => (
+                  <tr key={order._id}>
+                    <td>{order.id}</td>
+                    <td>{order.schoolID}</td>
+                    <td>&#8369;{order.amount}</td>
+                    <td>{order.product}</td>
+                    <td>
+                      <select
+                        value={order.status}
+                        onChange={(e) =>
+                          handleStatusChange(order._id, e.target.value, false)
+                        }
+                      >
+                        <option value="Pending">Pending</option>
+                        <option value="Preparing">Preparing</option>
+                        <option value="Ready for Pickup">
+                          Ready for Pickup
+                        </option>
+                        <option value="Completed">Completed</option>
+                        <option value="Cancelled">Cancelled</option>
+                      </select>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5">No customer orders available</td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         )}
@@ -411,6 +507,22 @@ const MainAdminInterface = () => {
       "November",
       "December",
     ];
+
+    const filteredHistoryOrders = historyOrders
+      ? historyOrders.filter((order) => {
+          const orderDate = new Date(order.dateOrdered);
+          return (
+            (order.studentNumber.includes(reportSearchTerm) ||
+              order.userName
+                .toLowerCase()
+                .includes(reportSearchTerm.toLowerCase())) &&
+            (!reportDate || orderDate.getDate() === parseInt(reportDate)) &&
+            (!reportMonth ||
+              orderDate.getMonth() === parseInt(reportMonth) - 1) &&
+            (!reportYear || orderDate.getFullYear() === parseInt(reportYear))
+          );
+        })
+      : [];
 
     return (
       <div className="admin-reports">
@@ -480,11 +592,32 @@ const MainAdminInterface = () => {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td colSpan="6" className="no-data">
-                No data available
-              </td>
-            </tr>
+            {filteredHistoryOrders.length > 0 ? (
+              filteredHistoryOrders.map((order) => (
+                <tr key={order._id}>
+                  <td>{order.studentNumber}</td>
+                  <td>{new Date(order.dateOrdered).toLocaleString()}</td>
+                  <td>{order.status}</td>
+                  <td>
+                    {order.menusOrdered.map((menu, index) => (
+                      <div key={index}>{menu.itemName}</div>
+                    ))}
+                  </td>
+                  <td>
+                    {order.menusOrdered.map((menu, index) => (
+                      <div key={index}>{menu.quantity}x</div>
+                    ))}
+                  </td>
+                  <td>₱{order.totalPrice.toFixed(2)}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6" className="no-data">
+                  No data available
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

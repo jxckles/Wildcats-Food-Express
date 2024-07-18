@@ -3,10 +3,11 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const multer = require("multer");
 const path = require("path");
-const fs = require("fs"); // Import fs module
+const fs = require("fs");
 const UserModel = require("./models/User");
 const MenuItem = require("./models/Menu");
 const Order = require("./models/Order");
+const History = require("./models/History.js");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const app = express();
@@ -410,7 +411,12 @@ app.post("/change-password", async (req, res) => {
 //history of orders
 async function getHistoryOrdersByUserId(userId) {
   try {
-    const orders = await Order.find({ userId: userId });
+    let query = {};
+    //check if admin
+    if (userId !== "668e8d77cfc185e3ac2d32a5") {
+      query.userId = userId;
+    }
+    const orders = await History.find(query);
     return orders;
   } catch (error) {
     console.error("Error fetching orders from database:", error);
@@ -505,6 +511,17 @@ app.put("/orders/:orderId/status", async (req, res) => {
 
     if (!order) {
       return res.status(404).send({ message: "Order not found" });
+    }
+
+    //check if status compelete delete from order and move to history
+    if (status === "Completed") {
+      const historyOrder = new History(order.toObject());
+      await historyOrder.save();
+      await Order.deleteOne({ _id: orderId });
+
+      return res
+        .status(200)
+        .send({ message: "Order completed and moved to history" });
     }
 
     res.status(200).send(order);
