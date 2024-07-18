@@ -401,9 +401,9 @@ app.get("/orders", async (req, res) => {
 
 app.post('/clientorders', async (req, res) => {
   try {
-    const { schoolId, items, status, priorityNumber } = req.body;
+    const { schoolId, items, status, priorityNumber, totalPrice } = req.body;
 
-    if (!schoolId || !items || !status) {
+    if (!schoolId || !items || !status || totalPrice === undefined) {  // Check for totalPrice
       return res.status(400).json({ message: "Missing required fields" });
     }
 
@@ -412,6 +412,7 @@ app.post('/clientorders', async (req, res) => {
       items,
       status,
       priorityNumber: priorityNumber || Math.floor(Math.random() * 1000000), // Generate if not provided
+      totalPrice,  // Include totalPrice in the new order
     });
 
     await newOrder.validate(); // Validate schema before saving
