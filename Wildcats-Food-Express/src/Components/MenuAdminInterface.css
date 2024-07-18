@@ -405,12 +405,12 @@
 /* User Roles Styles */
 .user-roles-modal {
   text-align: center;
+  padding: 20px 20px;
 }
 
-.user-roles-modal h3 {
-  margin-bottom: 20px;
+.user-roles-modal .my-roles-admin {
+  margin-bottom: 10px;
   color: #990000;
-  margin-left: 80px;
   font-size: 1.5em;
   font-weight: bold;
 }
@@ -424,32 +424,7 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 1em;
-}
-
-/* Client Interface Styles */
-.client-interface {
-  padding: 20px;
   text-align: center;
-}
-
-.client-interface h1 {
-  color: #990000;
-  margin-bottom: 20px;
-}
-
-.client-interface button {
-  background-color: #990000;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1em;
-  margin-top: 20px;
-}
-
-.admin-options{
-  color: #990000;
 }
 
 /* Add these styles to your existing AdminInterface.css file */

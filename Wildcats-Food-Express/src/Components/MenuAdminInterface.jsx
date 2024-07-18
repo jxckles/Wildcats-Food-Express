@@ -705,7 +705,7 @@ const MainAdminInterface = () => {
     return (
       <div className="modal-overlay">
         <div className="modal user-roles-modal">
-          <h3>My Roles</h3>
+          <div className="my-roles-admin">My Roles</div>
           <button onClick={() => navigate("/client-interface")}>
             Client Interface
           </button>

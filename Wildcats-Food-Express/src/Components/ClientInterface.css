@@ -191,7 +191,8 @@
   }
   
   .orders-tab {
-    max-width: 600px;
+    width: 100%;
+    max-width: 1000px;
     margin: 0 auto;
   }
   
@@ -231,7 +232,8 @@
   }
   
   .order-summary {
-    text-align: right;
+    text-align: center;
+    padding: 10px;
     margin-bottom: 20px;
   }
   
@@ -311,6 +313,73 @@
             color: #b86565;
         }
   }
+
+  /* User Roles Styles */
+
+  .modal-overlay-client {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+  }
+
+  .user-roles-modal-client {
+    text-align: center;
+    padding: 20px 20px;
+  }
+
+  .user-roles-modal-client .my-roles-h3 {
+    margin-bottom: 10px;
+    color: #990000;
+    font-size: 1.5em;
+    font-weight: bold;
+  }
+
+  .user-roles-modal-client button {
+    background-color: #990000;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 1px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    text-align: center;
+  }
+
+
+/* Client Interface Styles */
+.client-interface {
+  padding: 20px;
+  text-align: center;
+}
+
+.client-interface h1 {
+  color: #990000;
+  margin-bottom: 20px;
+}
+
+.client-interface button {
+  background-color: #990000;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+  margin-top: 20px;
+}
+
+.admin-options{
+  color: #990000;
+}
+
   
   @media (max-width: 768px) {
     .client-header {

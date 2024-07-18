@@ -378,9 +378,9 @@ const ClientInterface = () => {
 
   const renderUserRolesModal = () => {
     return (
-      <div className="modal-overlay">
-        <div className="modal user-roles-modal">
-          <h3>My Roles</h3>
+      <div className="modal-overlay-client">
+        <div className="modal user-roles-modal-client">
+          <div className="my-roles-h3">My Roles</div>
           <button onClick={handleAdminInterfaceChange}>Admin Interface</button>
           <button onClick={closeUserRolesModal}>Cancel</button>
         </div>
