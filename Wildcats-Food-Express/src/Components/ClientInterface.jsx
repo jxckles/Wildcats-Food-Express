@@ -46,6 +46,14 @@ const ClientInterface = () => {
     fetchClientOrders();
   }, [refreshKey]);
 
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      fetchClientOrders();
+    }, 2000); // Fetch every 5 seconds
+
+    return () => clearInterval(intervalId);
+  }, []);
+
   const fetchMenuItems = async () => {
     try {
       const response = await axios.get("http://localhost:5000/menu");
