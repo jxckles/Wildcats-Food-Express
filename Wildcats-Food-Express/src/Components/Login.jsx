@@ -31,7 +31,7 @@ const Login = () => {
               showSuccessToast("Login successful! Welcome Admin!");
               setTimeout(() => navigate("/admin"), 2000);
             } else if (res.data.role === "User") {
-              showSuccessToast("Login successful!");
+              showSuccessToast("Login successful! Welcome!");
               setTimeout(() => navigate("/dashboard"), 2000);
             } else {
               showErrorToast("Login failed! Invalid Email or Password.");
