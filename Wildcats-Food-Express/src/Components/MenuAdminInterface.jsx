@@ -772,7 +772,7 @@ const MainAdminInterface = () => {
                 onClick={toggleCartMenu}
               />
               {isCartMenuOpen && (
-                <div className="cart-menu">
+                <div className="cart-menu-admin">
                   <button onClick={handleLogout}>Logout</button>
                 </div>
               )}

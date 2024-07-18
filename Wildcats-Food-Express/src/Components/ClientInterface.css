@@ -67,6 +67,14 @@
     width: 30px;
     height: 30px;
     cursor: pointer;
+    &:hover{
+      opacity: 50%;
+      width: 33px;
+      height: 33px;
+    }
+    &:active{
+      opacity: 100%;
+    }
   }
   
   .menu-container {
@@ -76,14 +84,18 @@
   .client-cart-menu {
     position: absolute;
     top: 100%;
-    right: 0;
-    background-color: white;
+    right: 15px;
+    background-color: rgb(255, 236, 236);
     border: 1px solid #ddd;
-    border-radius: 4px;
+    border-radius: 50px 5px 50px 50px;
     padding: 10px;
     width: 140px;
-    height: 70px;
+    height: 50px;
     z-index: 1000;
+
+    p{
+      font-weight: bold;
+    }
   }
   
   .client-main {
@@ -304,13 +316,17 @@
   .client-options {
     color: #990000;
     font-weight: bold;
+    font-size: 20px;
         &:hover{
             cursor: pointer;
             text-decoration-line: underline;
         }
 
+        &:hover{
+          opacity: 50%;
+        }
         &:active{
-            color: #b86565;
+          opacity: 100%;
         }
   }
 
