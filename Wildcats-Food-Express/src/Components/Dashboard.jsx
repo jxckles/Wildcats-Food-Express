@@ -75,7 +75,6 @@ const UserInterface = () => {
           : null,
       }));
       setMenuItems(menuData);
-      console.log("Fetched menu items:", menuData);
     } catch (error) {
       console.error("Error fetching menu items:", error);
     }
@@ -88,7 +87,6 @@ const UserInterface = () => {
         `http://localhost:5000/orders?userId=${userId}`
       );
       setOrders(response.data);
-      console.log("Fetched orders:", response.data);
     } catch (error) {
       console.error("Error fetching orders:", error);
     }
@@ -100,6 +98,13 @@ const UserInterface = () => {
       const response = await axios.get(`http://localhost:5000/user/${userId}`);
       setUser({
         name: `${response.data.firstName} ${response.data.lastName}`,
+        profilePicture: response.data.profilePicture,
+      });
+
+      setUserProfile({
+        firstName: response.data.firstName,
+        lastName: response.data.lastName,
+        courseYear: response.data.courseYear,
         profilePicture: response.data.profilePicture,
       });
     } catch (error) {
@@ -233,11 +238,14 @@ const UserInterface = () => {
       formData.append("firstName", userProfile.firstName);
       formData.append("lastName", userProfile.lastName);
       formData.append("courseYear", userProfile.courseYear);
-      if (userProfile.profilePicture) {
+
+      //check is the user selected a new pic
+      if (userProfile.profilePicture && isFileSelected) {
         // Convert base64 to blob
         const response = await fetch(userProfile.profilePicture);
         const blob = await response.blob();
         formData.append("profilePicture", blob, "profile.jpg");
+        setIsFileSelected(true);
       }
 
       const response = await axios.put(
@@ -251,17 +259,23 @@ const UserInterface = () => {
       );
       alert("Profile updated successfully!");
       closeUserRolesModal();
+      window.location.reload();
     } catch (error) {
       console.error("Error updating profile:", error);
       alert("Failed to update profile. Please try again.");
     }
   };
 
+  const [imagePreview, setImagePreview] = useState(userProfile.profilePicture);
+  const [isFileSelected, setIsFileSelected] = useState(false);
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setIsFileSelected(true);
       const reader = new FileReader();
       reader.onloadend = () => {
+        setImagePreview(reader.result);
         setUserProfile((prev) => ({ ...prev, profilePicture: reader.result }));
       };
       reader.readAsDataURL(file);
@@ -600,8 +614,6 @@ const UserInterface = () => {
           new Date(order.dateOrdered).getFullYear() === parseInt(searchYear))
     );
 
-    console.log("Rendering history orders:", filteredOrders);
-
     const currentYear = new Date().getFullYear();
     const years = Array.from({ length: 5 }, (_, i) => currentYear + i);
     const months = [
@@ -698,9 +710,15 @@ const UserInterface = () => {
         <h2>Edit Profile</h2>
         <form onSubmit={handleProfileUpdate}>
           <div className="profile-picture-container">
-            {userProfile.profilePicture ? (
+            {imagePreview ? (
               <img
-                src={userProfile.profilePicture}
+                src={imagePreview}
+                alt="Profile Preview"
+                className="profile-picture"
+              />
+            ) : user.profilePicture ? (
+              <img
+                src={`http://localhost:5000${user.profilePicture}`}
                 alt="Profile"
                 className="profile-picture"
               />
@@ -803,7 +821,7 @@ const UserInterface = () => {
           <div className="user-info" onClick={openUserRolesModal}>
             {user.profilePicture ? (
               <img
-                src={user.profilePicture}
+                src={`http://localhost:5000${user.profilePicture}`}
                 alt="Profile"
                 className="user-avatar"
               />
