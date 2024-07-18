@@ -514,7 +514,7 @@ app.put("/orders/:orderId/status", async (req, res) => {
     }
 
     //check if status compelete delete from order and move to history
-    if (status === "Completed") {
+    if (status === "Completed" || status === "Cancelled") {
       const historyOrder = new History(order.toObject());
       await historyOrder.save();
       await Order.deleteOne({ _id: orderId });

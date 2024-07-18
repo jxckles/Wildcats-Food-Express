@@ -233,7 +233,7 @@ const MainAdminInterface = () => {
       const updatedOrder = response.data;
 
       if (isOnlineOrder) {
-        if (newStatus === "Completed") {
+        if (newStatus === "Completed" || newStatus === "Cancelled") {
           setOnlineOrders((prevOrders) =>
             prevOrders.filter((order) => order._id !== orderId)
           );
