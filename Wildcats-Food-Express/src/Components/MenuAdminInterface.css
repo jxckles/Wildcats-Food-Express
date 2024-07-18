@@ -337,6 +337,7 @@
 
 .report-search-input {
   width: 100%;
+  max-width: 400px;
   padding: 10px;
   border: 1px solid #ffcfa2;
   border-radius: 25px;

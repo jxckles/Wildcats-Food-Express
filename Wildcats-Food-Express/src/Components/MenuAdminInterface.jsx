@@ -268,57 +268,139 @@ const MainAdminInterface = () => {
     setReportSearchTerm(e.target.value);
   };
 
-  const handleDownloadReport = () => {
-    const doc = new jsPDF();
+const handleDownloadReport = () => {
+  const doc = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'a4'
+  });
 
-    //title and basic information
-    doc.setFontSize(18);
-    doc.text("Report", 15, 15);
-    doc.setFontSize(12);
-    doc.text(`Date: ${reportDate || "N/A"}`, 15, 25);
-    doc.text(`Month: ${reportMonth || "N/A"}`, 15, 35);
-    doc.text(`Year: ${reportYear || "N/A"}`, 15, 45);
-    doc.text(`Search Term: ${reportSearchTerm || "N/A"}`, 15, 55);
+  // Set document properties
+  doc.setProperties({
+    title: 'Wildcat Food Express - Sales Report',
+    subject: 'Sales Report',
+    author: 'Wildcat Food Express Admin',
+    keywords: 'sales, report, food, express',
+    creator: 'Wildcat Food Express System'
+  });
 
-    //table headers
-    const headers = [
-      { title: "Order Number", dataKey: "orderNumber" },
-      { title: "Date Ordered", dataKey: "dateOrdered" },
-      { title: "Status", dataKey: "status" },
-      { title: "Product", dataKey: "product" },
-      { title: "Quantity", dataKey: "quantity" },
-      { title: "Total Price", dataKey: "totalPrice" },
-    ];
-
-    const ordersData = [];
-
-    //data for the table
-    if (historyOrders) {
-      historyOrders.forEach((order, index) => {
-        ordersData.push({
-          orderNumber: order.studentNumber,
-          dateOrdered: new Date(order.dateOrdered).toLocaleString(),
-          status: order.status,
-          product: order.menusOrdered.map((menu) => menu.itemName).join(", "),
-          quantity: order.menusOrdered.map((menu) => menu.quantity).join(", "),
-          totalPrice: `₱${order.totalPrice.toFixed(2)}`,
-        });
-      });
-    }
-
-    //autoTable function to generate the table
-    doc.autoTable({
-      head: [headers.map((header) => header.title)],
-      body: ordersData.map((data) =>
-        headers.map((header) => data[header.dataKey])
-      ),
-      startY: 65,
-      styles: { overflow: "linebreak" },
-    });
-
-    doc.save("report.pdf");
+  // Define styles
+  const titleStyle = { fontSize: 16, fontStyle: 'bold', };
+  const subtitleStyle = { fontSize: 10, fontStyle: 'normal' };
+  const tableHeaderStyle = { 
+    fillColor: [153, 0, 0], // #990000
+    textColor: [255, 255, 255], 
+    fontStyle: 'bold',
+    fontSize: 8, 
+    halign: 'center', 
+    valign: 'middle' 
+  };
+  const tableBodyStyle = { 
+    textColor: [50, 50, 50], 
+    fontSize: 8,
+    cellPadding: 2
   };
 
+  // Title and basic information
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(titleStyle.fontSize);
+  
+  doc.text("Wildcat Food Express - Sales Report", 15, 20);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(subtitleStyle.fontSize);
+  doc.text(`Date: ${reportDate || "All"}`, 15, 30);
+  doc.text(`Month: ${reportMonth ? months[parseInt(reportMonth) - 1] : "All"}`, 15, 35);
+  doc.text(`Year: ${reportYear || "All"}`, 15, 40);
+  doc.text(`Search Term: ${reportSearchTerm || "None"}`, 15, 45);
+
+  // Table headers
+  const headers = [
+    { title: "Order Number", dataKey: "orderNumber" },
+    { title: "Date Ordered", dataKey: "dateOrdered" },
+    { title: "Status", dataKey: "status" },
+    { title: "Product", dataKey: "product" },
+    { title: "Quantity", dataKey: "quantity" },
+    { title: "Total Price", dataKey: "totalPrice" },
+  ];
+
+  
+
+  // Filter and search logic
+  const filteredHistoryOrders = historyOrders ? historyOrders.filter((order) => {
+    const orderDate = new Date(order.dateOrdered);
+    const searchLower = reportSearchTerm.toLowerCase();
+    
+    const matchesSearch = 
+      order.studentNumber.toLowerCase().includes(searchLower) ||
+      orderDate.toLocaleString().toLowerCase().includes(searchLower) ||
+      order.status.toLowerCase().includes(searchLower) ||
+      order.menusOrdered.some(menu => menu.itemName.toLowerCase().includes(searchLower));
+
+    return matchesSearch &&
+      (!reportDate || orderDate.getDate() === parseInt(reportDate)) &&
+      (!reportMonth || orderDate.getMonth() === parseInt(reportMonth) - 1) &&
+      (!reportYear || orderDate.getFullYear() === parseInt(reportYear));
+  }) : [];
+
+  // Data for the table
+  const ordersData = filteredHistoryOrders.map((order) => ({
+    orderNumber: order.studentNumber,
+    dateOrdered: new Date(order.dateOrdered).toLocaleString(),
+    status: order.status,
+    product: order.menusOrdered.map((menu) => menu.itemName).join(", "),
+    quantity: order.menusOrdered.map((menu) => menu.quantity).join(", "),
+    totalPrice: `₱${order.totalPrice.toFixed(2)}`,
+  }));
+
+  // Generate the table
+  doc.autoTable({
+    head: [headers.map((header) => header.title)],
+    body: ordersData.map((data) => headers.map((header) => data[header.dataKey])),
+    startY: 50,
+    styles: { 
+      font: "helvetica", 
+      overflow: "linebreak",
+      cellPadding: 2,
+    },
+    headStyles: tableHeaderStyle,
+    bodyStyles: tableBodyStyle,
+    alternateRowStyles: { fillColor: [245, 245, 245] },
+    columnStyles: {
+      0: { cellWidth: 25 },
+      1: { cellWidth: 35 },
+      2: { cellWidth: 20 },
+      3: { cellWidth: 'auto' },
+      4: { cellWidth: 20 },
+      5: { cellWidth: 25 },
+    },
+    didDrawPage: function (data) {
+      // Footer
+      let str = `Page ${doc.internal.getNumberOfPages()}`;
+      doc.setFontSize(8);
+      doc.text(str, data.settings.margin.left, doc.internal.pageSize.height - 10);
+    },
+    margin: { top: 50, right: 15, bottom: 15, left: 15 },
+  });
+
+  // Add summary information
+  const totalSales = ordersData.reduce((sum, order) => sum + parseFloat(order.totalPrice.replace('₱', '')), 0);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+  doc.text(`Total Sales: ₱${totalSales.toFixed(2)}`, 15, doc.lastAutoTable.finalY + 10);
+
+  // Generate filename based on filters
+  let filename = "Wildcat_Food_Express_Sales_Report";
+  if (reportDate) filename += `_Date${reportDate}`;
+  if (reportMonth) filename += `_Month${reportMonth}`;
+  if (reportYear) filename += `_Year${reportYear}`;
+  if (reportSearchTerm) filename += `_Search${reportSearchTerm.replace(/\s+/g, '_')}`;
+  filename += ".pdf";
+
+  doc.save(filename);
+};  
+  
+  
   const handleInterfaceChange = (type) => {
     setInterfaceType(type);
     setIsModalOpen(false);
@@ -509,32 +591,34 @@ const MainAdminInterface = () => {
     ];
 
     const filteredHistoryOrders = historyOrders
-      ? historyOrders.filter((order) => {
-          const orderDate = new Date(order.dateOrdered);
-          return (
-            (order.studentNumber.includes(reportSearchTerm) ||
-              order.userName
-                .toLowerCase()
-                .includes(reportSearchTerm.toLowerCase())) &&
-            (!reportDate || orderDate.getDate() === parseInt(reportDate)) &&
-            (!reportMonth ||
-              orderDate.getMonth() === parseInt(reportMonth) - 1) &&
-            (!reportYear || orderDate.getFullYear() === parseInt(reportYear))
-          );
-        })
-      : [];
+    ? historyOrders.filter((order) => {
+        const orderDate = new Date(order.dateOrdered);
+        const searchLower = reportSearchTerm.toLowerCase();
+        
+        const matchesSearch = 
+          order.studentNumber.toLowerCase().includes(searchLower) ||
+          orderDate.toLocaleString().toLowerCase().includes(searchLower) ||
+          order.status.toLowerCase().includes(searchLower) ||
+          order.menusOrdered.some(menu => menu.itemName.toLowerCase().includes(searchLower));
+
+        return matchesSearch &&
+          (!reportDate || orderDate.getDate() === parseInt(reportDate)) &&
+          (!reportMonth || orderDate.getMonth() === parseInt(reportMonth) - 1) &&
+          (!reportYear || orderDate.getFullYear() === parseInt(reportYear));
+      })
+    : [];
 
     return (
       <div className="admin-reports">
         <h2>Admin Reports</h2>
         <div className="report-search-container">
-          <input
-            type="text"
-            placeholder="Search Report"
-            className="report-search-input"
-            value={reportSearchTerm}
-            onChange={handleReportSearch}
-          />
+        <input
+          type="text"
+          placeholder="Search by Order Number, Date, Status, or Product"
+          className="report-search-input"
+          value={reportSearchTerm}
+          onChange={handleReportSearch}
+        />
         </div>
         <div className="report-filters">
           <div className="filter-group">
