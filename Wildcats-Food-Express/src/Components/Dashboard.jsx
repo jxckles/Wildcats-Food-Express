@@ -735,7 +735,7 @@ const UserInterface = () => {
               style={{ display: "none" }}
             />
             <label htmlFor="profilePicture" className="upload-button">
-              Change Picture
+              +
             </label>
           </div>
           <div className="form-group">
@@ -818,7 +818,7 @@ const UserInterface = () => {
           </nav>
         </div>
         <div className="user-profile">
-          <div className="user-info" onClick={openUserRolesModal}>
+          <div className="user-info">
             {user.profilePicture ? (
               <img
                 src={`http://localhost:5000${user.profilePicture}`}
@@ -830,7 +830,7 @@ const UserInterface = () => {
                 {user.name ? user.name.charAt(0).toUpperCase() : ""}
               </div>
             )}
-            <span className="user-name">{user.name || "Users name"}</span>
+            <span className="user-name" onClick={openUserRolesModal}>{user.name || "Users name"}</span>
           </div>
           <div className="menu-container-dashboard">
             <img
