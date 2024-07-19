@@ -18,6 +18,18 @@
   display: none; /* Hide on desktop and tablet */
 }
 
+.menuIcon{
+  padding: 15px;
+
+  &:hover{
+    opacity: 50%;
+  }
+
+  &:active{
+    opacity: 100%;
+  }
+}
+
 
 .menu-close {
   cursor: pointer;

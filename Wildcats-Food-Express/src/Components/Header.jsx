@@ -21,19 +21,19 @@ const Header = () => {
         </Link>
       </div>
       <nav>
-        <a
+        <div
           className="menu-open hide-desktop"
           onClick={toggleMenu}
           style={{ display: menuOpen ? 'none' : 'inline-block' }} // Hide menu button when menu is open
         >
-          <img src={menuIcon} alt="Open Menu" className="hide-desktop" />
-        </a>
+          <img src={menuIcon} alt="Open Menu" className="menuIcon hide-desktop" />
+        </div>
 
         <ul className={menuOpen ? 'open' : ''}>
           <li className="hide-desktop">
-            <a href="#" onClick={toggleMenu}>
+            <div onClick={toggleMenu}>
               <img src={closeIcon} alt="Close Menu" className="menuClose" />
-            </a>
+            </div>
           </li>
           <li>
             <Link to="/login" className="cta login-cta" onClick={toggleMenu}>
