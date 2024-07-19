@@ -22,7 +22,6 @@ const Header = () => {
       </div>
       <nav>
         <a
-          href="#"
           className="menu-open hide-desktop"
           onClick={toggleMenu}
           style={{ display: menuOpen ? 'none' : 'inline-block' }} // Hide menu button when menu is open
