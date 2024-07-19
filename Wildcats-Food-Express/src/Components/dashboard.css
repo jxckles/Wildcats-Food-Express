@@ -779,7 +779,19 @@
 .payment-form h3{
   margin-top: 30px;
   margin-left: 100px;
+  color: rgb(20, 0, 134);
+  font-weight: bold;
 }
+
+.payment-form p{
+  font-weight: bold;
+}
+
+.payment-form .gcash-number{
+  font-size: 20px;
+  margin-left: 100px;
+}
+
 .payment-form img {
   width: 100px;
   border-radius: 50%;
@@ -795,7 +807,7 @@
 .payment-form label {
   font-weight: bold;
 }
-.payment-form label.NameLabel{
+.payment-form label.OrderIDLabel{
   margin-right: 250px ;
 }
 .payment-form label.ReferenceLabel{

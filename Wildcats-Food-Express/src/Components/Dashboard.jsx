@@ -577,12 +577,13 @@ const UserInterface = () => {
 
             <p>Send your Virtual payment to:</p>
             <h3>GCASH</h3>
+            <p className="gcash-number">+639123456789</p>
             <img src={gcashIcon} alt="GcashLogo"/>
 
             <hr className="gcash"/>
 
             <form>
-              <label className="NameLabel">Name:</label>
+              <label className="OrderIDLabel">Order ID:</label>
               <input type="text" name="name" className="Name" />
 
               <label className="ReferenceLabel">Reference Number:</label>

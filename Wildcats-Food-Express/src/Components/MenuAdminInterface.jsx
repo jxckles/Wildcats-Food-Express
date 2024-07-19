@@ -483,6 +483,7 @@ const MainAdminInterface = () => {
                 <th>Total Amount</th>
                 <th>Product</th>
                 <th>Status</th>
+                <th>Proof of Payment</th>
               </tr>
             </thead>
             <tbody>
@@ -517,6 +518,7 @@ const MainAdminInterface = () => {
                         <option value="Cancelled">Cancelled</option>
                       </select>
                     </td>
+                    <td></td>
                   </tr>
                 ))
               ) : (
@@ -738,25 +740,25 @@ const MainAdminInterface = () => {
             <nav className="admin-nav">
               <button
                 onClick={() => handleTabChange("menu")}
-                className="nav-link menu-button"
+                className={`nav-link ${activeTab === "menu" ? "active" : ""}`}
               >
                 Add Menu
               </button>
               <button
                 onClick={() => handleTabChange("orders")}
-                className="nav-link"
+                className={`nav-link ${activeTab === "orders" ? "active" : ""}`}
               >
                 Orders
               </button>
               <button
                 onClick={() => handleTabChange("reports")}
-                className="nav-link"
+                className={`nav-link ${activeTab === "reports" ? "active" : ""}`}
               >
                 Reports
               </button>
               <button
                 onClick={() => handleTabChange("userRoles")}
-                className="nav-link"
+                className={`nav-link ${activeTab === "userRoles" ? "active" : ""}`}
               >
                 User Roles
               </button>
