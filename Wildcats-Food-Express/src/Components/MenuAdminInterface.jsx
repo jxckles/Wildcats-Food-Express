@@ -523,7 +523,7 @@ const MainAdminInterface = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5">No online orders available</td>
+                  <td colSpan="6" className="no-orders">No online orders available</td>
                 </tr>
               )}
             </tbody>
