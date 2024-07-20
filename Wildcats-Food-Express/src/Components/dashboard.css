@@ -617,7 +617,7 @@
   font-size: 16px;
 }
 
-.submit-btn {
+.submit-btn-password {
   width: 100%;
   padding: 10px;
   background-color: #8B0000;
@@ -629,7 +629,7 @@
   transition: background-color 0.3s;
 }
 
-.submit-btn:hover {
+.submit-btn-password:hover {
   background-color: #6B0000;
 }
 
@@ -838,7 +838,7 @@
   margin-bottom: 10px;
 }
 
-.upload-btn, .submit-btn {
+.upload-btn, .submit-btn-payment {
   padding: 10px;
   border: none;
   border-radius: 5px;
@@ -853,16 +853,16 @@
   width: 120%;
   max-width: 300px;
 }
-.submit-btn{
+.submit-btn-payment{
   width: 100%;
   max-width: 250px;
 }
 
-.upload-btn,.remove-btn, .submit-btn {
+.upload-btn,.remove-btn, .submit-btn-payment {
   background-color: #800000;
   color: #fff;
 }
 
-.remove-btn:hover, .upload-btn:hover, .submit-btn:hover {
+.remove-btn:hover, .upload-btn:hover, .submit-btn-payment:hover {
   background-color: #ff3333;
 }
