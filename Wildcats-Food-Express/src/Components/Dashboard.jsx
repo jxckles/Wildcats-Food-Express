@@ -555,7 +555,7 @@ const UserInterface = () => {
               onChange={(e) => setConfirmNewPassword(e.target.value)}
             />
           </div>
-          <button className="submit-btn" onClick={handleChangePassSubmit}>
+          <button className="submit-btn-password" onClick={handleChangePassSubmit}>
             Submit
           </button>
         </div>
@@ -697,7 +697,7 @@ const UserInterface = () => {
                 )}
               </div>
               {receiptImage && <p>Receipt uploaded successfully!</p>}
-              <button type="submit" className="submit-btn">Submit</button>
+              <button type="submit" className="submit-btn-payment">Submit</button>
             </form>
           </div>
         </div>
