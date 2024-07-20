@@ -65,6 +65,7 @@ const MainAdminInterface = () => {
   const [setInterfaceType] = useState("admin");
   const [isCartMenuOpen, setIsCartMenuOpen] = useState(false);
   const [message, setMessage] = useState();
+  const [qrCodeImage, setQrCodeImage] = useState(null);
 
   axios.defaults.withCredentials = true;
 
@@ -87,7 +88,9 @@ const MainAdminInterface = () => {
   useEffect(() => {
     fetchMenuItems();
     fetchOrders();
+    fetchQRCode();
   }, [refreshKey]);
+
 
   const fetchMenuItems = async () => {
     try {
@@ -424,6 +427,56 @@ const MainAdminInterface = () => {
     }
   };
 
+  //qr code upload
+  const handleQRCodeUpload = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append('qrCode', file);
+      try {
+        const response = await axios.post('http://localhost:5000/upload-qr-code', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        if (response.data.qrCodeUrl) {
+          setQrCodeImage(`http://localhost:5000${response.data.qrCodeUrl}`);
+        }
+        alert('QR code uploaded successfully!');
+      } catch (error) {
+        console.error('Error uploading QR code:', error);
+        alert('Failed to upload QR code. Please try again.');
+      }
+    }
+  };
+  const handleRemoveQRCode = async () => {
+    try {
+      await axios.delete('http://localhost:5000/remove-qr-code');
+      setQrCodeImage(null);
+      alert('QR code removed successfully!');
+    } catch (error) {
+      console.error('Error removing QR code:', error);
+      alert('Failed to remove QR code. Please try again.');
+    }
+  };  
+  
+
+  const fetchQRCode = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/get-qr-code');
+      if (response.data.qrCodeUrl) {
+        setQrCodeImage(`http://localhost:5000${response.data.qrCodeUrl}`);
+      } else {
+        setQrCodeImage(null);
+      }
+    } catch (error) {
+      if (error.response && error.response.status !== 404) {
+        console.error('Error fetching QR code:', error);
+      }
+      setQrCodeImage(null);
+    }
+  };
+
   const toggleCartMenu = () => {
     setIsCartMenuOpen(!isCartMenuOpen);
   };
@@ -724,6 +777,45 @@ const MainAdminInterface = () => {
     );
   };
 
+  const renderQRCodeManagement = () => {
+    return (
+      <div className="qr-code-management-admin">
+        <h2>Manage QR Code</h2>
+        <div className="qr-code-container-admin">
+          {qrCodeImage ? (
+            <>
+              <img 
+                src={qrCodeImage} 
+                alt="QR Code" 
+                className="qr-code-image-admin" 
+                onError={(e) => {
+                  console.error("Error loading QR code image");
+                  e.target.style.display = 'none';
+                }}
+              />
+              <button onClick={handleRemoveQRCode} className="remove-qr-btn">
+                Remove QR Code
+              </button>
+            </>
+          ) : (
+            <div className="qr-code-upload-admin">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleQRCodeUpload}
+                style={{ display: 'none' }}
+                id="qr-code-upload-admin"
+              />
+              <label htmlFor="qr-code-upload-admin" className="upload-qr-btn-admin">
+                Upload QR Code
+              </label>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   const renderAdminInterface = () => {
     return (
       <div className="admin-interface">
@@ -775,6 +867,7 @@ const MainAdminInterface = () => {
               />
               {isCartMenuOpen && (
                 <div className="cart-menu-admin">
+                  <button onClick={() => setActiveTab("qrCode")}>QR Code</button>
                   <button onClick={handleLogout}>Logout</button>
                 </div>
               )}
@@ -854,6 +947,7 @@ const MainAdminInterface = () => {
           )}
           {activeTab === "orders" && renderOrderTracking()}
           {activeTab === "reports" && renderReports()}
+          {activeTab === "qrCode" && renderQRCodeManagement()}
           {isModalOpen && activeTab === "userRoles" && renderUserRolesModal()}
           {isModalOpen && activeTab !== "userRoles" && (
             <div className="modal-overlay">
