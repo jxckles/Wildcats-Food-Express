@@ -20,6 +20,9 @@ const UserInterface = () => {
   const [searchDate, setSearchDate] = useState("");
   const [searchMonth, setSearchMonth] = useState("");
   const [searchYear, setSearchYear] = useState("");
+  const [receiptImage, setReceiptImage] = useState(null);
+  const [referenceNumber, setReferenceNumber] = useState("");
+  const [amountSent, setAmountSent] = useState("");
   const navigate = useNavigate();
 
   /* FOR AUTHENTICATION */
@@ -197,7 +200,7 @@ const UserInterface = () => {
       alert("Please enter a valid school ID in the format xx-xxxx-xxx");
       return;
     }
-
+  
     const order = {
       userId: localStorage.getItem("userID"),
       userName: localStorage.getItem("userName"),
@@ -210,16 +213,14 @@ const UserInterface = () => {
       status: "Pending",
       totalPrice: calculateTotal(),
     };
-
+  
     console.log("Order Payload:", JSON.stringify(order, null, 2));
-
+  
     try {
       const response = await axios.post("http://localhost:5000/orders", order);
       console.log("Order placed successfully:", response.data);
-      setCart([]);
-      setSchoolId("");
       fetchOrders();
-      alert("Order placed successfully!");
+      alert("Order placed successfully! Please proceed to payment.");
       setActiveTab("payment");
     } catch (error) {
       console.error(
@@ -229,7 +230,6 @@ const UserInterface = () => {
       alert("Failed to checkout order. Please try again.");
     }
   };
-
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
     try {
@@ -329,7 +329,7 @@ const UserInterface = () => {
     const filteredMenuItems = menuItems.filter((item) =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-
+  
     return (
       <div className="menus-tab">
         <div className="search-container">
@@ -379,9 +379,9 @@ const UserInterface = () => {
               </div>
             ))}
           </div>
-
+  
           <div className="order-summary">
-            <h2>Order Summary</h2>
+            <h2>Place Order</h2>
             <div className="orders-tab">
               <input
                 type="text"
@@ -423,7 +423,6 @@ const UserInterface = () => {
       </div>
     );
   };
-
   const renderOrders = () => {
     return (
       <div className="orders-tab-user">
@@ -439,23 +438,27 @@ const UserInterface = () => {
             </tr>
           </thead>
           <tbody>
-            {orders.map((order) => (
-              <tr key={order.id}>
-                <td>{order.studentNumber}</td>
-                <td>{formatDate(order.dateOrdered)}</td>
-                <td>
-                  {order.menusOrdered.map((menu, index) => (
-                    <div key={index} style={{ marginBottom: "10px" }}>
-                      {`${menu.itemName} (x${menu.quantity}) - \u20B1${
-                        menu.price * menu.quantity
-                      }`}
-                    </div>
-                  ))}
-                </td>
-                <td>&#8369;{order.totalPrice}</td>
-                <td>{order.status}</td>
+            {orders.length > 0 ? (
+              orders.map((order) => (
+                <tr key={order.id}>
+                  <td>{order.studentNumber}</td>
+                  <td>{formatDate(order.dateOrdered)}</td>
+                  <td>
+                    {order.menusOrdered.map((menu, index) => (
+                      <div key={index} style={{ marginBottom: "10px" }}>
+                        {`${menu.itemName} (x${menu.quantity}) - \u20B1${menu.price * menu.quantity}`}
+                      </div>
+                    ))}
+                  </td>
+                  <td>&#8369;{order.totalPrice}</td>
+                  <td>{order.status}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6" className="no-orders">No recent orders available</td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
@@ -561,42 +564,141 @@ const UserInterface = () => {
   };
 
   const renderPaymentOrder = () => {
+   
+    const handleFileUpload = (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setReceiptImage(reader.result);
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+  
+    const handleRemoveReceipt = () => {
+      setReceiptImage(null);
+      // Reset the file input
+      const fileInput = document.getElementById('receipt-upload');
+      if (fileInput) {
+        fileInput.value = '';
+      }
+    };
+  
+    const handleSubmitPayment = async () => {
+      if (!schoolId || !receiptImage || !referenceNumber || !amountSent) {
+        alert("Please fill all fields and upload a receipt image.");
+        return;
+      }
+  
+      try {
+        // Here you would typically send the payment data to your backend
+        // For now, we'll just simulate a successful payment
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulating API call
+  
+        alert("Payment submitted successfully!");
+        
+        // Clear the cart and reset the form
+        setCart([]);
+        setReferenceNumber("");
+        setAmountSent("");
+        setReceiptImage(null);
+  
+        // Offer to save the payment receipt as PDF
+        if (window.confirm("Would you like to save the payment receipt as PDF?")) {
+          generatePDF();
+        }
+  
+        // Navigate back to the menu
+        setActiveTab("menus");
+      } catch (error) {
+        console.error("Error submitting payment:", error);
+        alert("Failed to submit payment. Please try again.");
+      }
+    };
+  
+    const generatePDF = () => {
+      // This is a placeholder for PDF generation logic
+      // You would typically use a library like jsPDF here
+      alert("PDF generation functionality will be implemented here.");
+    };
+  
     return (
       <div className="payment-container">
-
-        <h1>Payment</h1>
-
+        <h1>Payment Portal</h1>
         <div className="payment-content">
           <div className="order_summary">
             <h2>Order Summary</h2>
-            <p>DISH HERE <span>PRICE HERE</span></p>
+            {cart.map((item) => (
+              <p key={item._id}>
+                {item.name} (x{item.quantity}) <span>₱{(item.price * item.quantity).toFixed(2)}</span>
+              </p>
+            ))}
             <hr />
-            <p>Total <span>TOTAL PRICE HERE</span></p>
+            <p>Total <span>₱{calculateTotal().toFixed(2)}</span></p>
           </div>
           <div className="payment-form">
-
             <p>Send your Virtual payment to:</p>
-            <h3>GCASH</h3>
+            <div className="gcash-h3">GCASH</div>
             <p className="gcash-number">+639123456789</p>
+            <div className="qr-code-container">
+              {/* This will be replaced with the actual QR code image later */}
+              <div className="qr-code-placeholder">QR Code Here</div>
+            </div>
             <img src={gcashIcon} alt="GcashLogo"/>
-
             <hr className="gcash"/>
-
-            <form>
+            <form onSubmit={(e) => { e.preventDefault(); handleSubmitPayment(); }}>
               <label className="OrderIDLabel">Order ID:</label>
-              <input type="text" name="name" className="Name" />
-
+              <input type="text" name="name" className="Name" value={schoolId} readOnly />
+  
               <label className="ReferenceLabel">Reference Number:</label>
-              <input type="text" name="referenceNumber" className="Reference" />
-
+              <input 
+                type="text" 
+                name="referenceNumber" 
+                className="Reference"
+                required="true" 
+                value={referenceNumber}
+                onChange={(e) => setReferenceNumber(e.target.value)}
+              />
+  
               <label className="AmountLabel">Amount Sent:</label>
-              <input type="text" name="amountSent" className="Amount" />
+              <input 
+                type="text" 
+                name="amountSent" 
+                className="Amount"
+                required="true"
+                value={amountSent}
+                onChange={(e) => setAmountSent(e.target.value)}
+              />
               
-              <button type="button" className="upload-btn">Upload Receipt</button>
-
+              <input 
+                type="file" 
+                accept="image/*" 
+                onChange={handleFileUpload} 
+                style={{ display: 'none' }} 
+                id="receipt-upload"
+              />
+              <div className="receipt-upload-container">
+                <button 
+                  type="button" 
+                  onClick={() => document.getElementById('receipt-upload').click()} 
+                  className="upload-btn"
+                >
+                  {receiptImage ? 'Change' : 'Upload Receipt'}
+                </button>
+                {receiptImage && (
+                  <button 
+                    type="button" 
+                    onClick={handleRemoveReceipt} 
+                    className="remove-btn"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+              {receiptImage && <p>Receipt uploaded successfully!</p>}
               <button type="submit" className="submit-btn">Submit</button>
             </form>
-
           </div>
         </div>
       </div>

@@ -489,6 +489,10 @@
   min-width: 150px; /* Ensure first column width is sufficient for ID */
 }
 
+.orders-table-user .no-orders{
+  text-align: center;
+}
+
 .user-roles-modal-dashboard{
   text-align: center;
   padding: 10px 20px;
@@ -776,10 +780,9 @@
   border-bottom: 1px solid #e0e0e0;
 }
 
-.payment-form h3{
-  margin-top: 30px;
-  margin-left: 100px;
+.payment-form .gcash-h3{
   color: rgb(20, 0, 134);
+  font-size: 20px;
   font-weight: bold;
 }
 
@@ -788,8 +791,7 @@
 }
 
 .payment-form .gcash-number{
-  font-size: 20px;
-  margin-left: 100px;
+  font-size: 20px;  
 }
 
 .payment-form img {
@@ -830,25 +832,37 @@
   margin-top: -120px;
 }
 
-.upload-btn{
+.receipt-upload-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.upload-btn, .submit-btn {
   padding: 10px;
   border: none;
   border-radius: 5px;
-  background-color: #800000;
-  color: #fff;
-  cursor: pointer;
-  margin-top: 5px;
+  cursor: pointer;  
+}
+
+.remove-btn{
+  width: 120%;
+  max-width: 300px;
+}
+.upload-btn{
+  width: 120%;
+  max-width: 300px;
+}
+.submit-btn{
   width: 100%;
   max-width: 250px;
 }
-.submit-btn{
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
+
+.upload-btn,.remove-btn, .submit-btn {
   background-color: #800000;
   color: #fff;
-  cursor: pointer;
-  margin-top: 5px;
-  width: 100%;
-  max-width: 250px;
+}
+
+.remove-btn:hover, .upload-btn:hover, .submit-btn:hover {
+  background-color: #ff3333;
 }
