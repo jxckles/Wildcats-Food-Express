@@ -23,6 +23,7 @@ const UserInterface = () => {
   const [receiptImage, setReceiptImage] = useState(null);
   const [referenceNumber, setReferenceNumber] = useState("");
   const [amountSent, setAmountSent] = useState("");
+  const [qrCodeImage, setQrCodeImage] = useState(null);
   const navigate = useNavigate();
 
   /* FOR AUTHENTICATION */
@@ -66,7 +67,25 @@ const UserInterface = () => {
   useEffect(() => {
     fetchMenuItems();
     fetchOrders();
+    fetchQRCode();
   }, []);
+
+  //fetch qr code image
+    const fetchQRCode = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/get-qr-code');
+        if (response.data.qrCodeUrl) {
+          setQrCodeImage(`http://localhost:5000${response.data.qrCodeUrl}`);
+        } else {
+          setQrCodeImage(null);
+        }
+      } catch (error) {
+        console.error('Error fetching QR code:', error);
+        setQrCodeImage(null);
+      }
+    };
+ 
+
 
   const fetchMenuItems = async () => {
     try {
@@ -642,9 +661,20 @@ const UserInterface = () => {
             <div className="gcash-h3">GCASH</div>
             <p className="gcash-number">+639123456789</p>
             <div className="qr-code-container">
-              {/* This will be replaced with the actual QR code image later */}
-              <div className="qr-code-placeholder">QR Code Here</div>
-            </div>
+            {qrCodeImage ? (
+              <img 
+                src={qrCodeImage} 
+                alt="QR Code" 
+                className="qr-code-image"
+                onError={(e) => {
+                  console.error("Error loading QR code image");
+                  e.target.style.display = 'none';
+                }}
+              />
+            ) : (
+              <div className="qr-code-placeholder">QR Code Not Available</div>
+            )}
+          </div>
             <img src={gcashIcon} alt="GcashLogo"/>
             <hr className="gcash"/>
             <form onSubmit={(e) => { e.preventDefault(); handleSubmitPayment(); }}>
