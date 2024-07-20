@@ -13,6 +13,7 @@ const cookieParser = require("cookie-parser");
 const app = express();
 const nodemailer = require("nodemailer");
 const ClientOrder = require("./models/ClientOrder");
+const QRCode = require('./models/QRCode');
 
 app.use(express.json());
 app.use(cookieParser());
@@ -609,4 +610,66 @@ app.put("/orders/:orderId/status", async (req, res) => {
 
 app.listen(5000, () => {
   console.log("Server is running on port 5000");
+});
+
+
+// QR Code upload route
+app.post('/upload-qr-code', upload.single('qrCode'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    const qrCodeUrl = `/Images/${req.file.filename}`;
+
+    // Remove existing QR code if any
+    await QRCode.deleteMany({});
+
+    // Create new QR code entry
+    const newQRCode = new QRCode({ imageUrl: qrCodeUrl });
+    await newQRCode.save();
+
+    res.status(200).json({ message: 'QR code uploaded successfully', qrCodeUrl });
+  } catch (error) {
+    console.error('Error uploading QR code:', error);
+    res.status(500).json({ message: 'Failed to upload QR code' });
+  }
+});
+
+// QR Code removal route
+app.delete('/remove-qr-code', async (req, res) => {
+  try {
+    const qrCode = await QRCode.findOne();
+    if (qrCode) {
+      // Remove the image file
+      const imagePath = path.join(__dirname, 'public', qrCode.imageUrl);
+      fs.unlink(imagePath, (err) => {
+        if (err) console.error('Error deleting QR code image:', err);
+      });
+
+      // Remove the database entry
+      await QRCode.deleteMany({});
+      res.status(200).json({ message: 'QR code removed successfully' });
+    } else {
+      res.status(404).json({ message: 'No QR code found' });
+    }
+  } catch (error) {
+    console.error('Error removing QR code:', error);
+    res.status(500).json({ message: 'Failed to remove QR code' });
+  }
+});
+
+// QR Code retrieval route
+app.get('/get-qr-code', async (req, res) => {
+  try {
+    const qrCode = await QRCode.findOne();
+    if (qrCode) {
+      res.status(200).json({ qrCodeUrl: qrCode.imageUrl });
+    } else {
+      res.status(404).json({ message: 'No QR code found' });
+    }
+  } catch (error) {
+    console.error('Error retrieving QR code:', error);
+    res.status(500).json({ message: 'Failed to retrieve QR code' });
+  }
 });
