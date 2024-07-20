@@ -337,6 +337,10 @@
   text-align: left;
 }
 
+.order-table .no-orders{
+  text-align: center;
+}
+
 .order-table th {
   background-color: #f2f2f2;
 }
