@@ -789,6 +789,7 @@ const UserInterface = () => {
                   type="button" 
                   onClick={() => document.getElementById('receipt-upload').click()} 
                   className="upload-btn"
+                  disabled={cart.length === 0}
                 >
                   {receiptImage ? 'Change' : 'Upload Receipt'}
                 </button>
