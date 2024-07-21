@@ -5,7 +5,6 @@ import logo from "/logo.svg";
 import profileIcon from "/cat_profile.svg";
 import cartIcon from "/shopping_cart.svg";
 import { useNavigate } from "react-router-dom";
-import gcashIcon from "/gcash.svg";
 
 const UserInterface = () => {
   const [menuItems, setMenuItems] = useState([]);
@@ -313,7 +312,6 @@ const UserInterface = () => {
     setIsUserRolesModalOpen(false);
   };
 
-  const handleAdminInterfaceChange = () => {};
 
   const handleChangePassSubmit = async (e) => {
     e.preventDefault();
@@ -603,18 +601,48 @@ const UserInterface = () => {
         fileInput.value = '';
       }
     };
+
+    // Helper function to format amount to two decimal places
+    const formatAmount = (amount) => {
+      return parseFloat(amount).toFixed(2);
+    };
+
+    // Helper function to validate amount
+    const validateAmount = (amount) => {
+      const regex = /^\d+(\.\d{0,2})?$/;
+      return regex.test(amount);
+    };
   
     const handleSubmitPayment = async () => {
+      if (cart.length === 0) {
+        alert("Your cart is empty. Please add items to your order before proceeding with payment.");
+        return;
+      }
+    
       if (!schoolId || !receiptImage || !referenceNumber || !amountSent) {
         alert("Please fill all fields and upload a receipt image.");
         return;
       }
-  
+    
+      // Validate and format amountSent
+      if (!validateAmount(amountSent)) {
+        alert("Please enter a valid amount (up to two decimal places).");
+        return;
+      }
+    
+      const formattedAmountSent = formatAmount(amountSent);
+      const totalOrderAmount = formatAmount(calculateTotal());
+    
+      if (formattedAmountSent !== totalOrderAmount) {
+        alert(`The amount paid (${formattedAmountSent}) must exactly match the total order amount (${totalOrderAmount}).`);
+        return;
+      }
+    
       try {
         // Here you would typically send the payment data to your backend
         // For now, we'll just simulate a successful payment
         await new Promise(resolve => setTimeout(resolve, 1000)); // Simulating API call
-  
+    
         alert("Payment submitted successfully!");
         
         // Clear the cart and reset the form
@@ -622,12 +650,12 @@ const UserInterface = () => {
         setReferenceNumber("");
         setAmountSent("");
         setReceiptImage(null);
-  
+    
         // Offer to save the payment receipt as PDF
         if (window.confirm("Would you like to save the payment receipt as PDF?")) {
-          generatePDF();
+          generatePDF(formattedAmountSent);
         }
-  
+    
         // Navigate back to the menu
         setActiveTab("menus");
       } catch (error) {
@@ -635,13 +663,59 @@ const UserInterface = () => {
         alert("Failed to submit payment. Please try again.");
       }
     };
+        
   
-    const generatePDF = () => {
-      // This is a placeholder for PDF generation logic
-      // You would typically use a library like jsPDF here
-      alert("PDF generation functionality will be implemented here.");
+    const generatePDF = (formattedAmountSent) => {
+      import('jspdf').then((jsPDF) => {
+        const { jsPDF: jsPDFConstructor } = jsPDF;
+        const doc = new jsPDFConstructor();
+    
+        // Set page size to A4
+        doc.setFontSize(12);
+    
+        // Add header
+        doc.setFontSize(18);
+        doc.setFont(undefined, 'bold');
+        doc.text('Payment Receipt', 105, 20, { align: 'center' });
+    
+        // Add receipt details
+        doc.setFontSize(12);
+        doc.setFont(undefined, 'normal');
+        let y = 40;
+        doc.text(`Order ID: ${schoolId}`, 20, y);
+        doc.text(`Reference Number: ${referenceNumber}`, 20, y + 10);
+        doc.text(`Amount Sent: Php ${formattedAmountSent}`, 20, y + 20);
+        doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, y + 30);
+    
+        // Add order summary
+        y = y + 50;
+        doc.setFont(undefined, 'bold');
+        doc.text('Order Summary:', 20, y);
+    
+        y = y + 10;
+        doc.setFont(undefined, 'normal');
+        cart.forEach((item) => {
+          const itemText = `${item.name} (x${item.quantity})`;
+          const itemPrice = `Php ${formatAmount(item.price * item.quantity)}`;
+          doc.text(itemText, 30, y);
+          doc.text(itemPrice, 190, y, { align: 'right' });
+          y += 10;
+        });
+    
+        // Add total
+        y += 5;
+        doc.setFont(undefined, 'bold');
+        doc.text('Total:', 30, y);
+        doc.text(`Php ${formatAmount(calculateTotal())}`, 190, y, { align: 'right' });
+    
+        // Save the PDF
+        doc.save('payment_receipt.pdf');
+      }).catch((error) => {
+        console.error('Error generating PDF:', error);
+        alert('Failed to generate PDF. Please try again.');
+      });
     };
-  
+    
     return (
       <div className="payment-container">
         <h1>Payment Portal</h1>
@@ -658,8 +732,7 @@ const UserInterface = () => {
           </div>
           <div className="payment-form">
             <p>Send your Virtual payment to:</p>
-            <div className="gcash-h3">GCASH</div>
-            <p className="gcash-number">+639123456789</p>
+            <div className="gcash-h3">GCASH <p className="gcash-number">+639123456789</p></div>
             <div className="qr-code-container">
             {qrCodeImage ? (
               <img 
@@ -675,7 +748,6 @@ const UserInterface = () => {
               <div className="qr-code-placeholder">QR Code Not Available</div>
             )}
           </div>
-            <img src={gcashIcon} alt="GcashLogo"/>
             <hr className="gcash"/>
             <form onSubmit={(e) => { e.preventDefault(); handleSubmitPayment(); }}>
               <label className="OrderIDLabel">Order ID:</label>
@@ -698,7 +770,11 @@ const UserInterface = () => {
                 className="Amount"
                 required="true"
                 value={amountSent}
-                onChange={(e) => setAmountSent(e.target.value)}
+                onChange={(e) => {
+                  if (validateAmount(e.target.value) || e.target.value === '') {
+                    setAmountSent(e.target.value);
+                  }
+                }}
               />
               
               <input 
