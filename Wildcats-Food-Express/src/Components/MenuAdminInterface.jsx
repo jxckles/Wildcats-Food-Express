@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import io from 'socket.io-client';
 import "./MenuAdminInterface.css";
 import logo from "/logo.svg";
 import profileIcon from "/cat_profile.svg";
@@ -9,6 +10,9 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 
 const MainAdminInterface = () => {
+  const [socket, setSocket] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+  const [notificationPermission, setNotificationPermission] = useState(false);
   const [menuItems, setMenuItems] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState({
@@ -76,6 +80,75 @@ const MainAdminInterface = () => {
     fetchQRCode();
     fetchClientOrders();
   }, [refreshKey]);
+  
+   useEffect(() => {
+    if ("Notification" in window) {
+      Notification.requestPermission().then((permission) => {
+        if (permission === "granted") {
+          setNotificationPermission(true);
+        }
+      });
+    }
+  }, []);
+  
+  useEffect(() => {
+    const newSocket = io('http://localhost:5000');
+    setSocket(newSocket);
+  
+    return () => newSocket.close();
+  }, []);
+  
+  useEffect(() => {
+    if (socket) {
+      socket.on('newOrder', (order) => {
+        console.log('Received new order:', order);
+        addNotification(`New order received from ${order.userName || 'Unknown User'}`, order._id);
+        
+        // Update the onlineOrders state with the new order
+        setOnlineOrders(prevOrders => [...prevOrders, order]);
+      });
+  
+      return () => {
+        socket.off('newOrder');
+      };
+    }
+  }, [socket]);
+
+
+  const addNotification = (message, orderId) => {
+    if (!message) {
+      console.error('Attempted to add empty notification');
+      return;
+    }
+  
+    const newNotification = { id: Date.now(), message, orderId };
+  
+    setNotifications(prev => {
+      const filteredNotifications = prev.filter(n => n.orderId !== orderId);
+      return [...filteredNotifications, newNotification];
+    });
+    
+    if (Notification.permission === "granted") {
+      if (window.activeNotifications && window.activeNotifications[orderId]) {
+        window.activeNotifications[orderId].close();
+      }
+  
+      const notification = new Notification("New Order", { 
+        body: message,
+        icon: "/cat_profile.svg", // Use an appropriate icon
+        tag: orderId
+      });
+  
+      if (!window.activeNotifications) window.activeNotifications = {};
+      window.activeNotifications[orderId] = notification;
+  
+      const notificationDuration = 5000; // 5 seconds
+      setTimeout(() => {
+        notification.close();
+        delete window.activeNotifications[orderId];
+      }, notificationDuration);
+    }
+  };
 
   const fetchMenuItems = async () => {
     try {
@@ -100,6 +173,17 @@ const MainAdminInterface = () => {
       );
       setOnlineOrders(response.data);
       console.log("Fetched orders:", response.data);
+  
+      // Set up socket listener for real-time updates
+      if (socket) {
+        socket.on('orderUpdate', (updatedOrder) => {
+          setOnlineOrders(prevOrders => 
+            prevOrders.map(order => 
+              order._id === updatedOrder._id ? updatedOrder : order
+            )
+          );
+        });
+      }
     } catch (error) {
       console.error("Error fetching orders:", error);
     }
@@ -138,6 +222,7 @@ const MainAdminInterface = () => {
       console.error("Error updating order status:", error);
     }
   };
+
 
   const openModal = (
     item = { _id: null, name: "", price: "", image: null, quantity: 0 }
@@ -254,6 +339,11 @@ const MainAdminInterface = () => {
 
       const updatedOrder = response.data;
 
+       // Emit the updated order to all connected clients
+        if (socket) {
+          socket.emit('orderUpdate', updatedOrder);
+        }
+
       if (isOnlineOrder) {
         if (newStatus === "Completed" || newStatus === "Cancelled") {
           setOnlineOrders((prevOrders) =>
@@ -285,6 +375,7 @@ const MainAdminInterface = () => {
       console.error(`Error updating status for order ${orderId}:`, error);
     }
   };
+  
 
   const handleReportSearch = (e) => {
     setReportSearchTerm(e.target.value);

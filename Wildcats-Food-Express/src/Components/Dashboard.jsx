@@ -109,7 +109,7 @@ const UserInterface = () => {
             )
           );
           addNotification(
-            `Order ${updatedOrder.studentNumber || 'Unknown'} status updated to ${updatedOrder.status || 'Unknown'}`,
+            `Your Order ${updatedOrder.studentNumber || 'Unknown'} status has been updated to ${updatedOrder.status || 'Unknown'}`,
             updatedOrder._id
           );
         }

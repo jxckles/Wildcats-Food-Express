@@ -393,6 +393,9 @@ app.post("/orders", async (req, res) => {
     await session.commitTransaction();
     session.endSession();
 
+    // After successfully creating the order
+    io.emit('newOrder', newOrder);
+
     res
       .status(201)
       .json({ message: "Order placed successfully", order: newOrder });
