@@ -903,6 +903,19 @@ const UserInterface = () => {
     );
   };
 
+  //In web Notification UI p.s. not yet declared 
+  const renderNotificationsComponent = () => {
+    return (
+      <div className="notifications-container">
+        {notifications.map(notification => (
+          <div key={notification.id} className="notification">
+            {notification.message}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   const renderHistory = () => {
     const filteredOrders = historyOrders.filter(
       (order) =>
