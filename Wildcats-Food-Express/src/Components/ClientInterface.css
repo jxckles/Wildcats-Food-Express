@@ -292,8 +292,13 @@
   }
   
   .order-status-tab {
-    max-width: 800px;
+    width: 100%;
+    max-width: 1500px;
     margin: 0 auto;
+  }
+  
+  .order-status-tab h2 {
+    font-size: 2em;
   }
   
   .order-status-table {
@@ -301,16 +306,21 @@
     border-collapse: collapse;
   }
   
+  
   .order-status-table th,
   .order-status-table td {
     border: 1px solid #ddd;
-    padding: 8px;
+    padding: 15px;
     text-align: left;
+    font-size: 1.5em;
+    font-weight: 500;
+    color: #990000;
   }
   
   .order-status-table th {
     background-color: #f2f2f2;
-    color: #990000;
+    font-weight: bold;
+    text-align: center;
   }
   
   .client-options {
