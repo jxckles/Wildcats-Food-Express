@@ -15,6 +15,30 @@ const nodemailer = require("nodemailer");
 const ClientOrder = require("./models/ClientOrder");
 const QRCode = require('./models/QRCode');
 
+const http = require('http');
+const socketIo = require('socket.io');
+
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"]
+  }
+});
+
+io.on('connection', (socket) => {
+  console.log('New client connected');
+  
+  socket.on('authenticate', (userId) => {
+    socket.userId = userId;
+    console.log(`User ${userId} authenticated`);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
+});
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(
@@ -590,6 +614,14 @@ app.put("/orders/:orderId/status", async (req, res) => {
       return res.status(404).send({ message: "Order not found" });
     }
 
+     // Emit the status update to all connected clients
+     io.emit('orderStatusUpdate', { 
+      _id: order._id,
+      studentNumber: order.studentNumber,
+      status: order.status,
+      userId: order.userId
+    });
+         
     //check if status compelete delete from order and move to history
     if (status === "Completed" || status === "Cancelled") {
       const historyOrder = new History(order.toObject());
@@ -608,7 +640,9 @@ app.put("/orders/:orderId/status", async (req, res) => {
   }
 });
 
-app.listen(5000, () => {
+
+// Change app.listen to server.listen
+server.listen(5000, () => {
   console.log("Server is running on port 5000");
 });
 

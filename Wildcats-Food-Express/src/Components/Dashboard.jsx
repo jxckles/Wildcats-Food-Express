@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import io from 'socket.io-client';
 import "./dashboard.css";
 import logo from "/logo.svg";
 import profileIcon from "/cat_profile.svg";
@@ -24,6 +25,11 @@ const UserInterface = () => {
   const [amountSent, setAmountSent] = useState("");
   const [qrCodeImage, setQrCodeImage] = useState(null);
   const navigate = useNavigate();
+
+  const [socket, setSocket] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+  const [notificationPermission, setNotificationPermission] = useState(false);
+
 
   /* FOR AUTHENTICATION */
   const [message, setMessage] = useState();
@@ -69,6 +75,92 @@ const UserInterface = () => {
     fetchQRCode();
   }, []);
 
+  useEffect(() => {
+    if ("Notification" in window) {
+      Notification.requestPermission().then((permission) => {
+        if (permission === "granted") {
+          setNotificationPermission(true);
+        }
+      });
+    }
+  }, []);
+  
+
+  useEffect(() => {
+    const newSocket = io('http://localhost:5000');
+    setSocket(newSocket);
+  
+    // Authenticate the socket connection with the user ID
+    const userId = localStorage.getItem("userID");
+    newSocket.emit('authenticate', userId);
+  
+    return () => newSocket.close();
+  }, []);  
+
+  useEffect(() => {
+    if (socket) {
+      socket.on('orderStatusUpdate', (updatedOrder) => {
+        console.log('Received order update:', updatedOrder);
+        const userId = localStorage.getItem("userID");
+        if (updatedOrder.userId === userId) {
+          setOrders(prevOrders => 
+            prevOrders.map(order => 
+              order._id === updatedOrder._id ? {...order, ...updatedOrder} : order
+            )
+          );
+          addNotification(
+            `Order ${updatedOrder.studentNumber || 'Unknown'} status updated to ${updatedOrder.status || 'Unknown'}`,
+            updatedOrder._id
+          );
+        }
+      });
+  
+      return () => {
+        socket.off('orderStatusUpdate');
+      };
+    }
+  }, [socket]);
+  
+  const addNotification = (message, orderId) => {
+    if (!message) {
+      console.error('Attempted to add empty notification');
+      return;
+    }
+  
+    const userId = localStorage.getItem("userID");
+    const newNotification = { id: Date.now(), userId, message, orderId };
+  
+    setNotifications(prev => {
+      // Remove any existing notification for the same order
+      const filteredNotifications = prev.filter(n => n.orderId !== orderId);
+      return [...filteredNotifications, newNotification];
+    });
+    
+    if (Notification.permission === "granted") {
+      // Close any existing notification for this order
+      if (window.activeNotifications && window.activeNotifications[orderId]) {
+        window.activeNotifications[orderId].close();
+      }
+  
+      const notification = new Notification("Order Status Update", { 
+        body: message,
+        icon: "/cat_profile.svg",
+        tag: orderId // This ensures only one notification per order is shown
+      });
+  
+      // Store the notification reference
+      if (!window.activeNotifications) window.activeNotifications = {};
+      window.activeNotifications[orderId] = notification;
+  
+      const notificationDuration = 3000;
+      setTimeout(() => {
+        notification.close();
+        delete window.activeNotifications[orderId];
+      }, notificationDuration);
+    }
+  }; 
+
+
   //fetch qr code image
     const fetchQRCode = async () => {
       try {
@@ -104,14 +196,12 @@ const UserInterface = () => {
   const fetchOrders = async () => {
     try {
       const userId = localStorage.getItem("userID");
-      const response = await axios.get(
-        `http://localhost:5000/orders?userId=${userId}`
-      );
+      const response = await axios.get(`http://localhost:5000/orders?userId=${userId}`);
       setOrders(response.data);
     } catch (error) {
       console.error("Error fetching orders:", error);
     }
-  };
+  };  
 
   const fetchUserData = async () => {
     try {
@@ -341,6 +431,7 @@ const UserInterface = () => {
       alert("Failed to change password.");
     }
   };
+
 
   const renderMenus = () => {
     const filteredMenuItems = menuItems.filter((item) =>
