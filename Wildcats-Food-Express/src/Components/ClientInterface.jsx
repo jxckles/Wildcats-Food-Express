@@ -363,13 +363,15 @@ const ClientInterface = () => {
             </tr>
           </thead>
           <tbody>
-            {clientorders.map((clientorders) => (
-              <tr key={clientorders._id}>
-                <td>{clientorders.priorityNumber}</td>
-                <td>{clientorders.schoolId}</td>
-                <td>{clientorders.status}</td>
-              </tr>
-            ))}
+            {clientorders
+              .filter((order) => order.status !== "Completed")
+              .map((order) => (
+                <tr key={order._id}>
+                  <td>{order.priorityNumber}</td>
+                  <td>{order.schoolId}</td>
+                  <td>{order.status}</td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>

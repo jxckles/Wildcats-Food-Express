@@ -487,6 +487,42 @@ app.get('/clientorders', async (req, res) => {
 });
 
 
+app.put('/clientorders/:orderId/status', async (req, res) => {
+  const { orderId } = req.params;
+  const { status } = req.body;
+
+  try {
+    const order = await ClientOrder.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    
+    order.status = status;
+    await order.save();
+
+    res.status(200).json(order);
+  } catch (error) {
+    console.error("Error updating order status:", error);
+    res.status(500).json({ message: "Failed to update order status", error: error.message });
+  }
+});
+
+app.delete('/clientorders/:orderId', async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    const order = await ClientOrder.findByIdAndDelete(orderId);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    
+    res.status(200).json({ message: "Order deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting order:", error);
+    res.status(500).json({ message: "Failed to delete order", error: error.message });
+  }
+});
+
 //for change password
 
 app.post("/change-password", async (req, res) => {

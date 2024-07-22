@@ -27,7 +27,7 @@ const MainAdminInterface = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("menu");
-  const [orderSubTab, setOrderSubTab] = useState("online");
+  const [orderSubTab, setOrderSubTab] = useState("pos");
   const [onlineOrders, setOnlineOrders] = useState([
     {
       id: "22-3456-345",
@@ -44,22 +44,6 @@ const MainAdminInterface = () => {
       status: "Pending",
     },
   ]);
-  const [customerOrders, setCustomerOrders] = useState([
-    {
-      id: "POS-001",
-      schoolID: "21-8877-890",
-      amount: "₱50.00",
-      product: "Fried Chicken",
-      status: "Pending",
-    },
-    {
-      id: "POS-002",
-      schoolID: "19-2322-567",
-      amount: "₱40.00",
-      product: "Chicken Adobo",
-      status: "Pending",
-    },
-  ]);
 
   const [reportSearchTerm, setReportSearchTerm] = useState("");
   const [reportDate, setReportDate] = useState("");
@@ -70,6 +54,7 @@ const MainAdminInterface = () => {
   const [isCartMenuOpen, setIsCartMenuOpen] = useState(false);
   const [message, setMessage] = useState();
   const [qrCodeImage, setQrCodeImage] = useState(null);
+  const [customerOrders, setCustomerOrders] = useState([]);
 
   axios.defaults.withCredentials = true;
 
@@ -93,9 +78,10 @@ const MainAdminInterface = () => {
     fetchMenuItems();
     fetchOrders();
     fetchQRCode();
+    fetchClientOrders();
   }, [refreshKey]);
-
-  useEffect(() => {
+  
+   useEffect(() => {
     if ("Notification" in window) {
       Notification.requestPermission().then((permission) => {
         if (permission === "granted") {
@@ -163,7 +149,7 @@ const MainAdminInterface = () => {
       }, notificationDuration);
     }
   };
-  
+
   const fetchMenuItems = async () => {
     try {
       const response = await axios.get("http://localhost:5000/menu");
@@ -200,6 +186,40 @@ const MainAdminInterface = () => {
       }
     } catch (error) {
       console.error("Error fetching orders:", error);
+    }
+  };
+
+  const fetchClientOrders = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/clientorders");
+      console.log("Fetched client orders:", response.data);
+      setCustomerOrders(Array.isArray(response.data) ? response.data : []);
+    } catch (error) {
+      console.error("Error fetching client orders:", error);
+      setCustomerOrders([]); // Ensure customerOrders is an array even if the fetch fails
+    }
+  };
+
+  const handleStatusChangeClient = async (orderId, newStatus) => {
+    try {
+      if (newStatus === "Cancelled") {
+        await axios.delete(`http://localhost:5000/clientorders/${orderId}`);
+        setCustomerOrders((prevOrders) =>
+          prevOrders.filter((order) => order._id !== orderId)
+        );
+      } else {
+        await axios.put(
+          `http://localhost:5000/clientorders/${orderId}/status`,
+          { status: newStatus }
+        );
+        setCustomerOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order._id === orderId ? { ...order, status: newStatus } : order
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error updating order status:", error);
     }
   };
 
@@ -363,55 +383,69 @@ const MainAdminInterface = () => {
 
   const handleDownloadReport = () => {
     const months = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December",
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
     ];
-  
+
     const doc = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: 'a4'
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
     });
-  
+
     // Set document properties
     doc.setProperties({
-      title: 'Wildcat Food Express - Sales Report',
-      subject: 'Sales Report',
-      author: 'Wildcat Food Express Admin',
-      keywords: 'sales, report, food, express',
-      creator: 'Wildcat Food Express System'
+      title: "Wildcat Food Express - Sales Report",
+      subject: "Sales Report",
+      author: "Wildcat Food Express Admin",
+      keywords: "sales, report, food, express",
+      creator: "Wildcat Food Express System",
     });
-  
+
     // Define styles
-    const titleStyle = { fontSize: 16, fontStyle: 'bold', };
-    const subtitleStyle = { fontSize: 10, fontStyle: 'normal' };
-    const tableHeaderStyle = { 
+    const titleStyle = { fontSize: 16, fontStyle: "bold" };
+    const subtitleStyle = { fontSize: 10, fontStyle: "normal" };
+    const tableHeaderStyle = {
       fillColor: [153, 0, 0], // #990000
-      textColor: [255, 255, 255], 
-      fontStyle: 'bold',
-      fontSize: 8, 
-      halign: 'center', 
-      valign: 'middle' 
-    };
-    const tableBodyStyle = { 
-      textColor: [50, 50, 50], 
+      textColor: [255, 255, 255],
+      fontStyle: "bold",
       fontSize: 8,
-      cellPadding: 2
+      halign: "center",
+      valign: "middle",
     };
-  
+    const tableBodyStyle = {
+      textColor: [50, 50, 50],
+      fontSize: 8,
+      cellPadding: 2,
+    };
+
     // Title and basic information
     doc.setFont("helvetica", "bold");
     doc.setFontSize(titleStyle.fontSize);
-    
+
     doc.text("Wildcat Food Express - Sales Report", 15, 20);
-  
+
     doc.setFont("helvetica", "normal");
     doc.setFontSize(subtitleStyle.fontSize);
     doc.text(`Date: ${reportDate || "All"}`, 15, 30);
-    doc.text(`Month: ${reportMonth ? months[parseInt(reportMonth) - 1] : "All"}`, 15, 35);
+    doc.text(
+      `Month: ${reportMonth ? months[parseInt(reportMonth) - 1] : "All"}`,
+      15,
+      35
+    );
     doc.text(`Year: ${reportYear || "All"}`, 15, 40);
     doc.text(`Search Term: ${reportSearchTerm || "None"}`, 15, 45);
-  
+
     // Table headers
     const headers = [
       { title: "Order Number", dataKey: "orderNumber" },
@@ -421,25 +455,31 @@ const MainAdminInterface = () => {
       { title: "Quantity", dataKey: "quantity" },
       { title: "Total Price", dataKey: "totalPrice" },
     ];
-  
+
     // Filter and search logic
     const filteredHistoryOrders = historyOrders.filter((order) => {
       const orderDate = new Date(order.dateOrdered);
       const searchLower = reportSearchTerm.toLowerCase();
-      
-      const matchesSearch = !reportSearchTerm || 
+
+      const matchesSearch =
+        !reportSearchTerm ||
         order.studentNumber.toLowerCase().includes(searchLower) ||
         orderDate.toLocaleString().toLowerCase().includes(searchLower) ||
         order.status.toLowerCase().includes(searchLower) ||
-        order.menusOrdered.some(menu => menu.itemName.toLowerCase().includes(searchLower));
-  
-      const dateMatches = !reportDate || orderDate.getDate() === parseInt(reportDate);
-      const monthMatches = !reportMonth || orderDate.getMonth() === parseInt(reportMonth) - 1;
-      const yearMatches = !reportYear || orderDate.getFullYear() === parseInt(reportYear);
-  
+        order.menusOrdered.some((menu) =>
+          menu.itemName.toLowerCase().includes(searchLower)
+        );
+
+      const dateMatches =
+        !reportDate || orderDate.getDate() === parseInt(reportDate);
+      const monthMatches =
+        !reportMonth || orderDate.getMonth() === parseInt(reportMonth) - 1;
+      const yearMatches =
+        !reportYear || orderDate.getFullYear() === parseInt(reportYear);
+
       return matchesSearch && dateMatches && monthMatches && yearMatches;
     });
-  
+
     // Data for the table
     const ordersData = filteredHistoryOrders.map((order) => ({
       orderNumber: order.studentNumber,
@@ -449,14 +489,16 @@ const MainAdminInterface = () => {
       quantity: order.menusOrdered.map((menu) => menu.quantity).join(", "),
       totalPrice: `₱${order.totalPrice.toFixed(2)}`,
     }));
-  
+
     // Generate the table
     doc.autoTable({
       head: [headers.map((header) => header.title)],
-      body: ordersData.map((data) => headers.map((header) => data[header.dataKey])),
+      body: ordersData.map((data) =>
+        headers.map((header) => data[header.dataKey])
+      ),
       startY: 50,
-      styles: { 
-        font: "helvetica", 
+      styles: {
+        font: "helvetica",
         overflow: "linebreak",
         cellPadding: 2,
       },
@@ -467,7 +509,7 @@ const MainAdminInterface = () => {
         0: { cellWidth: 25 },
         1: { cellWidth: 35 },
         2: { cellWidth: 20 },
-        3: { cellWidth: 'auto' },
+        3: { cellWidth: "auto" },
         4: { cellWidth: 20 },
         5: { cellWidth: 25 },
       },
@@ -475,25 +517,37 @@ const MainAdminInterface = () => {
         // Footer
         let str = `Page ${doc.internal.getNumberOfPages()}`;
         doc.setFontSize(8);
-        doc.text(str, data.settings.margin.left, doc.internal.pageSize.height - 10);
+        doc.text(
+          str,
+          data.settings.margin.left,
+          doc.internal.pageSize.height - 10
+        );
       },
       margin: { top: 50, right: 15, bottom: 15, left: 15 },
     });
-  
+
     // Add summary information
-    const totalSales = ordersData.reduce((sum, order) => sum + parseFloat(order.totalPrice.replace('₱', '')), 0);
+    const totalSales = ordersData.reduce(
+      (sum, order) => sum + parseFloat(order.totalPrice.replace("₱", "")),
+      0
+    );
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
-    doc.text(`Total Sales: ₱${totalSales.toFixed(2)}`, 15, doc.lastAutoTable.finalY + 10);
-  
+    doc.text(
+      `Total Sales: ₱${totalSales.toFixed(2)}`,
+      15,
+      doc.lastAutoTable.finalY + 10
+    );
+
     // Generate filename based on filters
     let filename = "Wildcat_Food_Express_Sales_Report";
-    if (reportDate) filename += `_Date ${reportDate.padStart(2, '0')}`;
-    if (reportMonth) filename += `_Month ${reportMonth.padStart(2, '0')}`;
+    if (reportDate) filename += `_Date ${reportDate.padStart(2, "0")}`;
+    if (reportMonth) filename += `_Month ${reportMonth.padStart(2, "0")}`;
     if (reportYear) filename += `_Year ${reportYear}`;
-    if (reportSearchTerm) filename += `_Search ${reportSearchTerm.replace(/\s+/g, '_')}`;
+    if (reportSearchTerm)
+      filename += `_Search ${reportSearchTerm.replace(/\s+/g, "_")}`;
     filename += ".pdf";
-  
+
     doc.save(filename);
   };
 
@@ -522,38 +576,41 @@ const MainAdminInterface = () => {
     const file = e.target.files[0];
     if (file) {
       const formData = new FormData();
-      formData.append('qrCode', file);
+      formData.append("qrCode", file);
       try {
-        const response = await axios.post('http://localhost:5000/upload-qr-code', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        const response = await axios.post(
+          "http://localhost:5000/upload-qr-code",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
         if (response.data.qrCodeUrl) {
           setQrCodeImage(`http://localhost:5000${response.data.qrCodeUrl}`);
         }
-        alert('QR code uploaded successfully!');
+        alert("QR code uploaded successfully!");
       } catch (error) {
-        console.error('Error uploading QR code:', error);
-        alert('Failed to upload QR code. Please try again.');
+        console.error("Error uploading QR code:", error);
+        alert("Failed to upload QR code. Please try again.");
       }
     }
   };
   const handleRemoveQRCode = async () => {
     try {
-      await axios.delete('http://localhost:5000/remove-qr-code');
+      await axios.delete("http://localhost:5000/remove-qr-code");
       setQrCodeImage(null);
-      alert('QR code removed successfully!');
+      alert("QR code removed successfully!");
     } catch (error) {
-      console.error('Error removing QR code:', error);
-      alert('Failed to remove QR code. Please try again.');
+      console.error("Error removing QR code:", error);
+      alert("Failed to remove QR code. Please try again.");
     }
-  };  
-  
+  };
 
   const fetchQRCode = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/get-qr-code');
+      const response = await axios.get("http://localhost:5000/get-qr-code");
       if (response.data.qrCodeUrl) {
         setQrCodeImage(`http://localhost:5000${response.data.qrCodeUrl}`);
       } else {
@@ -561,7 +618,7 @@ const MainAdminInterface = () => {
       }
     } catch (error) {
       if (error.response && error.response.status !== 404) {
-        console.error('Error fetching QR code:', error);
+        console.error("Error fetching QR code:", error);
       }
       setQrCodeImage(null);
     }
@@ -666,7 +723,9 @@ const MainAdminInterface = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="no-orders">No online orders available</td>
+                  <td colSpan="6" className="no-orders">
+                    No online orders available
+                  </td>
                 </tr>
               )}
             </tbody>
@@ -687,18 +746,23 @@ const MainAdminInterface = () => {
               {customerOrders.length > 0 ? (
                 customerOrders.map((order) => (
                   <tr key={order._id}>
-                    <td>{order.id}</td>
-                    <td>{order.schoolID}</td>
-                    <td>&#8369;{order.amount}</td>
-                    <td>{order.product}</td>
+                    <td>{order.priorityNumber}</td>
+                    <td>{order.schoolId}</td>
+                    <td>&#8369;{order.totalPrice}</td>
+                    <td>
+                      {order.items.map((item) => (
+                        <div key={item.name}>
+                          {item.name} x {item.quantity}
+                        </div>
+                      ))}
+                    </td>
                     <td>
                       <select
                         value={order.status}
                         onChange={(e) =>
-                          handleStatusChange(order._id, e.target.value, false)
+                          handleStatusChangeClient(order._id, e.target.value)
                         }
                       >
-                        <option value="Pending">Pending</option>
                         <option value="Preparing">Preparing</option>
                         <option value="Ready for Pickup">
                           Ready for Pickup
@@ -724,28 +788,43 @@ const MainAdminInterface = () => {
   const renderReports = () => {
     const currentYear = new Date().getFullYear();
     const months = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December",
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
     ];
-  
+
     const filteredHistoryOrders = historyOrders
       ? historyOrders.filter((order) => {
           const orderDate = new Date(order.dateOrdered);
           const searchLower = reportSearchTerm.toLowerCase();
-          
-          const matchesSearch = 
+
+          const matchesSearch =
             order.studentNumber.toLowerCase().includes(searchLower) ||
             orderDate.toLocaleString().toLowerCase().includes(searchLower) ||
             order.status.toLowerCase().includes(searchLower) ||
-            order.menusOrdered.some(menu => menu.itemName.toLowerCase().includes(searchLower));
-  
-          return matchesSearch &&
+            order.menusOrdered.some((menu) =>
+              menu.itemName.toLowerCase().includes(searchLower)
+            );
+
+          return (
+            matchesSearch &&
             (!reportDate || orderDate.getDate() === parseInt(reportDate)) &&
-            (!reportMonth || orderDate.getMonth() === parseInt(reportMonth) - 1) &&
-            (!reportYear || orderDate.getFullYear() === parseInt(reportYear));
+            (!reportMonth ||
+              orderDate.getMonth() === parseInt(reportMonth) - 1) &&
+            (!reportYear || orderDate.getFullYear() === parseInt(reportYear))
+          );
         })
       : [];
-  
+
     return (
       <div className="admin-reports">
         <h2>Admin Reports</h2>
@@ -874,13 +953,13 @@ const MainAdminInterface = () => {
         <div className="qr-code-container-admin">
           {qrCodeImage ? (
             <>
-              <img 
-                src={qrCodeImage} 
-                alt="QR Code" 
-                className="qr-code-image-admin" 
+              <img
+                src={qrCodeImage}
+                alt="QR Code"
+                className="qr-code-image-admin"
                 onError={(e) => {
                   console.error("Error loading QR code image");
-                  e.target.style.display = 'none';
+                  e.target.style.display = "none";
                 }}
               />
               <button onClick={handleRemoveQRCode} className="remove-qr-btn">
@@ -893,10 +972,13 @@ const MainAdminInterface = () => {
                 type="file"
                 accept="image/*"
                 onChange={handleQRCodeUpload}
-                style={{ display: 'none' }}
+                style={{ display: "none" }}
                 id="qr-code-upload-admin"
               />
-              <label htmlFor="qr-code-upload-admin" className="upload-qr-btn-admin">
+              <label
+                htmlFor="qr-code-upload-admin"
+                className="upload-qr-btn-admin"
+              >
                 Upload QR Code
               </label>
             </div>
@@ -934,13 +1016,17 @@ const MainAdminInterface = () => {
               </button>
               <button
                 onClick={() => handleTabChange("reports")}
-                className={`nav-link ${activeTab === "reports" ? "active" : ""}`}
+                className={`nav-link ${
+                  activeTab === "reports" ? "active" : ""
+                }`}
               >
                 Reports
               </button>
               <button
                 onClick={() => handleTabChange("userRoles")}
-                className={`nav-link ${activeTab === "userRoles" ? "active" : ""}`}
+                className={`nav-link ${
+                  activeTab === "userRoles" ? "active" : ""
+                }`}
               >
                 User Roles
               </button>
@@ -957,7 +1043,9 @@ const MainAdminInterface = () => {
               />
               {isCartMenuOpen && (
                 <div className="cart-menu-admin">
-                  <button onClick={() => setActiveTab("qrCode")}>QR Code</button>
+                  <button onClick={() => setActiveTab("qrCode")}>
+                    QR Code
+                  </button>
                   <button onClick={handleLogout}>Logout</button>
                 </div>
               )}
