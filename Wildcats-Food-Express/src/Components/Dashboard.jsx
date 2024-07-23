@@ -29,7 +29,7 @@ const UserInterface = () => {
   const [socket, setSocket] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [notificationPermission, setNotificationPermission] = useState(false);
-
+  const [receiptFile, setReceiptFile] = useState(null);
 
   /* FOR AUTHENTICATION */
   const [message, setMessage] = useState();
@@ -676,13 +676,14 @@ const UserInterface = () => {
     const handleFileUpload = (event) => {
       const file = event.target.files[0];
       if (file) {
+        setReceiptFile(file);
         const reader = new FileReader();
         reader.onloadend = () => {
           setReceiptImage(reader.result);
         };
         reader.readAsDataURL(file);
       }
-    };
+    };    
   
     const handleRemoveReceipt = () => {
       setReceiptImage(null);
@@ -730,25 +731,40 @@ const UserInterface = () => {
       }
     
       try {
-        // Here you would typically send the payment data to your backend
-        // For now, we'll just simulate a successful payment
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulating API call
-    
-        alert("Payment submitted successfully!");
+        const formData = new FormData();
         
-        // Clear the cart and reset the form
-        setCart([]);
-        setReferenceNumber("");
-        setAmountSent("");
-        setReceiptImage(null);
-    
-        // Offer to save the payment receipt as PDF
-        if (window.confirm("Would you like to save the payment receipt as PDF?")) {
-          generatePDF(formattedAmountSent);
+        formData.append('receipt', receiptFile);
+        formData.append('userId', localStorage.getItem('userID'));
+        formData.append('referenceNumber', referenceNumber);
+        formData.append('amountSent', formattedAmountSent);
+  
+        const response = await axios.post('http://localhost:5000/upload-receipt', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+  
+
+        if (response.data.message === 'Receipt uploaded successfully') {
+          alert("Payment submitted successfully!");
+          
+          // Clear the cart and reset the form
+          setCart([]);
+          setReferenceNumber("");
+          setAmountSent("");
+          setReceiptImage(null);
+          setReceiptFile(null);
+      
+          // Offer to save the payment receipt as PDF
+          if (window.confirm("Would you like to save the payment receipt as PDF?")) {
+            generatePDF(formattedAmountSent);
+          }
+      
+          // Navigate back to the menu
+          setActiveTab("menus");
+        } else {
+          throw new Error(response.data.message);
         }
-    
-        // Navigate back to the menu
-        setActiveTab("menus");
       } catch (error) {
         console.error("Error submitting payment:", error);
         alert("Failed to submit payment. Please try again.");

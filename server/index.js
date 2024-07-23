@@ -55,6 +55,19 @@ mongoose.connect(
   "mongodb+srv://castroy092003:7xiHqTSiUKH0ZIf4@wildcats-food-express.7w2snhk.mongodb.net/User?retryWrites=true&w=majority&appName=Wildcats-Food-Express"
 );
 
+// Multer configuration for receipt upload
+const receiptStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "public/UploadedReceipts");
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, `receipt-proof of payment-${uniqueSuffix}${path.extname(file.originalname)}`);
+  }
+});
+
+const uploadReceipt = multer({ storage: receiptStorage });
+
 // Multer setup for image storage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -744,5 +757,37 @@ app.get('/get-qr-code', async (req, res) => {
   } catch (error) {
     console.error('Error retrieving QR code:', error);
     res.status(500).json({ message: 'Failed to retrieve QR code' });
+  }
+});
+
+// Route to handle receipt upload
+app.post('/upload-receipt', uploadReceipt.single('receipt'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: 'No file uploaded' });
+  }
+
+  const userId = req.body.userId;
+  const receiptPath = `/Images/${req.file.filename}`; // Store the path relative to the public directory
+
+  try {
+    // Update the user's order with the receipt path
+    const order = await Order.findOneAndUpdate(
+      { userId: userId, status: 'Pending' },
+      { receiptPath: receiptPath },
+      { new: true }
+    );
+
+    if (!order) {
+      // If no pending order is found, delete the uploaded file
+      await fs.promises.unlink(path.join(__dirname, 'public', receiptPath));
+      return res.status(404).json({ message: 'No pending order found for this user' });
+    }
+
+    res.status(200).json({ message: 'Receipt uploaded successfully', receiptPath });
+  } catch (error) {
+    console.error('Error uploading receipt:', error);
+    // If there's an error, delete the uploaded file
+    await fs.promises.unlink(path.join(__dirname, 'public', receiptPath));
+    res.status(500).json({ message: 'Failed to upload receipt' });
   }
 });
