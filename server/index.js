@@ -48,6 +48,11 @@ app.use(
   })
 );
 
+app.use(
+  "/UploadedReceipts",
+  express.static(path.join(__dirname, "public/UploadedReceipts"))
+);
+
 // Static folder for images
 app.use("/Images", express.static(path.join(__dirname, "public/Images")));
 

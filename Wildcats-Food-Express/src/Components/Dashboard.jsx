@@ -779,7 +779,10 @@ const UserInterface = () => {
           }
         );
 
-        if (response.data.success) {
+        if (
+          response.status === 200 &&
+          response.data.message === "Order updated successfully"
+        ) {
           alert("Payment submitted successfully!");
 
           // Clear the cart and reset the form
@@ -798,20 +801,13 @@ const UserInterface = () => {
 
           // Navigate back to the menu
           setActiveTab("menus");
-        } else if (response.data.message) {
-          throw new Error(response.data.message);
         } else {
-          throw new Error("An unknown error occurred");
+          // Handle unexpected response
+          throw new Error(response.data.message || "An unknown error occurred");
         }
       } catch (error) {
         console.error("Error submitting payment:", error);
-        if (error.message === "Order updated successfully") {
-          // This is actually a success case
-          alert("Payment submitted successfully!");
-          // Add your success handling code here (clear cart, reset form, etc.)
-        } else {
-          alert("Failed to submit payment. Please try again.");
-        }
+        alert("Failed to submit payment. Please try again.");
       }
     };
 
