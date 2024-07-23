@@ -201,26 +201,24 @@ const UserInterface = () => {
         `http://localhost:5000/orders?userId=${userId}`
       );
       const orders = response.data;
-
+  
       // Store all orders
       setOrders(orders);
-
+  
       // Find the oldest unpaid order
-      const oldestUnpaidOrder = orders
+      const oldestUnpaid = orders
         .filter(
           (order) =>
             !order.receiptPath && !order.referenceNumber && !order.amountSent
         )
-        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))[0]; // Assuming 'createdAt' field exists
-
-      // Store the oldest unpaid order in a state or variable
-      // Assuming you have a setter function like setOldestUnpaidOrder
-      setOldestUnpaidOrder(oldestUnpaidOrder);
+        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))[0];
+  
+      // Store the oldest unpaid order
+      setOldestUnpaidOrder(oldestUnpaid);
     } catch (error) {
       console.error("Error fetching orders:", error);
     }
   };
-
   const fetchUserData = async () => {
     try {
       const userId = localStorage.getItem("userID");
@@ -768,6 +766,7 @@ const UserInterface = () => {
         formData.append("receipt", receiptFile); // Append the file
         formData.append("referenceNumber", referenceNumber);
         formData.append("amountSent", formattedAmountSent);
+        
 
         const response = await axios.put(
           "http://localhost:5000/update-order",
@@ -791,6 +790,7 @@ const UserInterface = () => {
           setAmountSent("");
           setReceiptImage(null);
           setReceiptFile(null);
+          setOldestUnpaidOrder(null); // Clear the oldest unpaid order
 
           // Offer to save the payment receipt as PDF
           if (
