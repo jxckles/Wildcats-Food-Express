@@ -680,6 +680,10 @@ app.put("/orders/:orderId/status", async (req, res) => {
 });
 
 
+// Change app.listen to server.listen
+server.listen(5000, () => {
+  console.log("Server is running on port 5000");
+});
 
 
 // QR Code upload route
@@ -742,9 +746,3 @@ app.get('/get-qr-code', async (req, res) => {
     res.status(500).json({ message: 'Failed to retrieve QR code' });
   }
 });
-
-// Change app.listen to server.listen
-server.listen(5000, () => {
-  console.log("Server is running on port 5000");
-});
-
