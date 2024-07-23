@@ -152,7 +152,7 @@ const UserInterface = () => {
       if (!window.activeNotifications) window.activeNotifications = {};
       window.activeNotifications[orderId] = notification;
   
-      const notificationDuration = 3000;
+      const notificationDuration = 2000;
       setTimeout(() => {
         notification.close();
         delete window.activeNotifications[orderId];
