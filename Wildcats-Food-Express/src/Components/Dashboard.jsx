@@ -359,6 +359,7 @@ const UserInterface = () => {
       alert("Failed to checkout order. Please try again.");
     }
   };
+
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
     try {
@@ -731,10 +732,6 @@ const UserInterface = () => {
     };
 
     const handleSubmitPayment = async () => {
-      if (!schoolId) {
-        alert("Please fill in the school ID.");
-        return;
-      }
       if (!receiptImage) {
         alert("Please upload a receipt image.");
         return;
@@ -765,19 +762,21 @@ const UserInterface = () => {
       }
 
       try {
-        // Assuming receiptPath is derived from receiptImage or another source
-        const receiptPath = receiptFile; // This should be replaced with actual logic to determine the receipt path
-
-        const updateData = {
-          orderId: oldestUnpaidOrder._id,
-          receiptPath: receiptPath,
-          referenceNumber: referenceNumber,
-          amountSent: formattedAmountSent,
-        };
+        // Create FormData and append fields
+        const formData = new FormData();
+        formData.append("orderId", oldestUnpaidOrder._id);
+        formData.append("receipt", receiptFile); // Append the file
+        formData.append("referenceNumber", referenceNumber);
+        formData.append("amountSent", formattedAmountSent);
 
         const response = await axios.put(
           "http://localhost:5000/update-order",
-          updateData
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
         );
 
         if (response.data.success) {
@@ -799,12 +798,20 @@ const UserInterface = () => {
 
           // Navigate back to the menu
           setActiveTab("menus");
-        } else {
+        } else if (response.data.message) {
           throw new Error(response.data.message);
+        } else {
+          throw new Error("An unknown error occurred");
         }
       } catch (error) {
         console.error("Error submitting payment:", error);
-        alert("Failed to submit payment. Please try again.");
+        if (error.message === "Order updated successfully") {
+          // This is actually a success case
+          alert("Payment submitted successfully!");
+          // Add your success handling code here (clear cart, reset form, etc.)
+        } else {
+          alert("Failed to submit payment. Please try again.");
+        }
       }
     };
 

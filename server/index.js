@@ -64,7 +64,7 @@ const receiptStorage = multer.diskStorage({
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
     cb(
       null,
-      `receipt-proof of payment-${uniqueSuffix}${path.extname(
+      `receipt-proof-of-payment-${uniqueSuffix}${path.extname(
         file.originalname
       )}`
     );
@@ -784,10 +784,9 @@ app.put("/update-order", uploadReceipt.single("receipt"), async (req, res) => {
   }
 
   const { orderId, referenceNumber, amountSent } = req.body;
-  const receiptPath = `/UploadedReceipts/${req.file.filename}`; // Store the path relative to the public directory
+  const receiptPath = `/UploadedReceipts/${req.file.filename}`;
 
   try {
-    // Update the order with the receipt path, reference number, and amount sent
     const order = await Order.findByIdAndUpdate(
       orderId,
       {
@@ -799,7 +798,6 @@ app.put("/update-order", uploadReceipt.single("receipt"), async (req, res) => {
     );
 
     if (!order) {
-      // If no order is found, delete the uploaded file
       await fs.promises.unlink(path.join(__dirname, "public", receiptPath));
       return res.status(404).json({ message: "Order not found" });
     }
@@ -807,8 +805,9 @@ app.put("/update-order", uploadReceipt.single("receipt"), async (req, res) => {
     res.status(200).json({ message: "Order updated successfully", order });
   } catch (error) {
     console.error("Error updating order:", error);
-    // If there's an error, delete the uploaded file
-    await fs.promises.unlink(path.join(__dirname, "public", receiptPath));
+    if (req.file) {
+      await fs.promises.unlink(path.join(__dirname, "public", receiptPath));
+    }
     res.status(500).json({ message: "Failed to update order" });
   }
 });
