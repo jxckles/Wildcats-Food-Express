@@ -25,6 +25,7 @@ const UserInterface = () => {
   const [amountSent, setAmountSent] = useState("");
   const [qrCodeImage, setQrCodeImage] = useState(null);
   const [oldestUnpaidOrder, setOldestUnpaidOrder] = useState(null);
+  const [hasUnpaidOrders, setHasUnpaidOrders] = useState(false);
   const navigate = useNavigate();
 
   const [socket, setSocket] = useState(null);
@@ -205,6 +206,12 @@ const UserInterface = () => {
       // Store all orders
       setOrders(orders);
   
+      // Check if there are any unpaid orders
+      const hasUnpaidOrders = orders.some(
+        (order) => !order.receiptPath && !order.referenceNumber && !order.amountSent
+      );
+      setHasUnpaidOrders(hasUnpaidOrders);
+  
       // Find the oldest unpaid order
       const oldestUnpaid = orders
         .filter(
@@ -219,6 +226,7 @@ const UserInterface = () => {
       console.error("Error fetching orders:", error);
     }
   };
+
   const fetchUserData = async () => {
     try {
       const userId = localStorage.getItem("userID");
@@ -320,6 +328,11 @@ const UserInterface = () => {
   };
 
   const handlePlaceOrder = async () => {
+    if (hasUnpaidOrders) {
+      alert("You have unpaid orders. Please complete your payment before placing a new order.");
+      return;
+    }
+  
     if (!schoolId.match(/^\d{2}-\d{4}-\d{3}$/)) {
       alert("Please enter a valid school ID in the format xx-xxxx-xxx");
       return;
@@ -539,9 +552,14 @@ const UserInterface = () => {
                 >
                   Cancel Order
                 </button>
-                <button onClick={handlePlaceOrder} className="place-order-btn">
+                <button onClick={handlePlaceOrder} className="place-order-btn" disabled={hasUnpaidOrders}>
                   Checkout
                 </button>
+                {hasUnpaidOrders && (
+                  <p className="unpaid-order-warning">
+                    You have unpaid orders. Please complete your payment before placing a new order.
+                  </p>
+                )}
               </div>
             </div>
           </div>
