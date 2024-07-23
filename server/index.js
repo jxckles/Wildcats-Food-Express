@@ -39,7 +39,13 @@ io.on('connection', (socket) => {
   });
 });
 
-app.use(express.static(path.join(__dirname, '../dist')));
+// Serve static files from the correct directory
+app.use(express.static(path.join(__dirname, 'public'))); // or 'dist' if you add a build step
+
+// For single-page applications, you might want to add this:
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html')); // or 'dist' if you add a build step
+});
 
 app.use(express.json());
 app.use(cookieParser());
