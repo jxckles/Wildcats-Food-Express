@@ -39,14 +39,6 @@ io.on('connection', (socket) => {
   });
 });
 
-// Serve static files from the correct directory
-app.use(express.static("/dist")); // or 'dist' if you add a build step
-
-// For single-page applications, you might want to add this:
-app.get('*', (req, res) => {
-  res.sendFile(path.join("/dist")); // or 'dist' if you add a build step
-});
-
 app.use(express.json());
 app.use(cookieParser());
 app.use(
@@ -688,6 +680,11 @@ app.put("/orders/:orderId/status", async (req, res) => {
 });
 
 
+// Change app.listen to server.listen
+server.listen(5000, () => {
+  console.log("Server is running on port 5000");
+});
+
 
 // QR Code upload route
 app.post('/upload-qr-code', upload.single('qrCode'), async (req, res) => {
@@ -748,14 +745,4 @@ app.get('/get-qr-code', async (req, res) => {
     console.error('Error retrieving QR code:', error);
     res.status(500).json({ message: 'Failed to retrieve QR code' });
   }
-});
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../dist/index.html'));
-});
-
-// Change app.listen to server.listen
-const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
 });
