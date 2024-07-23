@@ -726,7 +726,21 @@ const MainAdminInterface = () => {
                         <option value="Cancelled">Cancelled</option>
                       </select>
                     </td>
-                    <td></td>
+                    <td>
+                      <td>
+                        {order.receiptPath ? (
+                          <a
+                            href={`http://localhost:5000${order.receiptPath}`} // Updated to use the correct port
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Reference #: {order.referenceNumber}
+                          </a>
+                        ) : (
+                          "No yet paid"
+                        )}
+                      </td>
+                    </td>
                   </tr>
                 ))
               ) : (

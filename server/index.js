@@ -13,29 +13,29 @@ const cookieParser = require("cookie-parser");
 const app = express();
 const nodemailer = require("nodemailer");
 const ClientOrder = require("./models/ClientOrder");
-const QRCode = require('./models/QRCode');
+const QRCode = require("./models/QRCode");
 
-const http = require('http');
-const socketIo = require('socket.io');
+const http = require("http");
+const socketIo = require("socket.io");
 
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
     origin: "http://localhost:5173",
-    methods: ["GET", "POST"]
-  }
+    methods: ["GET", "POST"],
+  },
 });
 
-io.on('connection', (socket) => {
-  console.log('New client connected');
-  
-  socket.on('authenticate', (userId) => {
+io.on("connection", (socket) => {
+  console.log("New client connected");
+
+  socket.on("authenticate", (userId) => {
     socket.userId = userId;
     console.log(`User ${userId} authenticated`);
   });
 
-  socket.on('disconnect', () => {
-    console.log('Client disconnected');
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
   });
 });
 
@@ -48,12 +48,35 @@ app.use(
   })
 );
 
+app.use(
+  "/UploadedReceipts",
+  express.static(path.join(__dirname, "public/UploadedReceipts"))
+);
+
 // Static folder for images
 app.use("/Images", express.static(path.join(__dirname, "public/Images")));
 
 mongoose.connect(
   "mongodb+srv://castroy092003:7xiHqTSiUKH0ZIf4@wildcats-food-express.7w2snhk.mongodb.net/User?retryWrites=true&w=majority&appName=Wildcats-Food-Express"
 );
+
+// Multer configuration for receipt upload
+const receiptStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "public/UploadedReceipts");
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(
+      null,
+      `receipt-proof-of-payment-${uniqueSuffix}${path.extname(
+        file.originalname
+      )}`
+    );
+  },
+});
+
+const uploadReceipt = multer({ storage: receiptStorage });
 
 // Multer setup for image storage
 const storage = multer.diskStorage({
@@ -327,16 +350,15 @@ app.delete("/menu/:id", async (req, res) => {
   }
 });
 
-
-app.get('/menu/:id/quantity', async (req, res) => {
+app.get("/menu/:id/quantity", async (req, res) => {
   try {
     const item = await MenuItem.findById(req.params.id);
     if (!item) {
-      return res.status(404).send({ message: 'Item not found' });
+      return res.status(404).send({ message: "Item not found" });
     }
     res.send({ quantity: item.quantity });
   } catch (error) {
-    res.status(500).send({ message: 'Error fetching item quantity', error });
+    res.status(500).send({ message: "Error fetching item quantity", error });
   }
 });
 
@@ -360,7 +382,7 @@ app.post("/orders", async (req, res) => {
   session.startTransaction();
 
   try {
-    // create a new order
+    // Create a new order with receiptPath, referenceNumber, and amountSent as null
     const newOrder = new Order({
       userId,
       userName,
@@ -368,19 +390,22 @@ app.post("/orders", async (req, res) => {
       studentNumber,
       status,
       totalPrice,
+      receiptPath: null, // Explicitly setting the default value
+      referenceNumber: null, // Explicitly setting the default value
+      amountSent: null, // Explicitly setting the default value
     });
 
     await newOrder.save({ session });
 
-    // update the quantities of the ordered menu items
+    // Update the quantities of the ordered menu items
     for (const orderedMenu of menusOrdered) {
-      // find the menu item
+      // Find the menu item
       const menuItem = await MenuItem.findOne({
         name: orderedMenu.itemName,
       }).session(session);
       if (!menuItem) {
         throw new Error(
-          `Menu item with name ${orderedMenu.menuName} not found`
+          `Menu item with name ${orderedMenu.itemName} not found`
         );
       }
       if (menuItem.quantity < orderedMenu.quantity) {
@@ -394,7 +419,7 @@ app.post("/orders", async (req, res) => {
     session.endSession();
 
     // After successfully creating the order
-    io.emit('newOrder', newOrder);
+    io.emit("newOrder", newOrder);
 
     res
       .status(201)
@@ -428,11 +453,12 @@ app.get("/orders", async (req, res) => {
 
 //for client order interface; handle place order
 
-app.post('/clientorders', async (req, res) => {
+app.post("/clientorders", async (req, res) => {
   try {
     const { schoolId, items, status, priorityNumber, totalPrice } = req.body;
 
-    if (!schoolId || !items || !status || totalPrice === undefined) {  // Check for totalPrice
+    if (!schoolId || !items || !status || totalPrice === undefined) {
+      // Check for totalPrice
       return res.status(400).json({ message: "Missing required fields" });
     }
 
@@ -441,53 +467,58 @@ app.post('/clientorders', async (req, res) => {
       items,
       status,
       priorityNumber: priorityNumber || Math.floor(Math.random() * 1000000), // Generate if not provided
-      totalPrice,  // Include totalPrice in the new order
+      totalPrice, // Include totalPrice in the new order
     });
 
     await newOrder.validate(); // Validate schema before saving
     await newOrder.save();
-    res.status(201).json({ message: "Order placed successfully", order: newOrder });
+    res
+      .status(201)
+      .json({ message: "Order placed successfully", order: newOrder });
   } catch (error) {
-    if (error.name === 'ValidationError') {
+    if (error.name === "ValidationError") {
       const errors = Object.values(error.errors).map((err) => err.message);
       return res.status(400).json({ message: "Validation error", errors });
     }
     console.error("Error placing order:", error);
-    res.status(500).json({ message: "Failed to place order", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to place order", error: error.message });
   }
 });
 
-app.post('/update-quantity', async (req, res) => {
+app.post("/update-quantity", async (req, res) => {
   const { itemId, quantityChange } = req.body;
 
   try {
     const item = await MenuItem.findById(itemId);
     if (!item) {
-      return res.status(404).json({ message: 'Item not found' });
+      return res.status(404).json({ message: "Item not found" });
     }
 
     item.quantity += quantityChange;
     await item.save();
 
-    res.json({ message: 'Quantity updated', item });
+    res.json({ message: "Quantity updated", item });
   } catch (error) {
-    console.error('Error updating quantity:', error);
-    res.status(500).json({ message: 'Server error', error });
+    console.error("Error updating quantity:", error);
+    res.status(500).json({ message: "Server error", error });
   }
 });
 
-app.get('/clientorders', async (req, res) => {
+app.get("/clientorders", async (req, res) => {
   try {
     const orders = await ClientOrder.find();
     res.status(200).json(orders);
   } catch (error) {
     console.error("Error fetching client orders:", error);
-    res.status(500).json({ message: "Failed to fetch client orders", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to fetch client orders", error: error.message });
   }
 });
 
-
-app.put('/clientorders/:orderId/status', async (req, res) => {
+app.put("/clientorders/:orderId/status", async (req, res) => {
   const { orderId } = req.params;
   const { status } = req.body;
 
@@ -496,18 +527,20 @@ app.put('/clientorders/:orderId/status', async (req, res) => {
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
-    
+
     order.status = status;
     await order.save();
 
     res.status(200).json(order);
   } catch (error) {
     console.error("Error updating order status:", error);
-    res.status(500).json({ message: "Failed to update order status", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to update order status", error: error.message });
   }
 });
 
-app.delete('/clientorders/:orderId', async (req, res) => {
+app.delete("/clientorders/:orderId", async (req, res) => {
   const { orderId } = req.params;
 
   try {
@@ -515,11 +548,13 @@ app.delete('/clientorders/:orderId', async (req, res) => {
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
-    
+
     res.status(200).json({ message: "Order deleted successfully" });
   } catch (error) {
     console.error("Error deleting order:", error);
-    res.status(500).json({ message: "Failed to delete order", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to delete order", error: error.message });
   }
 });
 
@@ -653,14 +688,14 @@ app.put("/orders/:orderId/status", async (req, res) => {
       return res.status(404).send({ message: "Order not found" });
     }
 
-     // Emit the status update to all connected clients
-     io.emit('orderStatusUpdate', { 
+    // Emit the status update to all connected clients
+    io.emit("orderStatusUpdate", {
       _id: order._id,
       studentNumber: order.studentNumber,
       status: order.status,
-      userId: order.userId
+      userId: order.userId,
     });
-         
+
     //check if status compelete delete from order and move to history
     if (status === "Completed" || status === "Cancelled") {
       const historyOrder = new History(order.toObject());
@@ -679,18 +714,16 @@ app.put("/orders/:orderId/status", async (req, res) => {
   }
 });
 
-
 // Change app.listen to server.listen
 server.listen(5000, () => {
   console.log("Server is running on port 5000");
 });
 
-
 // QR Code upload route
-app.post('/upload-qr-code', upload.single('qrCode'), async (req, res) => {
+app.post("/upload-qr-code", upload.single("qrCode"), async (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ message: 'No file uploaded' });
+      return res.status(400).json({ message: "No file uploaded" });
     }
 
     const qrCodeUrl = `/Images/${req.file.filename}`;
@@ -702,47 +735,84 @@ app.post('/upload-qr-code', upload.single('qrCode'), async (req, res) => {
     const newQRCode = new QRCode({ imageUrl: qrCodeUrl });
     await newQRCode.save();
 
-    res.status(200).json({ message: 'QR code uploaded successfully', qrCodeUrl });
+    res
+      .status(200)
+      .json({ message: "QR code uploaded successfully", qrCodeUrl });
   } catch (error) {
-    console.error('Error uploading QR code:', error);
-    res.status(500).json({ message: 'Failed to upload QR code' });
+    console.error("Error uploading QR code:", error);
+    res.status(500).json({ message: "Failed to upload QR code" });
   }
 });
 
 // QR Code removal route
-app.delete('/remove-qr-code', async (req, res) => {
+app.delete("/remove-qr-code", async (req, res) => {
   try {
     const qrCode = await QRCode.findOne();
     if (qrCode) {
       // Remove the image file
-      const imagePath = path.join(__dirname, 'public', qrCode.imageUrl);
+      const imagePath = path.join(__dirname, "public", qrCode.imageUrl);
       fs.unlink(imagePath, (err) => {
-        if (err) console.error('Error deleting QR code image:', err);
+        if (err) console.error("Error deleting QR code image:", err);
       });
 
       // Remove the database entry
       await QRCode.deleteMany({});
-      res.status(200).json({ message: 'QR code removed successfully' });
+      res.status(200).json({ message: "QR code removed successfully" });
     } else {
-      res.status(404).json({ message: 'No QR code found' });
+      res.status(404).json({ message: "No QR code found" });
     }
   } catch (error) {
-    console.error('Error removing QR code:', error);
-    res.status(500).json({ message: 'Failed to remove QR code' });
+    console.error("Error removing QR code:", error);
+    res.status(500).json({ message: "Failed to remove QR code" });
   }
 });
 
 // QR Code retrieval route
-app.get('/get-qr-code', async (req, res) => {
+app.get("/get-qr-code", async (req, res) => {
   try {
     const qrCode = await QRCode.findOne();
     if (qrCode) {
       res.status(200).json({ qrCodeUrl: qrCode.imageUrl });
     } else {
-      res.status(404).json({ message: 'No QR code found' });
+      res.status(404).json({ message: "No QR code found" });
     }
   } catch (error) {
-    console.error('Error retrieving QR code:', error);
-    res.status(500).json({ message: 'Failed to retrieve QR code' });
+    console.error("Error retrieving QR code:", error);
+    res.status(500).json({ message: "Failed to retrieve QR code" });
+  }
+});
+
+// Route to handle receipt upload
+app.put("/update-order", uploadReceipt.single("receipt"), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: "No file uploaded" });
+  }
+
+  const { orderId, referenceNumber, amountSent } = req.body;
+  const receiptPath = `/UploadedReceipts/${req.file.filename}`;
+
+  try {
+    const order = await Order.findByIdAndUpdate(
+      orderId,
+      {
+        receiptPath,
+        referenceNumber,
+        amountSent,
+      },
+      { new: true }
+    );
+
+    if (!order) {
+      await fs.promises.unlink(path.join(__dirname, "public", receiptPath));
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    res.status(200).json({ message: "Order updated successfully", order });
+  } catch (error) {
+    console.error("Error updating order:", error);
+    if (req.file) {
+      await fs.promises.unlink(path.join(__dirname, "public", receiptPath));
+    }
+    res.status(500).json({ message: "Failed to update order" });
   }
 });
