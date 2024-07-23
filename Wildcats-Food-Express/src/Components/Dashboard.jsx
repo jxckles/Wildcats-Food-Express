@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import io from 'socket.io-client';
+import io from "socket.io-client";
 import "./dashboard.css";
 import logo from "/logo.svg";
 import profileIcon from "/cat_profile.svg";
@@ -24,6 +24,7 @@ const UserInterface = () => {
   const [referenceNumber, setReferenceNumber] = useState("");
   const [amountSent, setAmountSent] = useState("");
   const [qrCodeImage, setQrCodeImage] = useState(null);
+  const [oldestUnpaidOrder, setOldestUnpaidOrder] = useState(null);
   const navigate = useNavigate();
 
   const [socket, setSocket] = useState(null);
@@ -84,99 +85,99 @@ const UserInterface = () => {
       });
     }
   }, []);
-  
 
   useEffect(() => {
-    const newSocket = io('http://localhost:5000');
+    const newSocket = io("http://localhost:5000");
     setSocket(newSocket);
-  
+
     // Authenticate the socket connection with the user ID
     const userId = localStorage.getItem("userID");
-    newSocket.emit('authenticate', userId);
-  
+    newSocket.emit("authenticate", userId);
+
     return () => newSocket.close();
-  }, []);  
+  }, []);
 
   useEffect(() => {
     if (socket) {
-      socket.on('orderStatusUpdate', (updatedOrder) => {
-        console.log('Received order update:', updatedOrder);
+      socket.on("orderStatusUpdate", (updatedOrder) => {
+        console.log("Received order update:", updatedOrder);
         const userId = localStorage.getItem("userID");
         if (updatedOrder.userId === userId) {
-          setOrders(prevOrders => 
-            prevOrders.map(order => 
-              order._id === updatedOrder._id ? {...order, ...updatedOrder} : order
+          setOrders((prevOrders) =>
+            prevOrders.map((order) =>
+              order._id === updatedOrder._id
+                ? { ...order, ...updatedOrder }
+                : order
             )
           );
           addNotification(
-            `Your Order ${updatedOrder.studentNumber || 'Unknown'} status has been updated to ${updatedOrder.status || 'Unknown'}`,
+            `Your Order ${
+              updatedOrder.studentNumber || "Unknown"
+            } status has been updated to ${updatedOrder.status || "Unknown"}`,
             updatedOrder._id
           );
         }
       });
-  
+
       return () => {
-        socket.off('orderStatusUpdate');
+        socket.off("orderStatusUpdate");
       };
     }
   }, [socket]);
-  
+
   const addNotification = (message, orderId) => {
     if (!message) {
-      console.error('Attempted to add empty notification');
+      console.error("Attempted to add empty notification");
       return;
     }
-  
+
     const userId = localStorage.getItem("userID");
     const newNotification = { id: Date.now(), userId, message, orderId };
-  
-    setNotifications(prev => {
+
+    setNotifications((prev) => {
       // Remove any existing notification for the same order
-      const filteredNotifications = prev.filter(n => n.orderId !== orderId);
+      const filteredNotifications = prev.filter((n) => n.orderId !== orderId);
       return [...filteredNotifications, newNotification];
     });
-    
+
     if (Notification.permission === "granted") {
       // Close any existing notification for this order
       if (window.activeNotifications && window.activeNotifications[orderId]) {
         window.activeNotifications[orderId].close();
       }
-  
-      const notification = new Notification("Order Status Update", { 
+
+      const notification = new Notification("Order Status Update", {
         body: message,
         icon: "/cat_profile.svg",
-        tag: orderId // This ensures only one notification per order is shown
+        tag: orderId, // This ensures only one notification per order is shown
       });
-  
+
       // Store the notification reference
       if (!window.activeNotifications) window.activeNotifications = {};
       window.activeNotifications[orderId] = notification;
-  
+
       const notificationDuration = 2000;
       setTimeout(() => {
         notification.close();
         delete window.activeNotifications[orderId];
       }, notificationDuration);
     }
-  }; 
-
+  };
 
   //fetch qr code image
-    const fetchQRCode = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/get-qr-code');
-        if (response.data.qrCodeUrl) {
-          setQrCodeImage(`http://localhost:5000${response.data.qrCodeUrl}`);
-        } else {
-          setQrCodeImage(null);
-        }
-      } catch (error) {
-        console.error('Error fetching QR code:', error);
+  const fetchQRCode = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/get-qr-code");
+      if (response.data.qrCodeUrl) {
+        setQrCodeImage(`http://localhost:5000${response.data.qrCodeUrl}`);
+      } else {
         setQrCodeImage(null);
       }
-    };
- 
-
+    } catch (error) {
+      console.error("Error fetching QR code:", error);
+      setQrCodeImage(null);
+    }
+  };
 
   const fetchMenuItems = async () => {
     try {
@@ -196,12 +197,29 @@ const UserInterface = () => {
   const fetchOrders = async () => {
     try {
       const userId = localStorage.getItem("userID");
-      const response = await axios.get(`http://localhost:5000/orders?userId=${userId}`);
-      setOrders(response.data);
+      const response = await axios.get(
+        `http://localhost:5000/orders?userId=${userId}`
+      );
+      const orders = response.data;
+
+      // Store all orders
+      setOrders(orders);
+
+      // Find the oldest unpaid order
+      const oldestUnpaidOrder = orders
+        .filter(
+          (order) =>
+            !order.receiptPath && !order.referenceNumber && !order.amountSent
+        )
+        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))[0]; // Assuming 'createdAt' field exists
+
+      // Store the oldest unpaid order in a state or variable
+      // Assuming you have a setter function like setOldestUnpaidOrder
+      setOldestUnpaidOrder(oldestUnpaidOrder);
     } catch (error) {
       console.error("Error fetching orders:", error);
     }
-  };  
+  };
 
   const fetchUserData = async () => {
     try {
@@ -308,7 +326,7 @@ const UserInterface = () => {
       alert("Please enter a valid school ID in the format xx-xxxx-xxx");
       return;
     }
-  
+
     const order = {
       userId: localStorage.getItem("userID"),
       userName: localStorage.getItem("userName"),
@@ -320,10 +338,13 @@ const UserInterface = () => {
       studentNumber: schoolId,
       status: "Pending",
       totalPrice: calculateTotal(),
+      receiptPath: null, // Added field
+      referenceNumber: null, // Added field
+      amountSent: null, // Added field
     };
-  
+
     console.log("Order Payload:", JSON.stringify(order, null, 2));
-  
+
     try {
       const response = await axios.post("http://localhost:5000/orders", order);
       console.log("Order placed successfully:", response.data);
@@ -402,7 +423,6 @@ const UserInterface = () => {
     setIsUserRolesModalOpen(false);
   };
 
-
   const handleChangePassSubmit = async (e) => {
     e.preventDefault();
     if (newPassword !== confirmNewPassword) {
@@ -432,12 +452,11 @@ const UserInterface = () => {
     }
   };
 
-
   const renderMenus = () => {
     const filteredMenuItems = menuItems.filter((item) =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  
+
     return (
       <div className="menus-tab">
         <div className="search-container">
@@ -487,7 +506,7 @@ const UserInterface = () => {
               </div>
             ))}
           </div>
-  
+
           <div className="order-summary">
             <h2>Place Order</h2>
             <div className="orders-tab">
@@ -554,7 +573,9 @@ const UserInterface = () => {
                   <td>
                     {order.menusOrdered.map((menu, index) => (
                       <div key={index} style={{ marginBottom: "10px" }}>
-                        {`${menu.itemName} (x${menu.quantity}) - \u20B1${menu.price * menu.quantity}`}
+                        {`${menu.itemName} (x${menu.quantity}) - \u20B1${
+                          menu.price * menu.quantity
+                        }`}
                       </div>
                     ))}
                   </td>
@@ -564,7 +585,9 @@ const UserInterface = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="no-orders">No recent orders available</td>
+                <td colSpan="6" className="no-orders">
+                  No recent orders available
+                </td>
               </tr>
             )}
           </tbody>
@@ -663,7 +686,10 @@ const UserInterface = () => {
               onChange={(e) => setConfirmNewPassword(e.target.value)}
             />
           </div>
-          <button className="submit-btn-password" onClick={handleChangePassSubmit}>
+          <button
+            className="submit-btn-password"
+            onClick={handleChangePassSubmit}
+          >
             Submit
           </button>
         </div>
@@ -672,7 +698,6 @@ const UserInterface = () => {
   };
 
   const renderPaymentOrder = () => {
-   
     const handleFileUpload = (event) => {
       const file = event.target.files[0];
       if (file) {
@@ -683,14 +708,14 @@ const UserInterface = () => {
         };
         reader.readAsDataURL(file);
       }
-    };    
-  
+    };
+
     const handleRemoveReceipt = () => {
       setReceiptImage(null);
       // Reset the file input
-      const fileInput = document.getElementById('receipt-upload');
+      const fileInput = document.getElementById("receipt-upload");
       if (fileInput) {
-        fileInput.value = '';
+        fileInput.value = "";
       }
     };
 
@@ -704,62 +729,74 @@ const UserInterface = () => {
       const regex = /^\d+(\.\d{0,2})?$/;
       return regex.test(amount);
     };
-  
+
     const handleSubmitPayment = async () => {
-      if (cart.length === 0) {
-        alert("Your cart is empty. Please add items to your order before proceeding with payment.");
+      if (!schoolId) {
+        alert("Please fill in the school ID.");
         return;
       }
-    
-      if (!schoolId || !receiptImage || !referenceNumber || !amountSent) {
-        alert("Please fill all fields and upload a receipt image.");
+      if (!receiptImage) {
+        alert("Please upload a receipt image.");
         return;
       }
-    
+      if (!referenceNumber) {
+        alert("Please fill in the reference number.");
+        return;
+      }
+      if (!amountSent) {
+        alert("Please fill in the amount sent.");
+        return;
+      }
+
       // Validate and format amountSent
       if (!validateAmount(amountSent)) {
         alert("Please enter a valid amount (up to two decimal places).");
         return;
       }
-    
+
       const formattedAmountSent = formatAmount(amountSent);
-      const totalOrderAmount = formatAmount(calculateTotal());
-    
+      const totalOrderAmount = formatAmount(oldestUnpaidOrder.totalPrice);
+
       if (formattedAmountSent !== totalOrderAmount) {
-        alert(`The amount paid (${formattedAmountSent}) must exactly match the total order amount (${totalOrderAmount}).`);
+        alert(
+          `The amount paid (${formattedAmountSent}) must exactly match the total order amount (${totalOrderAmount}).`
+        );
         return;
       }
-    
-      try {
-        const formData = new FormData();
-        
-        formData.append('receipt', receiptFile);
-        formData.append('userId', localStorage.getItem('userID'));
-        formData.append('referenceNumber', referenceNumber);
-        formData.append('amountSent', formattedAmountSent);
-  
-        const response = await axios.post('http://localhost:5000/upload-receipt', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
-  
 
-        if (response.data.message === 'Receipt uploaded successfully') {
+      try {
+        // Assuming receiptPath is derived from receiptImage or another source
+        const receiptPath = receiptFile; // This should be replaced with actual logic to determine the receipt path
+
+        const updateData = {
+          orderId: oldestUnpaidOrder._id,
+          receiptPath: receiptPath,
+          referenceNumber: referenceNumber,
+          amountSent: formattedAmountSent,
+        };
+
+        const response = await axios.put(
+          "http://localhost:5000/update-order",
+          updateData
+        );
+
+        if (response.data.success) {
           alert("Payment submitted successfully!");
-          
+
           // Clear the cart and reset the form
           setCart([]);
           setReferenceNumber("");
           setAmountSent("");
           setReceiptImage(null);
           setReceiptFile(null);
-      
+
           // Offer to save the payment receipt as PDF
-          if (window.confirm("Would you like to save the payment receipt as PDF?")) {
+          if (
+            window.confirm("Would you like to save the payment receipt as PDF?")
+          ) {
             generatePDF(formattedAmountSent);
           }
-      
+
           // Navigate back to the menu
           setActiveTab("menus");
         } else {
@@ -770,140 +807,175 @@ const UserInterface = () => {
         alert("Failed to submit payment. Please try again.");
       }
     };
-        
-  
+
     const generatePDF = (formattedAmountSent) => {
-      import('jspdf').then((jsPDF) => {
-        const { jsPDF: jsPDFConstructor } = jsPDF;
-        const doc = new jsPDFConstructor();
-    
-        // Set page size to A4
-        doc.setFontSize(12);
-    
-        // Add header
-        doc.setFontSize(18);
-        doc.setFont(undefined, 'bold');
-        doc.text('Payment Receipt', 105, 20, { align: 'center' });
-    
-        // Add receipt details
-        doc.setFontSize(12);
-        doc.setFont(undefined, 'normal');
-        let y = 40;
-        doc.text(`Order ID: ${schoolId}`, 20, y);
-        doc.text(`Reference Number: ${referenceNumber}`, 20, y + 10);
-        doc.text(`Amount Sent: Php ${formattedAmountSent}`, 20, y + 20);
-        doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, y + 30);
-    
-        // Add order summary
-        y = y + 50;
-        doc.setFont(undefined, 'bold');
-        doc.text('Order Summary:', 20, y);
-    
-        y = y + 10;
-        doc.setFont(undefined, 'normal');
-        cart.forEach((item) => {
-          const itemText = `${item.name} (x${item.quantity})`;
-          const itemPrice = `Php ${formatAmount(item.price * item.quantity)}`;
-          doc.text(itemText, 30, y);
-          doc.text(itemPrice, 190, y, { align: 'right' });
-          y += 10;
+      import("jspdf")
+        .then((jsPDF) => {
+          const { jsPDF: jsPDFConstructor } = jsPDF;
+          const doc = new jsPDFConstructor();
+
+          // Set page size to A4
+          doc.setFontSize(12);
+
+          // Add header
+          doc.setFontSize(18);
+          doc.setFont(undefined, "bold");
+          doc.text("Payment Receipt", 105, 20, { align: "center" });
+
+          // Add receipt details
+          doc.setFontSize(12);
+          doc.setFont(undefined, "normal");
+          let y = 40;
+          doc.text(`Order ID: ${schoolId}`, 20, y);
+          doc.text(`Reference Number: ${referenceNumber}`, 20, y + 10);
+          doc.text(`Amount Sent: Php ${formattedAmountSent}`, 20, y + 20);
+          doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, y + 30);
+
+          // Add order summary
+          y = y + 50;
+          doc.setFont(undefined, "bold");
+          doc.text("Order Summary:", 20, y);
+
+          y = y + 10;
+          doc.setFont(undefined, "normal");
+          cart.forEach((item) => {
+            const itemText = `${item.name} (x${item.quantity})`;
+            const itemPrice = `Php ${formatAmount(item.price * item.quantity)}`;
+            doc.text(itemText, 30, y);
+            doc.text(itemPrice, 190, y, { align: "right" });
+            y += 10;
+          });
+
+          // Add total
+          y += 5;
+          doc.setFont(undefined, "bold");
+          doc.text("Total:", 30, y);
+          doc.text(`Php ${formatAmount(calculateTotal())}`, 190, y, {
+            align: "right",
+          });
+
+          // Save the PDF
+          doc.save("payment_receipt.pdf");
+        })
+        .catch((error) => {
+          console.error("Error generating PDF:", error);
+          alert("Failed to generate PDF. Please try again.");
         });
-    
-        // Add total
-        y += 5;
-        doc.setFont(undefined, 'bold');
-        doc.text('Total:', 30, y);
-        doc.text(`Php ${formatAmount(calculateTotal())}`, 190, y, { align: 'right' });
-    
-        // Save the PDF
-        doc.save('payment_receipt.pdf');
-      }).catch((error) => {
-        console.error('Error generating PDF:', error);
-        alert('Failed to generate PDF. Please try again.');
-      });
     };
-    
+
     return (
       <div className="payment-container">
         <h1>Payment Portal</h1>
         <div className="payment-content">
           <div className="order_summary">
             <h2>Order Summary</h2>
-            {cart.map((item) => (
-              <p key={item._id}>
-                {item.name} (x{item.quantity}) <span>₱{(item.price * item.quantity).toFixed(2)}</span>
-              </p>
-            ))}
+            {oldestUnpaidOrder && oldestUnpaidOrder.menusOrdered ? (
+              oldestUnpaidOrder.menusOrdered.map((menu) => (
+                <p key={menu._id}>
+                  {menu.itemName} (x{menu.quantity}){" "}
+                  <span>₱{(menu.price * menu.quantity).toFixed(2)}</span>
+                </p>
+              ))
+            ) : (
+              <p>No items found.</p>
+            )}
             <hr />
-            <p>Total <span>₱{calculateTotal().toFixed(2)}</span></p>
+            <p>
+              Total{" "}
+              <span>
+                ₱
+                {oldestUnpaidOrder && oldestUnpaidOrder.menusOrdered
+                  ? oldestUnpaidOrder.menusOrdered
+                      .reduce(
+                        (total, menu) => total + menu.price * menu.quantity,
+                        0
+                      )
+                      .toFixed(2)
+                  : "0.00"}
+              </span>
+            </p>
           </div>
           <div className="payment-form">
             <p>Send your Virtual payment to:</p>
-            <div className="gcash-h3">GCASH <p className="gcash-number">+639123456789</p></div>
+            <div className="gcash-h3">
+              GCASH <p className="gcash-number">+639123456789</p>
+            </div>
             <div className="qr-code-container">
-            {qrCodeImage ? (
-              <img 
-                src={qrCodeImage} 
-                alt="QR Code" 
-                className="qr-code-image"
-                onError={(e) => {
-                  console.error("Error loading QR code image");
-                  e.target.style.display = 'none';
-                }}
-              />
-            ) : (
-              <div className="qr-code-placeholder">QR Code Not Available</div>
-            )}
-          </div>
-            <hr className="gcash"/>
-            <form onSubmit={(e) => { e.preventDefault(); handleSubmitPayment(); }}>
+              {qrCodeImage ? (
+                <img
+                  src={qrCodeImage}
+                  alt="QR Code"
+                  className="qr-code-image"
+                  onError={(e) => {
+                    console.error("Error loading QR code image");
+                    e.target.style.display = "none";
+                  }}
+                />
+              ) : (
+                <div className="qr-code-placeholder">QR Code Not Available</div>
+              )}
+            </div>
+            <hr className="gcash" />
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSubmitPayment();
+              }}
+            >
               <label className="OrderIDLabel">Order ID:</label>
-              <input type="text" name="name" className="Name" value={schoolId} readOnly />
-  
+              <input
+                type="text"
+                name="name"
+                className="Name"
+                value={oldestUnpaidOrder?.studentNumber || ""}
+                readOnly
+              />
+
               <label className="ReferenceLabel">Reference Number:</label>
-              <input 
-                type="text" 
-                name="referenceNumber" 
+              <input
+                type="text"
+                name="referenceNumber"
                 className="Reference"
-                required="true" 
+                required="true"
                 value={referenceNumber}
                 onChange={(e) => setReferenceNumber(e.target.value)}
               />
-  
+
               <label className="AmountLabel">Amount Sent:</label>
-              <input 
-                type="text" 
-                name="amountSent" 
+              <input
+                type="text"
+                name="amountSent"
                 className="Amount"
                 required="true"
                 value={amountSent}
                 onChange={(e) => {
-                  if (validateAmount(e.target.value) || e.target.value === '') {
+                  if (validateAmount(e.target.value) || e.target.value === "") {
                     setAmountSent(e.target.value);
                   }
                 }}
               />
-              
-              <input 
-                type="file" 
-                accept="image/*" 
-                onChange={handleFileUpload} 
-                style={{ display: 'none' }} 
+
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                style={{ display: "none" }}
                 id="receipt-upload"
               />
               <div className="receipt-upload-container">
-                <button 
-                  type="button" 
-                  onClick={() => document.getElementById('receipt-upload').click()} 
+                <button
+                  type="button"
+                  onClick={() =>
+                    document.getElementById("receipt-upload").click()
+                  }
                   className="upload-btn"
-                  disabled={cart.length === 0}
                 >
-                  {receiptImage ? 'Change' : 'Upload Receipt'}
+                  {receiptImage ? "Change" : "Upload Receipt"}
                 </button>
                 {receiptImage && (
-                  <button 
-                    type="button" 
-                    onClick={handleRemoveReceipt} 
+                  <button
+                    type="button"
+                    onClick={handleRemoveReceipt}
                     className="remove-btn"
                   >
                     Remove
@@ -911,7 +983,9 @@ const UserInterface = () => {
                 )}
               </div>
               {receiptImage && <p>Receipt uploaded successfully!</p>}
-              <button type="submit" className="submit-btn-payment">Submit</button>
+              <button type="submit" className="submit-btn-payment">
+                Submit
+              </button>
             </form>
           </div>
         </div>
@@ -919,11 +993,11 @@ const UserInterface = () => {
     );
   };
 
-  //In web Notification UI p.s. not yet declared 
+  //In web Notification UI p.s. not yet declared
   const renderNotificationsComponent = () => {
     return (
       <div className="notifications-container">
-        {notifications.map(notification => (
+        {notifications.map((notification) => (
           <div key={notification.id} className="notification">
             {notification.message}
           </div>
@@ -1139,9 +1213,7 @@ const UserInterface = () => {
             </button>
             <button
               onClick={() => setActiveTab("payment")}
-              className={`nav-link ${
-                activeTab === "payment" ? "active" : ""
-              }`}
+              className={`nav-link ${activeTab === "payment" ? "active" : ""}`}
             >
               Payment
             </button>
@@ -1160,7 +1232,9 @@ const UserInterface = () => {
                 {user.name ? user.name.charAt(0).toUpperCase() : ""}
               </div>
             )}
-            <span className="user-name" onClick={openUserRolesModal}>{user.name || "Users name"}</span>
+            <span className="user-name" onClick={openUserRolesModal}>
+              {user.name || "Users name"}
+            </span>
           </div>
           <div className="menu-container-dashboard">
             <img

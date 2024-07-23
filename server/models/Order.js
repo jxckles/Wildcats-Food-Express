@@ -33,6 +33,18 @@ const orderSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  receiptPath: {
+    type: String,
+    default: null, // Will be null initially and can be updated later
+  },
+  referenceNumber: {
+    type: String,
+    default: null, // Will be null initially and can be updated later
+  },
+  amountSent: {
+    type: Number,
+    default: null, // Will be null initially and can be updated later
+  },
 });
 
 const Order = mongoose.model("Order", orderSchema);
