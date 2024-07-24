@@ -42,10 +42,11 @@ form {
   align-items: center;
   margin-bottom: 15px;
   width: 100%;
-  ::placeholder{
-    color: #990000;
-    opacity: 80%;
-  }
+}
+
+.form-group ::placeholder {
+  color: #990000;
+  opacity: 80%;
 }
 
 /* Label styling */
@@ -97,17 +98,47 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Media query for small screens */
-@media (max-width: 600px) {
+/* Media query for mobile and tablet screens */
+@media (max-width: 1024px) { /* Tablet */
+  .signup-container {
+    padding: 20px; /* Less padding on tablets */
+  }
+
+  .right-panel {
+    padding: 20px;
+    max-width: 90%; /* Full width with some margins on tablets */
+  }
+
+  button {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 600px) { /* Mobile */
   .signup-container {
     padding: 10px;
   }
 
   .right-panel {
-    padding: 20px;
+    padding: 15px; /* Less padding on mobile */
+    max-width: 100%; /* Full width on mobile */
+  }
+
+  .wildcat-img {
+    width: 80px; /* Smaller image on mobile */
+  }
+
+  label {
+    flex: 0 0 120px; /* Adjusted label width for smaller screens */
+    text-align: left; /* Left-align text on smaller screens */
+  }
+
+  input {
+    font-size: 14px; /* Smaller font size on mobile */
   }
 
   button {
-    max-width: 100%;
+    padding: 8px 16px; /* Adjusted padding for smaller screens */
+    font-size: 0.9em; /* Smaller font size for buttons */
   }
 }

@@ -2,9 +2,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Header.css';
-import logo from '/logo.svg';
+import logo from '/finallogo.svg';
 import menuIcon from '/menu.svg';
 import closeIcon from '/close.svg';
+
+
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -17,7 +19,7 @@ const Header = () => {
     <header className="header">
       <div className="header-left">
         <Link to="/" className="logo">
-          <img src={logo} alt="Wildcats Food Express Logo" className="logo-image" />
+          <img src={logo} alt="Wildcats Food Express Logo" className="logo" />
         </Link>
       </div>
       <nav>

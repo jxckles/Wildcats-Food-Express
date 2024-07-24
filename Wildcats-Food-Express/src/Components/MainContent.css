@@ -1,3 +1,4 @@
+/* General styles */
 .main-content {
     position: relative;
     display: flex;
@@ -19,6 +20,8 @@
     color: white;
     border-radius: 0.75em;
     margin: 1em 0;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .primary-cta:hover {
@@ -31,14 +34,14 @@
 
 .rh1 {
     margin-top: 1em;
-    margin-bottom: 0em;
+    margin-bottom: 0;
     color: #9b1410;
     font-size: 1.35rem;
     text-align: center;
+}
 
-    h3{
-      color: black;
-    }
+.rh1 h3 {
+    color: black;
 }
 
 .wildcats-foods,
@@ -58,22 +61,44 @@ h3 {
     line-height: 1.5;
 }
 
-/* For mobile, ensure the cat image is under the primary CTA */
+/* Image styles */
 .cat img {
     margin-top: 1em;
-    width: 80%;
+    width: 50%; /* Adjusted width to make the image smaller */
+    height: auto; /* Maintain aspect ratio */
+}
+/* For mobile devices */
+@media (max-width: 600px) {
+    .main-content {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .cat img {
+        width: 80%;
+        margin-top: 1em;
+    }
+
+    .primary-cta {
+        width: 80%;
+        margin: 1em 0;
+    }
 }
 
-@media (min-width: 600px) {
-    /* For tablet, position the cat image accordingly */
+/* For tablets */
+@media (min-width: 601px) and (max-width: 1280px) {
     .cat img {
         width: 60%;
         margin-top: 2em;
     }
+
+    .primary-cta {
+        width: 70%;
+    }
 }
 
+/* For desktop */
 @media (min-width: 1280px) {
-    /* For desktop, position the cat image to the right */
     .main-content {
         flex-direction: row;
         justify-content: space-between;
