@@ -55,6 +55,7 @@ const MainAdminInterface = () => {
   const [message, setMessage] = useState();
   const [qrCodeImage, setQrCodeImage] = useState(null);
   const [customerOrders, setCustomerOrders] = useState([]);
+  const [gcashNumber, setGcashNumber] = useState("");
 
   axios.defaults.withCredentials = true;
 
@@ -561,11 +562,19 @@ const MainAdminInterface = () => {
     doc.save(filename);
   };
 
-  const handleInterfaceChange = (type) => {
-    setInterfaceType(type);
-    setIsModalOpen(false);
-    setActiveTab("menu");
-  };
+  const handleGcashNumberUpdate = async () => {
+    try {
+      const response = await axios.post("http://localhost:5000/update-gcash-number", { gcashNumber });
+      if (response.data.success) {
+        alert("GCash number updated successfully!");
+      } else {
+        alert("Failed to update GCash number. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error updating GCash number:", error.response || error);
+      alert("An error occurred while updating the GCash number.");
+    }
+  };  
 
   const handleLogout = async () => {
     try {
@@ -809,6 +818,23 @@ const MainAdminInterface = () => {
     );
   };
 
+  const renderGcashManagement = () => {
+    return (
+      <div className="gcash-management-admin">
+        <h2>Manage GCash Number</h2>
+        <div className="gcash-input-container">
+          <input
+            type="text"
+            value={gcashNumber}
+            onChange={(e) => setGcashNumber(e.target.value)}
+            placeholder="Enter GCash Number"
+          />
+          <button onClick={handleGcashNumberUpdate}>Update GCash Number</button>
+        </div>
+      </div>
+    );
+  };
+
   const renderReports = () => {
     const currentYear = new Date().getFullYear();
     const months = [
@@ -1007,6 +1033,7 @@ const MainAdminInterface = () => {
               </label>
             </div>
           )}
+          {renderGcashManagement()}
         </div>
       </div>
     );
