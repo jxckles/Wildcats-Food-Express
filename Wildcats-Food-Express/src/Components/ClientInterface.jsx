@@ -216,6 +216,11 @@ const ClientInterface = () => {
       setSchoolId("");
       fetchOrders(); // Refresh orders after placing new order
       alert("Order placed successfully!");
+
+      const isPrint = window.confirm("Do you want to print the receipt?");
+      if (isPrint) {
+        window.print();
+      }
     } catch (error) {
       console.error(
         "Error placing order:",
