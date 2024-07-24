@@ -48,8 +48,9 @@ const ClientInterface = () => {
 
   useEffect(() => {
     const intervalId = setInterval(() => {
+      fetchMenuItems();
       fetchClientOrders();
-    }, 2000); // Fetch every 5 seconds
+    }, 1000);
 
     return () => clearInterval(intervalId);
   }, []);

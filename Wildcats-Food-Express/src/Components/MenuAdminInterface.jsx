@@ -83,8 +83,9 @@ const MainAdminInterface = () => {
 
   useEffect(() => {
     const intervalId = setInterval(() => {
+      fetchMenuItems();
       fetchClientOrders();
-    }, 2000); // Fetch every 5 seconds
+    }, 1000);
 
     return () => clearInterval(intervalId);
   }, []);
@@ -727,7 +728,7 @@ const MainAdminInterface = () => {
                       </select>
                     </td>
                     <td>
-                      <td style={{ border: 'none' }}>
+                      <td style={{ border: "none" }}>
                         {order.receiptPath ? (
                           <a
                             href={`http://localhost:5000${order.receiptPath}`} // Updated to use the correct port
