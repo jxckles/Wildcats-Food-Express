@@ -279,6 +279,11 @@ const UserInterface = () => {
   };
 
   const handleAddToCart = (item) => {
+    if (item.quantity <= 0) {
+      alert("This item is out of stock.");
+      return;
+    }
+    
     const existingItem = cart.find((cartItem) => cartItem._id === item._id);
     if (existingItem) {
       setCart(
@@ -292,7 +297,7 @@ const UserInterface = () => {
       setCart([...cart, { ...item, quantity: 1 }]);
     }
     updateMenuItemQuantity(item._id, -1);
-  };
+  };    
 
   const handleRemoveFromCart = (item) => {
     const existingItem = cart.find((cartItem) => cartItem._id === item._id);
@@ -513,7 +518,7 @@ const UserInterface = () => {
                   disabled={item.quantity === 0}
                   className="add-to-cart-btn"
                 >
-                  Add to Cart
+                  {item.quantity === 0 ? "Sold Out" : "Add to Cart"}
                 </button>
               </div>
             ))}
@@ -529,22 +534,31 @@ const UserInterface = () => {
                 onChange={(e) => setSchoolId(e.target.value)}
                 className="school-id-input"
               />
-              <div className="cart-items">
-                {cart.map((item) => (
-                  <div key={item._id} className="cart-item">
-                    <span>{item.name}</span>
-                    <span>₱{item.price.toFixed(2)}</span>
-                    <div className="quantity-controls">
-                      <button onClick={() => handleRemoveFromCart(item)}>
-                        -
-                      </button>
-                      <span>{item.quantity}</span>
-                      <button onClick={() => handleAddToCart(item)}>+</button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="order-actions">
+            <div className="cart-items">
+                  {cart.map((item) => {
+                    const menuItem = menuItems.find((menuItem) => menuItem._id === item._id);
+                    const isOutOfStock = menuItem ? menuItem.quantity <= 0 : true;
+                    
+                    return (
+                      <div key={item._id} className="cart-item">
+                        <span>{item.name}</span>
+                        <span>₱{item.price.toFixed(2)}</span>
+                        <div className="quantity-controls">
+                          <button onClick={() => handleRemoveFromCart(item)}>-</button>
+                          <span>{item.quantity}</span>
+                          <button 
+                            onClick={() => handleAddToCart(menuItem)}
+                            disabled={isOutOfStock}
+                            
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>              
+                <div className="order-actions">
                 <p>Total: ₱{calculateTotal().toFixed(2)}</p>
                 <button
                   onClick={handleCancelOrder}
