@@ -120,12 +120,11 @@ const UserInterface = () => {
             )
           );
           addNotification(
-            `Your Order ${
-              updatedOrder.studentNumber || "Unknown"
-            } status has been updated to ${updatedOrder.status || "Unknown"}`,
-            updatedOrder._id
-          );
-        }
+            `Your Order ${updatedOrder.studentNumber || "Unknown"} status has been updated`,
+            updatedOrder._id,
+            updatedOrder.status,
+            updatedOrder.studentNumber || "Unknown"
+          );        }
       });
 
       return () => {
@@ -134,44 +133,60 @@ const UserInterface = () => {
     }
   }, [socket]);
 
-  const addNotification = (message, orderId) => {
+  const addNotification = (message, orderId, status, studentNumber) => {
     if (!message) {
       console.error("Attempted to add empty notification");
       return;
     }
-
+  
     const userId = localStorage.getItem("userID");
-    const newNotification = { id: Date.now(), userId, message, orderId };
-
+    let statusMessage;
+  
+    switch (status) {
+      case "Preparing":
+        statusMessage = `Your order ${studentNumber} is now being prepared.`;
+        break;
+      case "Ready for Pickup":
+        statusMessage = `Your order ${studentNumber} is now ready for pickup.`;
+        break;
+      case "Completed":
+        statusMessage = `Your order ${studentNumber} has been completed. Thank you!`;
+        break;
+      case "Cancelled":
+        statusMessage = `Your order ${studentNumber} has been cancelled.`;
+        break;
+      default:
+        statusMessage = `Your order ${studentNumber} is now ${status}. Please proceed to Payment.`;
+    }
+  
+    const newNotification = { id: Date.now(), userId, message: statusMessage, orderId };
+  
     setNotifications((prev) => {
-      // Remove any existing notification for the same order
       const filteredNotifications = prev.filter((n) => n.orderId !== orderId);
       return [...filteredNotifications, newNotification];
     });
-
+  
     if (Notification.permission === "granted") {
-      // Close any existing notification for this order
       if (window.activeNotifications && window.activeNotifications[orderId]) {
         window.activeNotifications[orderId].close();
       }
-
+  
       const notification = new Notification("Order Status Update", {
-        body: message,
+        body: statusMessage,
         icon: "/cat_profile.svg",
-        tag: orderId, // This ensures only one notification per order is shown
+        tag: orderId,
       });
-
-      // Store the notification reference
+  
       if (!window.activeNotifications) window.activeNotifications = {};
       window.activeNotifications[orderId] = notification;
-
+  
       const notificationDuration = 2000;
       setTimeout(() => {
         notification.close();
         delete window.activeNotifications[orderId];
       }, notificationDuration);
     }
-  };
+  };  
 
   //fetch qr code image
   const fetchQRCode = async () => {
