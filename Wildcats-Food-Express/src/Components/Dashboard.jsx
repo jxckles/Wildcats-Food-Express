@@ -206,13 +206,13 @@ const UserInterface = () => {
       // Store all orders
       setOrders(orders);
   
-      // Check if there are any unpaid orders
-      const hasUnpaidOrders = orders.some(
+      // Check if there are any unpaid orders without payment proof
+      const hasUnpaidOrdersWithoutProof = orders.some(
         (order) => !order.receiptPath && !order.referenceNumber && !order.amountSent
       );
-      setHasUnpaidOrders(hasUnpaidOrders);
+      setHasUnpaidOrders(hasUnpaidOrdersWithoutProof);
   
-      // Find the oldest unpaid order
+      // Find the oldest unpaid order without payment proof
       const oldestUnpaid = orders
         .filter(
           (order) =>
@@ -225,7 +225,7 @@ const UserInterface = () => {
     } catch (error) {
       console.error("Error fetching orders:", error);
     }
-  };
+  };  
 
   const fetchUserData = async () => {
     try {
@@ -337,7 +337,7 @@ const UserInterface = () => {
       alert("You have unpaid orders. Please complete your payment before placing a new order.");
       return;
     }
-  
+
     if (!schoolId.match(/^\d{2}-\d{4}-\d{3}$/)) {
       alert("Please enter a valid school ID in the format xx-xxxx-xxx");
       return;
@@ -573,7 +573,7 @@ const UserInterface = () => {
                   <p className="unpaid-order-warning">
                     You have unpaid orders. Please complete your payment before placing a new order.
                   </p>
-                )}
+                )}                
               </div>
             </div>
           </div>
@@ -830,6 +830,9 @@ const UserInterface = () => {
           ) {
             generatePDF(formattedAmountSent);
           }
+
+          // Fetch orders again to update the hasUnpaidOrders state
+          fetchOrders();
 
           // Navigate back to the menu
           setActiveTab("menus");
