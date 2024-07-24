@@ -55,7 +55,6 @@ const MainAdminInterface = () => {
   const [message, setMessage] = useState();
   const [qrCodeImage, setQrCodeImage] = useState(null);
   const [customerOrders, setCustomerOrders] = useState([]);
-  const [gcashNumber, setGcashNumber] = useState("");
 
   axios.defaults.withCredentials = true;
 
