@@ -147,6 +147,8 @@
   padding: 10px;
   display: flex;
   flex-direction: column;
+  height: 300px; /* Set a fixed height */
+  overflow: hidden; /* Prevent content from overflowing */
 }
 .menu-image-container {
   height: 150px; /* Adjust image container height */
@@ -154,6 +156,8 @@
   justify-content: center;
   align-items: center;
   margin-bottom: 10px;
+  width: 100%;
+  overflow: hidden;
 }
 
 .menu-image {
@@ -171,8 +175,16 @@
   color: #666;
 }
 
+.menu-image, .menu-image-placeholder {
+  object-fit: cover; /* Ensure the image covers the container */
+}
+
 .menu-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   text-align: center;
+  
 }
 
 .menu-name {
@@ -200,6 +212,8 @@
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  width: 100%;
+  margin-top: auto; /* Push the button to the bottom */
 }
 
 .add-to-cart-btn:disabled {
