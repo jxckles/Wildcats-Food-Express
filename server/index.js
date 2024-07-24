@@ -13,7 +13,9 @@ const cookieParser = require("cookie-parser");
 const app = express();
 const nodemailer = require("nodemailer");
 const ClientOrder = require("./models/ClientOrder");
-const QRCode = require("./models/QRCode");
+const QRCode = require("./models/QRCode.js");
+const GCash = require('./models/GCash');
+
 
 const http = require("http");
 const socketIo = require("socket.io");
@@ -814,5 +816,36 @@ app.put("/update-order", uploadReceipt.single("receipt"), async (req, res) => {
       await fs.promises.unlink(path.join(__dirname, "public", receiptPath));
     }
     res.status(500).json({ message: "Failed to update order" });
+  }
+});
+
+app.post("/update-gcash-number", async (req, res) => {
+  try {
+    const { gcashNumber } = req.body;
+    let gcash = await GCash.findOne();
+    if (!gcash) {
+      gcash = new GCash({ number: gcashNumber });
+    } else {
+      gcash.number = gcashNumber;
+    }
+    await gcash.save();
+    res.status(200).json({ success: true, message: "GCash number updated successfully" });
+  } catch (error) {
+    console.error("Error updating GCash number:", error);
+    res.status(500).json({ success: false, message: "Failed to update GCash number" });
+  }
+});
+
+app.get("/get-gcash-number", async (req, res) => {
+  try {
+    const gcash = await GCash.findOne();
+    if (gcash) {
+      res.status(200).json({ gcashNumber: gcash.number });
+    } else {
+      res.status(404).json({ message: "No GCash number found" });
+    }
+  } catch (error) {
+    console.error("Error retrieving GCash number:", error);
+    res.status(500).json({ message: "Failed to retrieve GCash number" });
   }
 });
