@@ -78,6 +78,14 @@ const UserInterface = () => {
   }, []);
 
   useEffect(() => {
+    const intervalId = setInterval(() => {
+      fetchMenuItems();
+    }, 1000); // Fetch every 5 seconds
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
     if ("Notification" in window) {
       Notification.requestPermission().then((permission) => {
         if (permission === "granted") {
@@ -202,16 +210,17 @@ const UserInterface = () => {
         `http://localhost:5000/orders?userId=${userId}`
       );
       const orders = response.data;
-  
+
       // Store all orders
       setOrders(orders);
-  
+
       // Check if there are any unpaid orders
       const hasUnpaidOrders = orders.some(
-        (order) => !order.receiptPath && !order.referenceNumber && !order.amountSent
+        (order) =>
+          !order.receiptPath && !order.referenceNumber && !order.amountSent
       );
       setHasUnpaidOrders(hasUnpaidOrders);
-  
+
       // Find the oldest unpaid order
       const oldestUnpaid = orders
         .filter(
@@ -219,7 +228,7 @@ const UserInterface = () => {
             !order.receiptPath && !order.referenceNumber && !order.amountSent
         )
         .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))[0];
-  
+
       // Store the oldest unpaid order
       setOldestUnpaidOrder(oldestUnpaid);
     } catch (error) {
@@ -283,7 +292,7 @@ const UserInterface = () => {
       alert("This item is out of stock.");
       return;
     }
-    
+
     const existingItem = cart.find((cartItem) => cartItem._id === item._id);
     if (existingItem) {
       setCart(
@@ -297,7 +306,7 @@ const UserInterface = () => {
       setCart([...cart, { ...item, quantity: 1 }]);
     }
     updateMenuItemQuantity(item._id, -1);
-  };    
+  };
 
   const handleRemoveFromCart = (item) => {
     const existingItem = cart.find((cartItem) => cartItem._id === item._id);
@@ -334,10 +343,12 @@ const UserInterface = () => {
 
   const handlePlaceOrder = async () => {
     if (hasUnpaidOrders) {
-      alert("You have unpaid orders. Please complete your payment before placing a new order.");
+      alert(
+        "You have unpaid orders. Please complete your payment before placing a new order."
+      );
       return;
     }
-  
+
     if (!schoolId.match(/^\d{2}-\d{4}-\d{3}$/)) {
       alert("Please enter a valid school ID in the format xx-xxxx-xxx");
       return;
@@ -534,31 +545,34 @@ const UserInterface = () => {
                 onChange={(e) => setSchoolId(e.target.value)}
                 className="school-id-input"
               />
-            <div className="cart-items">
-                  {cart.map((item) => {
-                    const menuItem = menuItems.find((menuItem) => menuItem._id === item._id);
-                    const isOutOfStock = menuItem ? menuItem.quantity <= 0 : true;
-                    
-                    return (
-                      <div key={item._id} className="cart-item">
-                        <span>{item.name}</span>
-                        <span>₱{item.price.toFixed(2)}</span>
-                        <div className="quantity-controls">
-                          <button onClick={() => handleRemoveFromCart(item)}>-</button>
-                          <span>{item.quantity}</span>
-                          <button 
-                            onClick={() => handleAddToCart(menuItem)}
-                            disabled={isOutOfStock}
-                            
-                          >
-                            +
-                          </button>
-                        </div>
+              <div className="cart-items">
+                {cart.map((item) => {
+                  const menuItem = menuItems.find(
+                    (menuItem) => menuItem._id === item._id
+                  );
+                  const isOutOfStock = menuItem ? menuItem.quantity <= 0 : true;
+
+                  return (
+                    <div key={item._id} className="cart-item">
+                      <span>{item.name}</span>
+                      <span>₱{item.price.toFixed(2)}</span>
+                      <div className="quantity-controls">
+                        <button onClick={() => handleRemoveFromCart(item)}>
+                          -
+                        </button>
+                        <span>{item.quantity}</span>
+                        <button
+                          onClick={() => handleAddToCart(menuItem)}
+                          disabled={isOutOfStock}
+                        >
+                          +
+                        </button>
                       </div>
-                    );
-                  })}
-                </div>              
-                <div className="order-actions">
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="order-actions">
                 <p>Total: ₱{calculateTotal().toFixed(2)}</p>
                 <button
                   onClick={handleCancelOrder}
@@ -566,12 +580,17 @@ const UserInterface = () => {
                 >
                   Cancel Order
                 </button>
-                <button onClick={handlePlaceOrder} className="place-order-btn" disabled={hasUnpaidOrders}>
+                <button
+                  onClick={handlePlaceOrder}
+                  className="place-order-btn"
+                  disabled={hasUnpaidOrders}
+                >
                   Checkout
                 </button>
                 {hasUnpaidOrders && (
                   <p className="unpaid-order-warning">
-                    You have unpaid orders. Please complete your payment before placing a new order.
+                    You have unpaid orders. Please complete your payment before
+                    placing a new order.
                   </p>
                 )}
               </div>
@@ -798,7 +817,6 @@ const UserInterface = () => {
         formData.append("receipt", receiptFile); // Append the file
         formData.append("referenceNumber", referenceNumber);
         formData.append("amountSent", formattedAmountSent);
-        
 
         const response = await axios.put(
           "http://localhost:5000/update-order",
