@@ -55,6 +55,7 @@ const MainAdminInterface = () => {
   const [message, setMessage] = useState();
   const [qrCodeImage, setQrCodeImage] = useState(null);
   const [customerOrders, setCustomerOrders] = useState([]);
+  const [gcashNumber, setGcashNumber] = useState("");
 
   axios.defaults.withCredentials = true;
 
@@ -561,11 +562,7 @@ const MainAdminInterface = () => {
     doc.save(filename);
   };
 
-  const handleInterfaceChange = (type) => {
-    setInterfaceType(type);
-    setIsModalOpen(false);
-    setActiveTab("menu");
-  };
+
 
   const handleLogout = async () => {
     try {
