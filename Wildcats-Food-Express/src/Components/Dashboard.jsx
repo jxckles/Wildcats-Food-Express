@@ -26,6 +26,7 @@ const UserInterface = () => {
   const [qrCodeImage, setQrCodeImage] = useState(null);
   const [oldestUnpaidOrder, setOldestUnpaidOrder] = useState(null);
   const [hasUnpaidOrders, setHasUnpaidOrders] = useState(false);
+  const [gcashNumber, setGcashNumber] = useState("");
   const navigate = useNavigate();
 
   const [socket, setSocket] = useState(null);
@@ -83,6 +84,10 @@ const UserInterface = () => {
     }, 1000); // Fetch every 5 seconds
 
     return () => clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
+    fetchGcashNumber();
   }, []);
 
   useEffect(() => {
@@ -185,6 +190,19 @@ const UserInterface = () => {
         notification.close();
         delete window.activeNotifications[orderId];
       }, notificationDuration);
+    }
+  };  
+
+  //gcash number
+  const fetchGcashNumber = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/get-gcash-number");
+      if (response.data.gcashNumber) {
+        setGcashNumber(response.data.gcashNumber);
+      }
+    } catch (error) {
+      console.error("Error fetching GCash number:", error.response || error);
+      // Handle the error appropriately in your UI
     }
   };  
 
@@ -967,7 +985,8 @@ const UserInterface = () => {
           <div className="payment-form">
             <p>Send your Virtual payment to:</p>
             <div className="gcash-h3">
-              GCASH <p className="gcash-number">+639123456789</p>
+              GCASH 
+              <p className="gcash-number">{gcashNumber || "Not available"}</p>
             </div>
             <div className="qr-code-container">
               {qrCodeImage ? (
