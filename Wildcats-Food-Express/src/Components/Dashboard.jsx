@@ -79,7 +79,7 @@ const UserInterface = () => {
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      fetchMenuItems();
+      fetchOrders();
     }, 1000); // Fetch every 5 seconds
 
     return () => clearInterval(intervalId);

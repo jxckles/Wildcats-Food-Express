@@ -84,6 +84,7 @@ const MainAdminInterface = () => {
   useEffect(() => {
     const intervalId = setInterval(() => {
       fetchMenuItems();
+      fetchOrders();
       fetchClientOrders();
     }, 1000);
 
