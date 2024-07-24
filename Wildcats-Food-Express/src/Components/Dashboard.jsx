@@ -213,26 +213,13 @@ const UserInterface = () => {
 
       // Store all orders
       setOrders(orders);
-<<<<<<< HEAD
   
       // Check if there are any unpaid orders without payment proof
       const hasUnpaidOrdersWithoutProof = orders.some(
         (order) => !order.receiptPath && !order.referenceNumber && !order.amountSent
       );
       setHasUnpaidOrders(hasUnpaidOrdersWithoutProof);
-  
-      // Find the oldest unpaid order without payment proof
-=======
 
-      // Check if there are any unpaid orders
-      const hasUnpaidOrders = orders.some(
-        (order) =>
-          !order.receiptPath && !order.referenceNumber && !order.amountSent
-      );
-      setHasUnpaidOrders(hasUnpaidOrders);
-
-      // Find the oldest unpaid order
->>>>>>> 6a534e01e5b5411c995c9056be97348bfcd565e7
       const oldestUnpaid = orders
         .filter(
           (order) =>
