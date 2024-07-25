@@ -59,7 +59,7 @@ const UserInterface = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/dashboard")
+      .get("https://wildcats-food-express.onrender.com/dashboard")
       .then((res) => {
         if (res.data.valid) {
           setMessage(res.data.message);
@@ -102,7 +102,7 @@ const UserInterface = () => {
   }, []);
 
   useEffect(() => {
-    const newSocket = io("http://localhost:5000");
+    const newSocket = io("https://wildcats-food-express.onrender.com");
     setSocket(newSocket);
 
     // Authenticate the socket connection with the user ID
@@ -213,7 +213,7 @@ const UserInterface = () => {
   //gcash number
   const fetchGcashNumber = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/get-gcash-number");
+      const response = await axios.get("https://wildcats-food-express.onrender.com/get-gcash-number");
       if (response.data.gcashNumber) {
         setGcashNumber(response.data.gcashNumber);
       }
@@ -226,9 +226,9 @@ const UserInterface = () => {
   //fetch qr code image
   const fetchQRCode = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/get-qr-code");
+      const response = await axios.get("https://wildcats-food-express.onrender.com/get-qr-code");
       if (response.data.qrCodeUrl) {
-        setQrCodeImage(`http://localhost:5000${response.data.qrCodeUrl}`);
+        setQrCodeImage(`https://wildcats-food-express.onrender.com${response.data.qrCodeUrl}`);
       } else {
         setQrCodeImage(null);
       }
@@ -240,11 +240,11 @@ const UserInterface = () => {
 
   const fetchMenuItems = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/menu");
+      const response = await axios.get("https://wildcats-food-express.onrender.com/menu");
       const menuData = response.data.map((item) => ({
         ...item,
         image: item.image
-          ? `http://localhost:5000/Images/${item.image.split("\\").pop()}`
+          ? `https://wildcats-food-express.onrender.com/Images/${item.image.split("\\").pop()}`
           : null,
       }));
       setMenuItems(menuData);
@@ -257,7 +257,7 @@ const UserInterface = () => {
     try {
       const userId = localStorage.getItem("userID");
       const response = await axios.get(
-        `http://localhost:5000/orders?userId=${userId}`
+        `https://wildcats-food-express.onrender.com/orders?userId=${userId}`
       );
       const orders = response.data;
 
@@ -287,7 +287,7 @@ const UserInterface = () => {
   const fetchUserData = async () => {
     try {
       const userId = localStorage.getItem("userID");
-      const response = await axios.get(`http://localhost:5000/user/${userId}`);
+      const response = await axios.get(`https://wildcats-food-express.onrender.com/user/${userId}`);
       setUser({
         name: `${response.data.firstName} ${response.data.lastName}`,
         profilePicture: response.data.profilePicture,
@@ -316,7 +316,7 @@ const UserInterface = () => {
       }
       console.log(`Fetching history orders for user ID: ${userId}`);
       const response = await axios.get(
-        `http://localhost:5000/history-orders?userId=${userId}`
+        `https://wildcats-food-express.onrender.com/history-orders?userId=${userId}`
       );
       setHistoryOrders(response.data);
     } catch (error) {
@@ -421,7 +421,7 @@ const UserInterface = () => {
     console.log("Order Payload:", JSON.stringify(order, null, 2));
 
     try {
-      const response = await axios.post("http://localhost:5000/orders", order);
+      const response = await axios.post("https://wildcats-food-express.onrender.com/orders", order);
       console.log("Order placed successfully:", response.data);
       fetchOrders();
       alert("Order placed successfully! Please proceed to payment.");
@@ -454,7 +454,7 @@ const UserInterface = () => {
       }
 
       const response = await axios.put(
-        `http://localhost:5000/update-profile/${userId}`,
+        `https://wildcats-food-express.onrender.com/update-profile/${userId}`,
         formData,
         {
           headers: {
@@ -512,7 +512,7 @@ const UserInterface = () => {
     }
     try {
       const response = await axios.post(
-        "http://localhost:5000/change-password",
+        "https://wildcats-food-express.onrender.com/change-password",
         {
           userId,
           oldPassword,
@@ -738,7 +738,7 @@ const UserInterface = () => {
   const handleLogout = async () => {
     try {
       await axios.post(
-        "http://localhost:5000/logout",
+        "https://wildcats-food-express.onrender.com/logout",
         {},
         { withCredentials: true }
       );
@@ -867,7 +867,7 @@ const UserInterface = () => {
         formData.append("amountSent", formattedAmountSent);
 
         const response = await axios.put(
-          "http://localhost:5000/update-order",
+          "https://wildcats-food-express.onrender.com/update-order",
           formData,
           {
             headers: {
@@ -1227,7 +1227,7 @@ const UserInterface = () => {
               />
             ) : user.profilePicture ? (
               <img
-                src={`http://localhost:5000${user.profilePicture}`}
+                src={`https://wildcats-food-express.onrender.com${user.profilePicture}`}
                 alt="Profile"
                 className="profile-picture"
               />
@@ -1333,7 +1333,7 @@ const UserInterface = () => {
           <div className="user-info">
             {user.profilePicture ? (
               <img
-                src={`http://localhost:5000${user.profilePicture}`}
+                src={`https://wildcats-food-express.onrender.com${user.profilePicture}`}
                 alt="Profile"
                 className="user-avatar"
               />
