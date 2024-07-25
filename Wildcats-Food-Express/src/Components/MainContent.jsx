@@ -12,7 +12,7 @@ const MainContent = () => {
                     <h1 className="wildcats-food">Wildcats Food <span className="express-mobile">Express</span></h1>
                 </div>
                 <h3>Fast. Fresh. Fierce.</h3>
-                <a href="https://wildcats-food-express.onrender.com/Login" className="primary-cta">Order Food</a>
+                <a href="/dashboard" className="primary-cta">Order Food</a>
             </div>
 
             <div className="cat">
