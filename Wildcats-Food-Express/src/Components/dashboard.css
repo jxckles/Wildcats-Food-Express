@@ -1,4 +1,4 @@
-/* UserInterface.css */
+
 
 .user-interface {
   font-family: Arial, sans-serif;
@@ -44,9 +44,9 @@
   .nav-link:hover{
     font-weight: bold;
     color: #fff; /* White color for active link */
-    background-color: #990000; /* Maroon background for active link */
+    background-color: #990000;
     border-bottom: 2px solid #990000;
-    padding: 10px; 
+    padding: 6px; 
   }
 
   .nav-link.active {
@@ -71,8 +71,7 @@
   cursor: pointer;
 
   &:hover{
-    width: 37px;
-    height: 37px;
+    width: 35px;
     opacity: 50%;
   }
 
@@ -115,6 +114,7 @@
 }
 
 .search-container {
+  margin-left: -500px;
   display: flex;
   justify-content: center;
   margin-bottom: 20px;
@@ -129,6 +129,7 @@
   width: 100%;
   max-width: 500px;
 }
+
 .menu-and-summary-container {
   display: grid;
   grid-template-columns: 2fr 1fr; /* 2:1 ratio for menu and order summary */
@@ -604,9 +605,10 @@
   max-width: 400px;
   margin: 20px auto;
   padding: 20px;
-  background-color: #f9f9f9;
+  background-color: #f4d5d5;
   border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.5);
+
 }
 
 .edit-profile-tab h2 {
@@ -741,7 +743,7 @@
   font-weight: bold;
   color: #880000;
   cursor: pointer;
-
+  
   &:hover{
     opacity: 50%;
     text-decoration: underline;
