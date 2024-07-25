@@ -138,6 +138,7 @@ const UserInterface = () => {
     }
   }, [socket]);
 
+  
   const addNotification = (message, orderId, status, studentNumber) => {
     if (!message) {
       console.error("Attempted to add empty notification");
@@ -1276,6 +1277,11 @@ const UserInterface = () => {
 
   return (
     <div className="user-interface">
+            {mobileNotification && (
+      <div className="mobile-notification">
+        {mobileNotification}
+      </div>
+    )}
       <header className="user-header">
         <div className="logo-and-nav">
           <div className="logo-section">
