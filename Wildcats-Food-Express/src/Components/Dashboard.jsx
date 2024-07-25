@@ -181,9 +181,14 @@ const UserInterface = () => {
   };
 
   const isMobileDevice = () => {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  };
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isIOS = /iphone|ipad|ipod/.test(userAgent);
+    const isAndroid = /android/.test(userAgent);
+    const isTablet = /(ipad|tablet|(android(?!.*mobile))|(windows(?!.*phone)(.*touch))|kindle|playbook|silk|(puffin(?!.*(IP|AP|WP))))/.test(userAgent);
   
+    return isIOS || isAndroid || isTablet;
+  };
+    
   const showMobileNotification = (message) => {
     // For mobile, we'll update the UI to show a notification
     setMobileNotification(message);
