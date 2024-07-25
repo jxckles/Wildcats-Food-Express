@@ -22,13 +22,13 @@
   display: flex;
   align-items: center;
 }
+.loglog{
 
-.logo-image {
-  width: 400px;
-  height: 50px;
-  margin-right: 10px;
-  margin-top: 25px;
+    width: 700px; /* Adjust the width as needed */
+    height: auto;
 }
+
+
 
 .cat_profile {
   width: 100px;
@@ -945,9 +945,21 @@
     align-items: center;
     padding: 10px;
   }
+  .logo-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* Ensure it spans the full width of the parent */
+  }
   .user-main {
     padding-bottom: 250px; /* Increase this value to create more space at the bottom */
   }
+  .loglog{
+
+    width: 400px; /* Adjust the width as needed */
+    height: auto;
+    align-content: center;
+}
 
   .logo-image {
     width: 200px;
