@@ -1,4 +1,5 @@
 import './MainContent.css';
+import { Link } from "react-router-dom";
 import catImage from "../assets/chef.png";
 
 const MainContent = () => {
@@ -12,7 +13,7 @@ const MainContent = () => {
                     <h1 className="wildcats-food">Wildcats Food <span className="express-mobile">Express</span></h1>
                 </div>
                 <h3>Fast. Fresh. Fierce.</h3>
-                <a href="/dashboard" className="primary-cta">Order Food</a>
+                <Link to="/dashboard" className="primary-cta">Order Food</Link>
             </div>
 
             <div className="cat">
