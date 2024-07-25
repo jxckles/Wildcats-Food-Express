@@ -946,6 +946,7 @@
 /* Mobile */
 @media (max-width: 480px) {
   .user-header {
+    position: fixed;
     flex-direction: column;
     align-items: center;
     padding: 10px;
@@ -957,7 +958,7 @@
     width: 100%; /* Ensure it spans the full width of the parent */
   }
   .user-main {
-    padding-bottom: 250px; /* Increase this value to create more space at the bottom */
+    padding-bottom: 10px; /* Increase this value to create more space at the bottom */
   }
   .loglog{
 
@@ -993,25 +994,33 @@
   }
 
   .menu-items {
-    grid-template-columns: 2fr; /* Single column for mobile */
+    margin-top: 50%;
+    grid-template-columns: 2fr;
   }
 
   .order-summary {
-    position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    width: 100%;
+    margin-left: 2.1%;
+    width: 90%;
     max-width: 100%;
     background-color: #fff;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
     border-top: 1px solid #ddd;
     padding: 10px;
     text-align: center;
-    z-index: 1000;
+    z-index: 0;
   }
-
- 
+  .place-order-btn, .cancel-order-btn{
+    width: 75%;
+  }
+  .search-container {
+    margin-left: 2%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
   .order-summary p {
     margin: 0;
     font-size: 0.8em;
@@ -1030,8 +1039,72 @@
     grid-template-columns: 1fr;
     gap: 20px;
   }
+  .qr-code-container{
+    height: 80%;
+  }
+  .orders-tab-user{
+    margin-top: 30%;
+  }
+  .payment-container{
+    margin-left: -2%;
+    margin-top: 55%;
+    height: auto;
+    width: auto;
+    box-shadow: none;
+    padding-bottom: 250px;
+  }
+  .payment-form label.OrderIDLabel{
+    position:absolute;
+    margin-top: -100px;
+    margin-left: -200px;
+  }
+  .payment-form input.Name{
+    width: 60%;
+    position:absolute;
+    margin-top: -115px;
+    margin-left: -100px;
+  }
+  .payment-form label.ReferenceLabel{
+    position:absolute;
+    margin-top: -50px;
+    margin-left: -220px;
+  }
+  .payment-form input.Reference{
+    width: 45%;
+    position:absolute;
+    margin-top: -65px;
+    margin-left: -40px;
+  }
+  .payment-form label.AmountLabel{
+    position:absolute;
+    margin-top: 0px;
+    margin-left: -220px;
+  }
+  .payment-form input.Amount{
+    width: 50%;
+    position:absolute;
+    margin-top: -15px;
+    margin-left: -60px;
+  }
+  .order_summary{
+    height: 350px;
+    width: 48%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+    border-radius: 15px;
+  }
+  .upload-btn{
+    position: absolute;
+    width: 40%;
+    margin-left: -250px;
+    margin-top: 150px;
+  }
+  .submit-btn-payment{
+    position: absolute;
+    width: 25%;
+    margin-top: 55px;
+  }
+  }
 }
-/* Add these styles to your existing CSS file */
 
 @media (max-width: 300px) {
   .orders-tab-user {
