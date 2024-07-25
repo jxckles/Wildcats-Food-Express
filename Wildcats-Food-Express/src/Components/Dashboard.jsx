@@ -182,9 +182,9 @@ const UserInterface = () => {
 
   const isMobileDevice = () => {
     const userAgent = navigator.userAgent.toLowerCase();
-    const isIOS = /iPhone|iPad|iPod/.test(userAgent);
+    const isIOS = /iphone|ipad|ipod/.test(userAgent);
     const isAndroid = /android/.test(userAgent);
-    const isTablet = /(iPad|tablet|(android(?!.*mobile))|(windows(?!.*phone)(.*touch))|kindle|playbook|silk|(puffin(?!.*(IP|AP|WP))))/.test(userAgent);
+    const isTablet = /(ipad|tablet|(android(?!.*mobile))|(windows(?!.*phone)(.*touch))|kindle|playbook|silk|(puffin(?!.*(IP|AP|WP))))/.test(userAgent);
   
     return isIOS || isAndroid || isTablet;
   };
