@@ -1075,6 +1075,7 @@
   position: fixed;
   top: 20px;
   left: 50%;
+  width: 200px;
   transform: translateX(-50%);
   background-color: #333;
   color: white;
