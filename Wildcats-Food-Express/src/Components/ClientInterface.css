@@ -60,7 +60,12 @@
   .client-profile {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 10px; /* Increase the gap between items */
+    padding: 20px; 
+  }
+  .loglog {
+    width: 800px; /* Adjust the width as needed */
+    height: auto; /* Maintain aspect ratio */
   }
   
   .cart-icon-client {

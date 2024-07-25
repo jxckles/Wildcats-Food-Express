@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./ClientInterface.css";
-import logo from "/logo.svg";
+import logo from '/finallogo.svg';
 import profileIcon from "/cat_profile.svg";
 import cartIcon from "/shopping_cart.svg";
 import { useNavigate } from "react-router-dom";
@@ -405,11 +405,11 @@ const ClientInterface = () => {
       <header className="client-header">
         <div className="logo-and-nav">
           <div className="logo-section">
-            <img src={profileIcon} alt="Cat Logo" className="cat_profile" />
+           
             <img
               src={logo}
               alt="Wildcat Food Express Logo"
-              className="logo-image"
+              className="loglog"
             />
           </div>
           <nav className="client-nav">

@@ -18,6 +18,10 @@
   display: flex;
   align-items: center;
 }
+.loglog {
+  width: 800px; /* Adjust the width as needed */
+  height: auto; /* Maintain aspect ratio */
+}
 
 .logo-image {
   width: 400px;
