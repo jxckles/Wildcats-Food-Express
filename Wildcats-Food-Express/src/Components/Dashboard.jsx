@@ -31,6 +31,7 @@ const UserInterface = () => {
 
   const [socket, setSocket] = useState(null);
   const [notifications, setNotifications] = useState([]);
+  const [mobileNotification, setMobileNotification] = useState(null);
   const [notificationPermission, setNotificationPermission] = useState(false);
   const [receiptFile, setReceiptFile] = useState(null);
 
@@ -172,27 +173,43 @@ const UserInterface = () => {
       return [...filteredNotifications, newNotification];
     });
   
-    if (Notification.permission === "granted") {
-      if (window.activeNotifications && window.activeNotifications[orderId]) {
-        window.activeNotifications[orderId].close();
-      }
-  
-      const notification = new Notification("Order Status Update", {
-        body: statusMessage,
-        icon: "/cat_profile.svg",
-        tag: orderId,
-      });
-  
-      if (!window.activeNotifications) window.activeNotifications = {};
-      window.activeNotifications[orderId] = notification;
-  
-      const notificationDuration = 2000;
-      setTimeout(() => {
-        notification.close();
-        delete window.activeNotifications[orderId];
-      }, notificationDuration);
+    if (isMobileDevice()) {
+      showMobileNotification(statusMessage);
+    } else if (Notification.permission === "granted") {
+      showDesktopNotification(statusMessage, orderId);
     }
-  };  
+  };
+
+  const isMobileDevice = () => {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  };
+  
+  const showMobileNotification = (message) => {
+    // For mobile, we'll update the UI to show a notification
+    setMobileNotification(message);
+    setTimeout(() => setMobileNotification(null), 7000); // Hide after 1000ms => 1 second
+  };
+  
+  const showDesktopNotification = (message, orderId) => {
+    if (window.activeNotifications && window.activeNotifications[orderId]) {
+      window.activeNotifications[orderId].close();
+    }
+  
+    const notification = new Notification("Order Status Update", {
+      body: message,
+      icon: "/cat_profile.svg",
+      tag: orderId,
+    });
+  
+    if (!window.activeNotifications) window.activeNotifications = {};
+    window.activeNotifications[orderId] = notification;
+  
+    const notificationDuration = 5000;
+    setTimeout(() => {
+      notification.close();
+      delete window.activeNotifications[orderId];
+    }, notificationDuration);
+  };
 
   //gcash number
   const fetchGcashNumber = async () => {
