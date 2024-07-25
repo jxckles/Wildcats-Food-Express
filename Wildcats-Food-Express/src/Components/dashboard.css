@@ -890,9 +890,6 @@
   background-color: #ff3333;
 }
 
-/* Media Queries */
-
-/* Tablet (Portrait and Landscape) */
 @media (max-width: 768px) {
   .user-header {
     flex-direction: column;
@@ -943,7 +940,6 @@
   }
 }
 
-/* Mobile */
 @media (max-width: 480px) {
   .user-header {
     position: fixed;
@@ -955,14 +951,14 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%; /* Ensure it spans the full width of the parent */
+    width: 100%;
   }
   .user-main {
-    padding-bottom: 10px; /* Increase this value to create more space at the bottom */
+    padding-bottom: 10px;
   }
   .loglog{
 
-    width: 400px; /* Adjust the width as needed */
+    width: 400px;
     height: auto;
     align-content: center;
 }
@@ -990,7 +986,7 @@
   }
 
   .menu-and-summary-container {
-    margin-bottom: 60px; /* Add space between the last menu item and the order summary */
+    margin-bottom: 60px; 
   }
 
   .menu-items {
@@ -1103,63 +1099,31 @@
     width: 25%;
     margin-top: 55px;
   }
+
+  .edit-profile-tab{
+    margin-top: 75%;
+  }
+  .change-password-tab{
+    height: auto;
+    margin-top: 75%;
+    box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.5);
+    background-color: #f4d5d5;
+    border-radius: 5px;
+  }
+  .change-password-form{
+    background-color: #f4d5d5;
+  }
+  .history-tab{
+    height: auto;
+    width: 50%;
+    margin-top: 50%;
+  }
+  .orders-tab-user{
+    height: auto;
+    width: 50%;
   }
 }
 
-@media (max-width: 300px) {
-  .orders-tab-user {
-    padding: 0 20px; /* Reduce padding on smaller screens */
-  }
-
-  .orders-table-user {
-    font-size: 0.9em; /* Slightly smaller font size for better fit */
-  }
-
-  .orders-table-user th,
-  .orders-table-user td {
-    padding: 6px; /* Reduce padding for better fit */
-  }
-
-  .orders-table-user th {
-    font-size: 1em; /* Slightly smaller font size for headers */
-  }
-
-  .orders-table-user td {
-    font-size: 0.9em; /* Slightly smaller font size for table cells */
-  }
-
-  /* Make the table horizontally scrollable on mobile */
-  .orders-table-user-wrapper {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-  }
-  
-  .orders-table-user {
-    width: 50px; /* Allow the table to be wider than the container */
-    min-width: 300px; /* Ensure minimum width for readability */
-  }
-}
-
-@media (max-width: 480px) {
-  .orders-tab-user {
-    padding: 0 10px; /* Further reduce padding on very small screens */
-  }
-
-  .orders-table-user th,
-  .orders-table-user td {
-    padding: 4px; /* Reduce padding further for very small screens */
-  }
-
-  .orders-table-user th {
-    font-size: 0.9em; /* Further reduce font size for headers */
-  }
-
-  .orders-table-user td {
-    font-size: 0.8em; /* Further reduce font size for table cells */
-  }
-  
-  
-}
 
 .mobile-notification {
   position: fixed;
