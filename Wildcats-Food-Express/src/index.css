@@ -45,12 +45,11 @@ body {
       color: #9b1410; /* Change text color */
       padding: 0; /* Remove padding */
       border-radius: 0; /* Remove border radius */
-      font-size: 1.5rem; /* Adjust font size if needed */
+      font-size: 1.70rem; /* Adjust font size if needed */
       text-align: right; /* Align text to the left */
       margin: 2em 0; /* Adjust margin if needed */
   
       &:hover {
-          font-size: 1.5rem;
           text-decoration: underline; /* Add underline on hover */
       }
   }
@@ -66,7 +65,7 @@ body {
   
     .cat img {
         width: 80%; /* Smaller image size */
-        margin-top: 1em; /* Space below CTA */
+        margin-top: 2em; /* Space below CTA */
         position: relative;
     }
   }
