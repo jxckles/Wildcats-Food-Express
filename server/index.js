@@ -2,6 +2,8 @@ require('dotenv').config();
 const ACCESS_TOKEN = process.env.ACCESS_TOKEN;
 const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
 const PORT = process.env.PORT;
+const cors = require("cors");
+app.use(cors());
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
