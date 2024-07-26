@@ -38,7 +38,7 @@ const socketIo = require("socket.io");
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:5000",
+    origin: "https://wildcats-food-express.onrender.com",
     methods: ["GET", "POST"],
   },
 });
@@ -62,7 +62,7 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: ["http://localhost:5000"],
+    origin: ["https://wildcats-food-express.onrender.com"],
     credentials: true,
   })
 );
@@ -254,7 +254,7 @@ app.post("/forgot-password", async (req, res) => {
       from: "wildcatfoodexpress@gmail.com",
       to: email,
       subject: "Reset Password",
-      text: `http://localhost:5000/reset-password/${token}`,
+      text: `https://wildcats-food-express.onrender.com/reset-password/${token}`,
     };
 
     transporter.sendMail(mailOptions, function (error, info) {
