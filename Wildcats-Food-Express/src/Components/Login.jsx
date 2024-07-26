@@ -17,13 +17,13 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
-      .post("https://wildcats-food-express-deploy2.vercel.app/Login", {
+      .post("http://localhost:5000/Login", {
         email,
         password,
       })
       .then((result) => {
         axios
-          .post("https://wildcats-food-express-deploy2.vercel.app/Login", { email, password })
+          .post("http://localhost:5000/Login", { email, password })
           .then((res) => {
             localStorage.setItem("userID", res.data.userID);
             localStorage.setItem("userName", res.data.userName);
