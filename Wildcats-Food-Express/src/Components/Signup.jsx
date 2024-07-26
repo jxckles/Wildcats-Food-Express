@@ -33,7 +33,7 @@ const Signup = () => {
     }
 
     axios
-      .post("http://localhost:5000/Register", {
+      .post("https://wildcats-food-express-deploy2.vercel.app/Register", {
         firstName,
         lastName,
         courseYear,
