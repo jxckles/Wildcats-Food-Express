@@ -556,6 +556,7 @@
 
 .change-password-tab {
   display: flex;
+
   justify-content: center;
   align-items: flex-start;
   height: 80vh;
@@ -575,6 +576,21 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 400px;
+}
+@media (max-width: 600px) {
+  .change-password-tab {
+    height: auto;
+    padding: 15px;
+    margin: 10px auto;
+    align-items: center; /* Adjust alignment for better centering */
+    overflow: hidden; /* Prevent scrolling */
+  }
+
+  .change-password-form {
+    padding: 15px;
+    width: 300px; /* Use a percentage to better fit the mobile screen */
+    max-width: none; /* Remove the max-width to allow more flexibility */
+  }
 }
 
 .form-group {
@@ -622,9 +638,10 @@
 }
 
 .edit-profile-tab {
-  max-width: 400px;
+  max-width: 5300px;
+  max-height: 500px;
   margin: 20px auto;
-  padding: 20px;
+  padding: 80px;
   background-color: #f4d5d5;
   border-radius: 5px;
   box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.5);
@@ -634,6 +651,24 @@
   color: #8B0000;
   text-align: center;
   margin-bottom: 20px;
+}
+@media (max-width: 600px) {
+  .edit-profile-tab {
+    max-width: 90%;
+    padding: 70px;
+    max-height: 500px;
+    margin: 110px auto; /* Reduced margin for mobile */
+    box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.3);
+    align-items: center; /* Center content vertically */
+    overflow: hidden;
+    
+  }
+
+  .edit-profile-tab h2 {
+    font-size: 1.5em;
+    margin-bottom: 15px;
+    
+  }
 }
 
 .submit-btn-password {
@@ -907,6 +942,7 @@
   .user-interface {
     min-width: 320px;
   }
+  
 
   .user-header {
     position: fixed;

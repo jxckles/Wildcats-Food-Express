@@ -1,6 +1,6 @@
 import './MainContent.css';
 import { Link } from "react-router-dom";
-import catImage from "../assets/chef.png";
+import catImage from "/mainlogo.svg";
 
 const MainContent = () => {
     return (
