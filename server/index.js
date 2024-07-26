@@ -1,3 +1,7 @@
+require('dotenv').config();
+const ACCESS_TOKEN = process.env.ACCESS_TOKEN;
+const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
+const PORT = process.env.PORT;
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -58,10 +62,7 @@ app.use(
 // Static folder for images
 app.use("/Images", express.static(path.join(__dirname, "public/Images")));
 
-mongoose.connect(
-  "mongodb+srv://castroy092003:7xiHqTSiUKH0ZIf4@wildcats-food-express.7w2snhk.mongodb.net/User?retryWrites=true&w=majority&appName=Wildcats-Food-Express"
-);
-
+mongoose.connect(process.env.MONGODB_URL, { useNewUrlParser: true, useUnifiedTopology: true });
 // Multer configuration for receipt upload
 const receiptStorage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -104,12 +105,12 @@ app.post("/Login", (req, res) => {
           const userName = user.firstName + " " + user.lastName;
           const accessToken = jwt.sign(
             { email: email, role: role },
-            "jwt-access-token-secret-key",
+            ACCESS_TOKEN,
             { expiresIn: "7d" } // Access token valid for 2 days
           );
           const refreshToken = jwt.sign(
             { email: email, role: role },
-            "jwt-refresh-access-token-secret-key",
+           REFRESH_TOKEN,
             { expiresIn: "7d" } // Refresh token valid for 2 days
           );
           res.cookie("accessToken", accessToken, { maxAge: 15 * 60 * 1000 }); // 15 minutes
@@ -140,7 +141,7 @@ const verifyUser = (req, res, next) => {
       .json({ valid: false, message: "Access token missing" });
   }
 
-  jwt.verify(accessToken, "jwt-access-token-secret-key", (err, decoded) => {
+  jwt.verify(accessToken, ACCESS_TOKEN, (err, decoded) => {
     if (err) {
       return res
         .status(401)
@@ -161,14 +162,14 @@ const renewToken = (req, res) => {
   } else {
     jwt.verify(
       refreshToken,
-      "jwt-refresh-access-token-secret-key",
+     REFRESH_TOKEN,
       (err, decoded) => {
         if (err) {
           return res.json({ valid: false, message: "Invalid Refresh Token" });
         } else {
           const accessToken = jwt.sign(
             { email: decoded.email, role: decoded.role },
-            "jwt-access-token-secret-key",
+            ACCESS_TOKEN,
             { expiresIn: "1m" }
           );
           res.cookie("accessToken", accessToken, { maxAge: 60000 });
@@ -222,7 +223,7 @@ app.post("/forgot-password", async (req, res) => {
       return res.json({ message: "User not registered" });
     }
 
-    const token = jwt.sign({ id: user._id }, "jwt-access-token-secret-key", {
+    const token = jwt.sign({ id: user._id }, ACCESS_TOKEN, {
       expiresIn: "5m",
     });
 
@@ -258,7 +259,7 @@ app.post("/reset-password/:token", async (req, res) => {
   const { password } = req.body;
 
   try {
-    const decoded = jwt.verify(token, "jwt-access-token-secret-key");
+    const decoded = jwt.verify(token, ACCESS_TOKEN);
     const user = await UserModel.findById(decoded.id);
     if (!user) {
       return res
@@ -717,7 +718,7 @@ app.put("/orders/:orderId/status", async (req, res) => {
 });
 
 // Change app.listen to server.listen
-server.listen(5000, () => {
+server.listen(PORT, () => {
   console.log("Server is running on port 5000");
 });
 
