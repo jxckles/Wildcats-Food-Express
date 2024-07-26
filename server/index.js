@@ -3,6 +3,7 @@ const ACCESS_TOKEN = process.env.ACCESS_TOKEN;
 const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
 const PORT = process.env.PORT;
 const express = require("express");
+const router = require ("./routes");
 const cors = require("cors");
 const app = express();
 const mongoose = require("mongoose");
@@ -21,11 +22,15 @@ const QRCode = require("./models/QRCode.js");
 const GCash = require('./models/GCash');
 
 app.use(express.static(path.join(__dirname, "dist")));
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname,"dist/index.html"))
+
+app.use("/api", router);
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 
+
+app.use("/api",router);
 
 const http = require("http");
 const socketIo = require("socket.io");
@@ -33,7 +38,7 @@ const socketIo = require("socket.io");
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: "http://localhost:5000",
     methods: ["GET", "POST"],
   },
 });
@@ -57,7 +62,7 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: ["http://localhost:5000"],
     credentials: true,
   })
 );
@@ -249,7 +254,7 @@ app.post("/forgot-password", async (req, res) => {
       from: "wildcatfoodexpress@gmail.com",
       to: email,
       subject: "Reset Password",
-      text: `http://localhost:5173/reset-password/${token}`,
+      text: `http://localhost:5000/reset-password/${token}`,
     };
 
     transporter.sendMail(mailOptions, function (error, info) {

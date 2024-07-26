@@ -1,34 +1,38 @@
-// POST /todos
-router.post("/", (req, res) => {
-    res.status(201).json({ msg: "POST REQUEST TO /api/todos" });
-  });
-  
+const express = require('express');
+const router = express.Router();
 
-  router.post("/Login:", (req, res) => {
-    res.status(200).json({ msg: "POST REQUEST TO /api/login/:id" });
-  });
+router.post("/login", (req, res) => {
+  res.status(200).json({ msg: "POST REQUEST TO /api/login" });
+});
 
-  router.post("/signup", (req, res) => {
-    res.status(200).json({ msg: "POST REQUEST TO /api/signup/:id" });
-  });
-  
-  router.post("/dashboard", (req, res) => {
-    res.status(200).json({ msg: "POST REQUEST TO /api/dashboard/:id" });
-  });
+router.post("/register", (req, res) => {
+  res.status(200).json({ msg: "POST REQUEST TO /api/register" });
+});
 
-  router.post("/client-interface", (req, res) => {
-    res.status(200).json({ msg: "POST REQUEST TO /api/client-interface/:id" });
-  });
-  
+router.get("/admin", (req, res) => {
+  res.status(200).json({ msg: "GET REQUEST TO /api/admin" });
+});
 
-  router.post("/logout", (req, res) => {
-    res.status(200).json({ msg: "POST REQUEST TO /api/logout/:id" });
-  });
-  
-  router.post("/forgot-password", (req, res) => {
-    res.status(200).json({ msg: "POST REQUEST TO /api/forgot-password/:id" });
-  });
-  
-  
-  
-  module.exports = router;
+router.get("/dashboard", (req, res) => {
+  res.status(200).json({ msg: "GET REQUEST TO /api/dashboard" });
+});
+
+router.get("/client-interface", (req, res) => {
+  res.status(200).json({ msg: "GET REQUEST TO /api/client-interface" });
+});
+
+router.post("/logout", (req, res) => {
+  res.status(200).json({ msg: "POST REQUEST TO /api/logout" });
+});
+
+router.post("/forgot-password", (req, res) => {
+  res.status(200).json({ msg: "POST REQUEST TO /api/forgot-password" });
+});
+
+router.post("/reset-password/:token", (req, res) => {
+  res.status(200).json({ msg: "POST REQUEST TO /api/reset-password/:token" });
+});
+
+// Add other routes as needed
+
+module.exports = router;
