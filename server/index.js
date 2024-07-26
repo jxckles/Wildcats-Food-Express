@@ -29,9 +29,6 @@ app.get("*", (req, res) => {
 });
 
 
-
-app.use("/api",router);
-
 const http = require("http");
 const socketIo = require("socket.io");
 
