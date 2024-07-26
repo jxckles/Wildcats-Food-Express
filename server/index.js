@@ -3,15 +3,9 @@ const ACCESS_TOKEN = process.env.ACCESS_TOKEN;
 const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
 const PORT = process.env.PORT;
 const express = require("express");
-const mongoose = require("mongoose");
 const cors = require("cors");
-const corsConfig = {
-  origin:"*",
-  credential: true,
-  methods:["GET", "POST", "PUT", "DELETE" ],
-};
-app.options("", cors(corsConfig));
-app.use(cors(corsConfig));
+const app = express();
+const mongoose = require("mongoose");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
@@ -21,7 +15,6 @@ const Order = require("./models/Order");
 const History = require("./models/History.js");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
-const app = express();
 const nodemailer = require("nodemailer");
 const ClientOrder = require("./models/ClientOrder");
 const QRCode = require("./models/QRCode.js");
@@ -61,13 +54,13 @@ io.on("connection", (socket) => {
 app.use(express.json());
 app.use(cookieParser());
 
-/* for local test
+
 app.use(
   cors({
     origin: ["http://localhost:5173"],
     credentials: true,
   })
-);*/
+);
 
 
 
