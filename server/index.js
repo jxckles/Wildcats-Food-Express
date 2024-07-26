@@ -24,10 +24,14 @@ const GCash = require('./models/GCash');
 app.use(express.static(path.join(__dirname, "dist")));
 
 app.use("/api", router);
-app.get("/", (req, res) => {
+
+app.get('*', (req, res) => {
+  // Don't serve index.html for API routes
+  if (req.url.startsWith('/api/')) {
+    return res.status(404).send('API route not found');
+  }
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
-
 
 const http = require("http");
 const socketIo = require("socket.io");
