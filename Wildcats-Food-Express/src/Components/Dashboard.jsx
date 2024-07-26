@@ -3,7 +3,7 @@ import axios from "axios";
 import io from "socket.io-client";
 import "./dashboard.css";
 import logo from '/finallogo.svg';
-import profileIcon from "/cat_profile.svg";
+import logoMobile from '/logo1.svg';
 import cartIcon from "/shopping_cart.svg";
 import { useNavigate } from "react-router-dom";
 
@@ -34,6 +34,7 @@ const UserInterface = () => {
   const [mobileNotification, setMobileNotification] = useState(null);
   const [notificationPermission, setNotificationPermission] = useState(false);
   const [receiptFile, setReceiptFile] = useState(null);
+   const [isCartPopupOpen, setIsCartPopupOpen] = useState(false);
 
   /* FOR AUTHENTICATION */
   const [message, setMessage] = useState();
@@ -125,12 +126,15 @@ const UserInterface = () => {
                 : order
             )
           );
+          const statusMessage = `Your Order ${updatedOrder.studentNumber || "Unknown"} status has been updated to ${updatedOrder.status}`;
           addNotification(
-            `Your Order ${updatedOrder.studentNumber || "Unknown"} status has been updated`,
+            statusMessage,
             updatedOrder._id,
             updatedOrder.status,
             updatedOrder.studentNumber || "Unknown"
-          );        }
+          );
+          showMobileNotification(statusMessage);
+        }
       });
 
       return () => {
@@ -138,7 +142,6 @@ const UserInterface = () => {
       };
     }
   }, [socket]);
-
   
   const addNotification = (message, orderId, status, studentNumber) => {
     if (!message) {
@@ -192,7 +195,7 @@ const UserInterface = () => {
   const showMobileNotification = (message) => {
     // For mobile, we'll update the UI to show a notification
     setMobileNotification(message);
-    setTimeout(() => setMobileNotification(null), 7000); // Hide after 1000ms => 1 second
+    setTimeout(() => setMobileNotification(null), 10000); // Hide after 1000ms => 1 second
   };
   
   const showDesktopNotification = (message, orderId) => {
@@ -494,8 +497,26 @@ const UserInterface = () => {
   };
 
   const toggleCartMenu = () => {
-    setIsCartMenuOpen(!isCartMenuOpen);
+    if (window.innerWidth <= 768) {
+      setIsCartPopupOpen(!isCartPopupOpen);
+    } else {
+      setIsCartMenuOpen(!isCartMenuOpen);
+    }
   };
+
+  const renderCartPopup = () => {
+    if (!isCartPopupOpen) return null;
+  
+    return (
+      <div className="cart-popup-overlay">
+        <div className="cart-popup-content">
+          <button className="close-popup" onClick={() => setIsCartPopupOpen(false)}>×</button>
+          {renderOrderSummary()}
+        </div>
+      </div>
+    );
+  };
+
 
   const openUserRolesModal = () => {
     setIsUserRolesModalOpen(true);
@@ -534,6 +555,7 @@ const UserInterface = () => {
     }
   };
 
+  
   const renderMenus = () => {
     const filteredMenuItems = menuItems.filter((item) =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -654,6 +676,66 @@ const UserInterface = () => {
       </div>
     );
   };
+
+  const renderOrderSummary = () => {
+    return (
+      <div className="order-summary-pop-up">
+        <h2>Place Order</h2>
+        <input
+                type="text"
+                placeholder="Enter School ID (xx-xxxx-xxx)"
+                value={schoolId}
+                onChange={(e) => setSchoolId(e.target.value)}
+                className="school-id-input-mobile"
+              />
+                {cart.map((item) => {
+                  const menuItem = menuItems.find(
+                    (menuItem) => menuItem._id === item._id
+                  );
+                  const isOutOfStock = menuItem ? menuItem.quantity <= 0 : true;
+
+                  return (
+                    <div key={item._id} className="cart-item">
+                      <span>{item.name}</span>
+                      <span>₱{item.price.toFixed(2)}</span>
+                      <div className="quantity-controls">
+                        <button onClick={() => handleRemoveFromCart(item)}>
+                          -
+                        </button>
+                        <span>{item.quantity}</span>
+                        <button
+                          onClick={() => handleAddToCart(menuItem)}
+                          disabled={isOutOfStock}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}        <div className="order-total">
+          <p>Total: ₱{calculateTotal().toFixed(2)}</p>
+        </div>
+        <div className="order-actions">
+          <button onClick={handleCancelOrder} className="cancel-order-btn-mobile">
+            Cancel Order
+          </button>
+          <button onClick={handlePlaceOrder} className="place-order-btn-mobile">
+            Checkout
+          </button>
+          <button className="back-order-btn-mobile"
+            onClick={() => {
+              setActiveTab("menus");
+              setIsCartPopupOpen(false);
+            }}
+          >
+            Go back
+          </button>
+
+        </div>
+      </div>
+    );
+  };
+
   const renderOrders = () => {
     return (
       <div className="orders-tab-user">
@@ -1298,7 +1380,7 @@ const UserInterface = () => {
   };
 
   return (
-    <div className="user-interface">
+    <div className="user-interface">         
             {mobileNotification && (
       <div className="mobile-notification">
         {mobileNotification}
@@ -1306,12 +1388,16 @@ const UserInterface = () => {
     )}
       <header className="user-header">
         <div className="logo-and-nav">
-          <div className="logo-section">
-            
+          <div className="logo-section">         
+            <img
+                src={logoMobile}
+                alt="Wildcat Food Express Logo"
+                className="loglog-mobile"
+              />
             <img
               src={logo}
               alt="Wildcat Food Express Logo"
-              className="loglog"
+              className="loglog-desktop"
             />
           </div>
           <nav className="user-nav">
@@ -1353,18 +1439,26 @@ const UserInterface = () => {
             </span>
           </div>
           <div className="menu-container-dashboard">
-            <img
-              src={cartIcon}
-              alt="Cart"
-              className="cart"
-              onClick={toggleCartMenu}
-            />
-            {isCartMenuOpen && (
+          <img
+            src={cartIcon}
+            alt="Cart"
+            className="cart"
+            onClick={toggleCartMenu}
+          />
+          {window.innerWidth <= 768 ? (
+            isCartMenuOpen && (
               <div className="user-cart-menu">
                 <p>{cart.length} items in cart</p>
               </div>
-            )}
-          </div>
+            )
+          ) : (
+            isCartMenuOpen && (
+              <div className="user-cart-menu">
+                <p>{cart.length} items in cart</p>
+              </div>
+            )
+          )}
+         </div>
         </div>
       </header>
       <main className="user-main">
@@ -1376,6 +1470,7 @@ const UserInterface = () => {
         {activeTab === "editProfile" && renderEditProfile()}
       </main>
       {isUserRolesModalOpen && renderUserRolesModal()}
+      {renderCartPopup()}
     </div>
   );
 };
