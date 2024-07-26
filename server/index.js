@@ -27,6 +27,12 @@ const ClientOrder = require("./models/ClientOrder");
 const QRCode = require("./models/QRCode.js");
 const GCash = require('./models/GCash');
 
+app.use(express.static(path.join(__dirname, "dist")));
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname,"dist/index.html"))
+});
+
+
 
 const http = require("http");
 const socketIo = require("socket.io");
