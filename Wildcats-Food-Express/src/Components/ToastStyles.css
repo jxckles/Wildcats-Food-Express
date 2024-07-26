@@ -1,18 +1,63 @@
 /* ToastStyles.css */
 .Toastify__toast-theme--colored.Toastify__toast--success {
-    background-color: #4caf50;
-  }
-  
-  .Toastify__toast-theme--colored.Toastify__toast--error {
-    background-color: #f44336;
-  }
-  
+  background-color: #4caf50;
+}
+
+.Toastify__toast-theme--colored.Toastify__toast--error {
+  background-color: #f44336;
+}
+
+.Toastify__toast {
+  position: relative;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* Tablet styles */
+@media (max-width: 1024px) {
   .Toastify__toast {
-    position: relative;
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    font-weight: bold;
-    text-align: center;
-    width: 120%;
-    max-width: 500px;
+    font-size: 14px;
+    max-width: 400px;
   }
+}
+
+/* Mobile styles */
+@media (max-width: 767px) {
+  .Toastify__toast {
+    font-size: 12px;
+    max-width: 300px;
+    padding: 8px 12px;
+  }
+
+  .Toastify__toast-body {
+    margin: 0;
+  }
+
+  .Toastify__close-button {
+    padding: 4px;
+  }
+}
+
+/* Ensure toast container is responsive */
+.Toastify__toast-container {
+  width: 100%;
+  max-width: 100%;
+  padding: 0 15px;
+  box-sizing: border-box;
+}
+
+/* Adjust toast position for mobile */
+@media (max-width: 767px) {
+  .Toastify__toast-container--top-center {
+    top: 1em;
+  }
+  
+  .Toastify__toast-container--bottom-center {
+    bottom: 1em;
+  }
+}
