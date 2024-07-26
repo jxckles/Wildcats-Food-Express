@@ -14,36 +14,39 @@ const Login = () => {
   const navigate = useNavigate();
 
   axios.defaults.withCredentials = true;
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    axios
-      .post("https://wildcats-food-express.onrender.com/api/Login", {
+    try {
+      const res = await axios.post("https://wildcats-food-express.onrender.com/api/Login", {
         email,
         password,
-      })
-      .then((result) => {
-        axios
-          .post("https://wildcats-food-express.onrender.com/api/Login", { email, password })
-          .then((res) => {
-            localStorage.setItem("userID", res.data.userID);
-            localStorage.setItem("userName", res.data.userName);
-            if (res.data.role === "Admin") {
-              showSuccessToast("Login successful! Welcome Admin!");
-              setTimeout(() => navigate("/admin"), 2000);
-            } else if (res.data.role === "User") {
-              showSuccessToast("Login successful! Welcome!");
-              setTimeout(() => navigate("/dashboard"), 2000);
-            } else {
-              showErrorToast("Login failed! Invalid Email or Password.");
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-            toast.error("Login error! Please check your connection.");
-          });
       });
+  
+      if (res.data.role) {
+        localStorage.setItem("userID", res.data.userID);
+        localStorage.setItem("userName", res.data.userName);
+  
+        if (res.data.role === "Admin") {
+          showSuccessToast("Login successful! Welcome Admin!");
+          setTimeout(() => navigate("/admin"), 2000);
+        } else if (res.data.role === "User") {
+          showSuccessToast("Login successful! Welcome!");
+          setTimeout(() => navigate("/dashboard"), 2000);
+        }
+      } else {
+        showErrorToast(res.data || "Login failed! Invalid Email or Password.");
+      }
+    } catch (err) {
+      console.error(err);
+      if (err.response) {
+        showErrorToast(err.response.data.message || "Login failed. Please try again.");
+      } else if (err.request) {
+        showErrorToast("Network error. Please check your connection.");
+      } else {
+        showErrorToast("An unexpected error occurred. Please try again.");
+      }
+    }
   };
-
   const showSuccessToast = (message) => {
     toast.success(message, {
       position: "top-center",
