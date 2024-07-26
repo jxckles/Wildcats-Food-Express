@@ -5,6 +5,12 @@ const PORT = process.env.PORT;
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const corsConfig = {
+  origin:"*",
+  credential: true,
+  methods:["GET", "POST", "PUT", "DELETE" ],
+};
+app.use(cors(corsConfig));
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
@@ -55,7 +61,7 @@ app.use(
     credentials: true,
   })
 );*/
-app.use(cors());
+
 
 
 app.use(
