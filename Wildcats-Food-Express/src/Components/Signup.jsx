@@ -33,7 +33,7 @@ const Signup = () => {
     }
 
     axios
-      .post("https://wildcats-food-express.onrender.com/api/Register", {
+      .post("https://wildcats-food-express.onrender.com/Register", {
         firstName,
         lastName,
         courseYear,

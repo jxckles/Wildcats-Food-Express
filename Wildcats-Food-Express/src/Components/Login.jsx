@@ -17,7 +17,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("https://wildcats-food-express.onrender.com/api/Login", {
+      const res = await axios.post("https://wildcats-food-express.onrender.com/Login", {
         email,
         password,
       });

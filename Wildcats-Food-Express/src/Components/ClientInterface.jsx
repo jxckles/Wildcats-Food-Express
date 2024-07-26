@@ -26,7 +26,7 @@ const ClientInterface = () => {
 
   useEffect(() => {
     axios
-      .get("https://wildcats-food-express.onrender.com/api/admin")
+      .get("https://wildcats-food-express.onrender.com/admin")
       .then((res) => {
         if (res.data.valid) {
           setMessage(res.data.message);
@@ -57,11 +57,11 @@ const ClientInterface = () => {
 
   const fetchMenuItems = async () => {
     try {
-      const response = await axios.get("https://wildcats-food-express.onrender.com/api/menu");
+      const response = await axios.get("https://wildcats-food-express.onrender.com/menu");
       const menuData = response.data.map((item) => ({
         ...item,
         image: item.image
-          ? `https://wildcats-food-express.onrender.com/api/Images/${item.image.split("\\").pop()}`
+          ? `https://wildcats-food-express.onrender.com/Images/${item.image.split("\\").pop()}`
           : null,
       }));
       setMenuItems(menuData);
@@ -73,7 +73,7 @@ const ClientInterface = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await axios.get("https://wildcats-food-express.onrender.com/api/orders");
+      const response = await axios.get("https://wildcats-food-express.onrender.com/orders");
       setOrders(response.data);
     } catch (error) {
       console.error("Error fetching orders:", error);
@@ -84,7 +84,7 @@ const ClientInterface = () => {
 
   const fetchClientOrders = async () => {
     try {
-      const response = await axios.get("https://wildcats-food-express.onrender.com/api/clientorders");
+      const response = await axios.get("https://wildcats-food-express.onrender.com/clientorders");
       setClientOrders(response.data);
     } catch (error) {
       console.error("Error fetching client orders:", error);
@@ -99,7 +99,7 @@ const ClientInterface = () => {
     try {
       // Fetch the current available quantity from the database
       const response = await axios.get(
-        `https://wildcats-food-express.onrender.com/api/menu/${item._id}/quantity`
+        `https://wildcats-food-express.onrender.com/menu/${item._id}/quantity`
       );
       const availableQuantity = response.data.quantity;
 
@@ -149,7 +149,7 @@ const ClientInterface = () => {
 
   const updateMenuItemQuantity = async (itemId, change) => {
     try {
-      await axios.post("https://wildcats-food-express.onrender.com/api/update-quantity", {
+      await axios.post("https://wildcats-food-express.onrender.com/update-quantity", {
         itemId,
         quantityChange: change,
       });
@@ -203,7 +203,7 @@ const ClientInterface = () => {
 
     try {
       const response = await axios.post(
-        "https://wildcats-food-express.onrender.com/api/clientorders",
+        "https://wildcats-food-express.onrender.com/clientorders",
         order,
         {
           headers: {
