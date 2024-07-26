@@ -195,7 +195,7 @@ const UserInterface = () => {
   const showMobileNotification = (message) => {
     // For mobile, we'll update the UI to show a notification
     setMobileNotification(message);
-    setTimeout(() => setMobileNotification(null), 10000); // Hide after 1000ms => 1 second
+    setTimeout(() => setMobileNotification(null), 7000); // Hide after 1000ms => 1 second
   };
   
   const showDesktopNotification = (message, orderId) => {
