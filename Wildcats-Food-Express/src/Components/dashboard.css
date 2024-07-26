@@ -987,8 +987,9 @@
 
   .payment-container {
     width: 90%;
-    padding: 10px;
+    margin-top: 30%;
     box-shadow: none;
+    padding: 10px;
   }
 
   .payment-content {
