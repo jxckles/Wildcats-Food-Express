@@ -14,7 +14,7 @@ const ForgotPassword = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
-      .post("https://wildcats-food-express.onrender.com/forgot-password", { email })
+      .post("http://localhost:5000/forgot-password", { email })
       .then((response) => {
         if (response.data.status === true) {
           toast.success("Password reset link sent to your email!");
