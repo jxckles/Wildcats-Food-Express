@@ -23,16 +23,16 @@ const GCash = require('./models/GCash');
 
 app.use(express.static(path.join(__dirname, "dist")));
 
-app.use("/api", router);
+app.use("https://wildcats-food-express.onrender.com", router);
 
 // Serve index.html for the root route
-app.get("/", (req, res) => {
+app.get("https://wildcats-food-express.onrender.com/", (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 app.get('*', (req, res) => {
   // Don't serve index.html for API routes
-  if (req.url.startsWith('/api/')) {
+  if (req.url.startsWith('https://wildcats-food-express.onrender.com/')) {
     return res.status(404).send('API route not found');
   }
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
