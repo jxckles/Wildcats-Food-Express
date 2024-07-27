@@ -23,14 +23,16 @@ const GCash = require('./models/GCash');
 
 app.use(express.static(path.join(__dirname, "dist")));
 
-app.use("https://wildcats-food-express.onrender.com", router);
+app.use("/", router);
 
 // Serve index.html for the root route
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
 
 const http = require("http");
 const socketIo = require("socket.io");
