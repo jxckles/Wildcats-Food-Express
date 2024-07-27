@@ -37,7 +37,7 @@ const socketIo = require("socket.io");
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "*",
+    origin: "https://wildcats-food-express.onrender.com",
     methods: ["GET", "POST"],
   },
 });
@@ -61,7 +61,7 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: ["*"],
+    origin: ["https://wildcats-food-express.onrender.com"],
     credentials: true,
   })
 );
