@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-router.post("/login", (req, res) => {
+router.post("/Login", (req, res) => {
   res.status(200).json({ msg: "POST REQUEST TO /api/login" });
 });
 
