@@ -25,7 +25,7 @@ const ResetPassword = () => {
 
     try {
       const response = await axios.post(
-        `https://wildcats-food-express.onrender.com/reset-password/${token}`,
+        `/api/reset-password/${token}`,
         { password: newPassword } // Ensure correct field name and value
       );
 
