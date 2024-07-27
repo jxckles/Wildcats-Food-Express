@@ -23,7 +23,7 @@ const GCash = require('./models/GCash');
 
 app.use(express.static(path.join(__dirname, "dist")));
 
-app.use("/", router);
+app.use("https://wildcats-food-express.onrender.com", router);
 
 // Serve index.html for the root route
 app.get("/", (req, res) => {
