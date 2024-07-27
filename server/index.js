@@ -256,7 +256,7 @@ app.post("/forgot-password", async (req, res) => {
       from: "wildcatfoodexpress@gmail.com",
       to: email,
       subject: "Reset Password",
-      text: `http://localhost:5000/reset-password/${token}`,
+      text: `https://wildcats-food-express.onrender.com/reset-password/${token}`,
     };
 
     transporter.sendMail(mailOptions, function (error, info) {
